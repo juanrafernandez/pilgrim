@@ -14,7 +14,7 @@ func _ready() -> void:
 	chase_speed = 180.0  # Runs away
 	attack_damage = 5  # Minimal damage if cornered
 	attack_range = 50.0
-	detection_range = 300.0
+	detection_range = 500.0  # Increased to react from farther away
 	patrol_distance = 150.0
 	patrol_wait_time = 3.0
 

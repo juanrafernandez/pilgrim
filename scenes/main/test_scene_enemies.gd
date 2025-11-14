@@ -191,8 +191,8 @@ func _on_lives_changed(new_lives: int) -> void:
 
 func _on_player_respawned() -> void:
 	"""Handle player respawn from GameManager"""
-	player.respawn(spawn_position)
-	print("Player respawned at spawn position")
+	player.respawn()  # Use auto checkpoint (last safe ground position)
+	print("Player respawned at last safe position")
 
 
 func _on_game_state_changed(new_state: GameManager.GameState) -> void:

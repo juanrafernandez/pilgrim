@@ -64,10 +64,16 @@ var attack_range: float = 80.0
 # Input direction
 var input_direction: Vector2 = Vector2.ZERO
 
+# Checkpoint system (auto-save last safe ground position)
+var last_safe_position: Vector2 = Vector2.ZERO
+var checkpoint_cooldown: float = 0.0
+const CHECKPOINT_INTERVAL: float = 0.5  # Update checkpoint every 0.5 seconds when grounded
+
 
 func _ready() -> void:
 	_setup_phase(current_phase)
 	current_health = max_health
+	last_safe_position = global_position  # Initialize checkpoint
 	print("Player initialized - Phase: %s" % GameManager.PlayerPhase.keys()[current_phase])
 
 
@@ -105,6 +111,13 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor() and velocity.y >= 0:
 		if state_machine.previous_state_name == "Fall":
 			landed.emit()
+
+	# Update checkpoint when grounded (auto-save safe position)
+	if is_on_floor() and not is_dead:
+		checkpoint_cooldown -= delta
+		if checkpoint_cooldown <= 0:
+			last_safe_position = global_position
+			checkpoint_cooldown = CHECKPOINT_INTERVAL
 
 
 func _get_input_direction() -> Vector2:
@@ -163,21 +176,24 @@ func die() -> void:
 
 
 ## Respawn at a position
-func respawn(respawn_position: Vector2) -> void:
+func respawn(respawn_position: Vector2 = Vector2.ZERO) -> void:
 	"""Respawn player at checkpoint or start position"""
 	is_dead = false
 	current_health = max_health
 	health_changed.emit(current_health, max_health)
 
+	# Use last safe position if no specific position provided
+	var spawn_pos = respawn_position if respawn_position != Vector2.ZERO else last_safe_position
+
 	# Reset position
-	global_position = respawn_position
+	global_position = spawn_pos
 	velocity = Vector2.ZERO
 
 	# Reset state to idle
 	if state_machine:
 		state_machine.change_state("Idle")
 
-	print("Player respawned at: %s" % respawn_position)
+	print("Player respawned at: %s (checkpoint)" % spawn_pos)
 
 
 ## Start invincibility frames
