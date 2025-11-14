@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://vulture123456"]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_vulture.gd" id="1_vulture"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vulture"]
+size = Vector2(40, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detection"]
+radius = 500.0
+
+[node name="EnemyVulture" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_vulture")
+
+[node name="Sprite" type="ColorRect" parent="."]
+offset_left = -20.0
+offset_top = -15.0
+offset_right = 20.0
+offset_bottom = 15.0
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_vulture")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("CircleShape2D_detection")
