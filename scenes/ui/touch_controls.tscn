@@ -1,0 +1,113 @@
+[gd_scene load_steps=3 format=3 uid="uid://t1o2u3c4h5c6t7r"]
+
+[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="1_touch_controls"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_button"]
+size = Vector2(100, 100)
+
+[node name="TouchControls" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_touch_controls")
+
+[node name="ControlsContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LeftButton" type="TouchScreenButton" parent="ControlsContainer"]
+position = Vector2(80, 1720)
+scale = Vector2(1.2, 1.2)
+shape = SubResource("RectangleShape2D_button")
+
+[node name="LeftVisual" type="ColorRect" parent="ControlsContainer/LeftButton"]
+modulate = Color(1, 1, 1, 0.3)
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="LeftIcon" type="Label" parent="ControlsContainer/LeftButton"]
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 48
+text = "◀"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightButton" type="TouchScreenButton" parent="ControlsContainer"]
+position = Vector2(280, 1720)
+scale = Vector2(1.2, 1.2)
+shape = SubResource("RectangleShape2D_button")
+
+[node name="RightVisual" type="ColorRect" parent="ControlsContainer/RightButton"]
+modulate = Color(1, 1, 1, 0.3)
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="RightIcon" type="Label" parent="ControlsContainer/RightButton"]
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 48
+text = "▶"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="JumpButton" type="TouchScreenButton" parent="ControlsContainer"]
+position = Vector2(920, 1720)
+scale = Vector2(1.4, 1.4)
+shape = SubResource("RectangleShape2D_button")
+
+[node name="JumpVisual" type="ColorRect" parent="ControlsContainer/JumpButton"]
+modulate = Color(1, 1, 1, 0.3)
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+color = Color(0.2, 0.6, 1, 1)
+
+[node name="JumpIcon" type="Label" parent="ControlsContainer/JumpButton"]
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 40
+text = "JUMP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackButton" type="TouchScreenButton" parent="ControlsContainer"]
+position = Vector2(920, 1520)
+scale = Vector2(1.2, 1.2)
+shape = SubResource("RectangleShape2D_button")
+
+[node name="AttackVisual" type="ColorRect" parent="ControlsContainer/AttackButton"]
+modulate = Color(1, 1, 1, 0.3)
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+color = Color(1, 0.3, 0.2, 1)
+
+[node name="AttackIcon" type="Label" parent="ControlsContainer/AttackButton"]
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+text = "ATK"
+horizontal_alignment = 1
+vertical_alignment = 1

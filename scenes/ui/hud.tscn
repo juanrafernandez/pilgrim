@@ -1,0 +1,81 @@
+[gd_scene load_steps=2 format=3 uid="uid://h1u2d3d4i5s6p7l"]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="HUDContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="HBoxContainer" parent="HUDContainer"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_constants/separation = 30
+
+[node name="HealthContainer" type="VBoxContainer" parent="HUDContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="HealthLabel" type="Label" parent="HUDContainer/TopBar/HealthContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Health: 100/100"
+
+[node name="HealthBar" type="ProgressBar" parent="HUDContainer/TopBar/HealthContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="VirtueContainer" type="VBoxContainer" parent="HUDContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="VirtueLabel" type="Label" parent="HUDContainer/TopBar/VirtueContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "Virtue: 0"
+
+[node name="VirtueBar" type="ProgressBar" parent="HUDContainer/TopBar/VirtueContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+max_value = 1000.0
+show_percentage = false
+
+[node name="InfoContainer" type="VBoxContainer" parent="HUDContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+alignment = 2
+
+[node name="LevelLabel" type="Label" parent="HUDContainer/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "Level 1 - Child"
+horizontal_alignment = 2
+
+[node name="LivesLabel" type="Label" parent="HUDContainer/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 24
+text = "Lives: 3"
+horizontal_alignment = 2
