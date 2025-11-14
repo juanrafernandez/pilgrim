@@ -149,11 +149,35 @@ func _perform_attack() -> void:
 	"""Perform attack and check for hits"""
 	print("Player attacks!")
 
-	# Get attack area
-	var attack_position = global_position + Vector2(attack_range if sprite.scale.x > 0 else -attack_range, 0)
+	# Get attack direction
+	var attack_dir = 1.0 if sprite.scale.x > 0 else -1.0
+	var attack_position = global_position + Vector2(attack_range * attack_dir, 0)
 
-	# Check for enemies in range (will implement when we have enemies)
-	# For now, just visual feedback
+	# Check for enemies in range
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsShapeQueryParameters2D.new()
+
+	# Create attack hitbox (rectangle)
+	var shape = RectangleShape2D.new()
+	shape.size = Vector2(attack_range, 80)
+	query.shape = shape
+	query.transform = Transform2D(0, attack_position)
+	query.collision_mask = 4  # Enemy layer
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	# Query for overlapping enemies
+	var results = space_state.intersect_shape(query, 10)
+
+	# Damage all hit enemies
+	for result in results:
+		var body = result["collider"]
+		if body.has_method("take_damage"):
+			var knockback = Vector2(attack_dir * 200, -100)
+			body.take_damage(attack_damage, knockback)
+			print("Player hit %s for %d damage!" % [body.name, attack_damage])
+
+	# Visual feedback
 	_show_attack_effect(attack_position)
 
 

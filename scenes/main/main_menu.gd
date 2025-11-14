@@ -20,6 +20,11 @@ func _on_btn_test_scene_pressed() -> void:
 	SceneManager.load_scene("res://scenes/main/test_scene_v2.tscn")
 
 
+func _on_btn_test_enemies_pressed() -> void:
+	print("Test Enemies clicked")
+	SceneManager.load_scene("res://scenes/main/test_scene_enemies.tscn")
+
+
 func _on_btn_quit_pressed() -> void:
 	print("Quit clicked")
 	get_tree().quit()

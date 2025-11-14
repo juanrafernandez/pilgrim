@@ -1,0 +1,105 @@
+[gd_scene load_steps=6 format=3 uid="uid://test_enemies"]
+
+[ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://cow123456" path="res://scenes/enemies/enemy_cow.tscn" id="2_cow"]
+[ext_resource type="PackedScene" uid="uid://wolf123456" path="res://scenes/enemies/enemy_wolf.tscn" id="3_wolf"]
+[ext_resource type="PackedScene" uid="uid://boar123456" path="res://scenes/enemies/enemy_boar.tscn" id="4_boar"]
+[ext_resource type="Script" path="res://scenes/main/test_scene_enemies.gd" id="5_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(2000, 220)
+
+[node name="TestSceneEnemies" type="Node2D"]
+script = ExtResource("5_script")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1080.0
+offset_bottom = 1920.0
+color = Color(0.15, 0.2, 0.25, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(200, 1600)
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(0, 1700)
+collision_layer = 2
+collision_mask = 5
+
+[node name="GroundSprite" type="ColorRect" parent="Ground"]
+offset_right = 2000.0
+offset_bottom = 220.0
+color = Color(0.35, 0.25, 0.15, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2(1000, 110)
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Cow1" parent="Enemies" instance=ExtResource("2_cow")]
+position = Vector2(500, 1650)
+
+[node name="Wolf1" parent="Enemies" instance=ExtResource("3_wolf")]
+position = Vector2(800, 1650)
+
+[node name="Boar1" parent="Enemies" instance=ExtResource("4_boar")]
+position = Vector2(1100, 1650)
+
+[node name="Cow2" parent="Enemies" instance=ExtResource("2_cow")]
+position = Vector2(1400, 1650)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InfoLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1060.0
+offset_bottom = 350.0
+theme_override_font_sizes/font_size = 26
+text = "PRUEBA DE ENEMIGOS
+
+Controles:
+A/D: Mover
+Espacio: Saltar
+J/Z: Atacar
+ESC: Men\u00fa
+
+Enemigos:
+🐄 VACA (marr\u00f3n) - Pasiva, huye del jugador
+🐺 LOBO (gris) - Agresiva, persigue r\u00e1pido
+🐗 JABAL\u00cd (marr\u00f3n oscuro) - Carga al jugador
+
+¡Prueba el combate!"
+
+[node name="HealthBar" type="ProgressBar" parent="UI"]
+offset_left = 20.0
+offset_top = 380.0
+offset_right = 420.0
+offset_bottom = 420.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 430.0
+offset_right = 420.0
+offset_bottom = 470.0
+theme_override_font_sizes/font_size = 24
+text = "Salud: 100/100"
+
+[node name="EnemyCountLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 480.0
+offset_right = 420.0
+offset_bottom = 520.0
+theme_override_font_sizes/font_size = 24
+text = "Enemigos: 4"
+
+[node name="DebugLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 1820.0
+offset_right = 1060.0
+offset_bottom = 1900.0
+theme_override_font_sizes/font_size = 22
+text = "FPS: 60"
