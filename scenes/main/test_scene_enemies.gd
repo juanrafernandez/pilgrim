@@ -7,7 +7,7 @@ extends Node2D
 @onready var camera: CameraController = $Camera
 @onready var enemies_node: Node2D = $Enemies
 @onready var death_zone: Area2D = $DeathZone
-@onready var arcade_hud: ArcadeHUD = $ArcadeHUD
+@onready var arcade_hud = $ArcadeHUD  # Type inferred from scene
 @onready var enemy_count_label: Label = $DebugUI/EnemyCountLabel
 @onready var debug_label: Label = $DebugUI/DebugLabel
 

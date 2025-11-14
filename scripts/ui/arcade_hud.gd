@@ -3,6 +3,7 @@ class_name ArcadeHUD
 
 ## Arcade-style HUD
 ## Minimal, clean interface inspired by Ghosts 'n Goblins and Maldita Castilla
+## Displays score, lives, weapon, and health
 
 # UI Elements
 @onready var score_label: Label = $HUDContainer/VBox/TopRow/ScoreLabel
