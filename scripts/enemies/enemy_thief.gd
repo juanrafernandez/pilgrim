@@ -25,12 +25,12 @@ func _ready() -> void:
 	patrol_wait_time = 1.5
 	attack_cooldown = 2.0
 
+	super._ready()
+
 	# Thief can jump (agile human)
 	can_jump = true
 	jump_velocity = -500.0  # High jump
 	max_jump_distance = 200.0  # Can jump far
-
-	super._ready()
 
 
 func _physics_process(delta: float) -> void:

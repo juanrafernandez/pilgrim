@@ -31,12 +31,12 @@ func _ready() -> void:
 	patrol_wait_time = 3.0
 	attack_cooldown = 2.5  # Slow but powerful attacks
 
+	super._ready()
+
 	# Knight can jump (armored but capable)
 	can_jump = true
 	jump_velocity = -350.0  # Heavy jump
 	max_jump_distance = 120.0  # Limited jump distance
-
-	super._ready()
 
 
 func _physics_process(delta: float) -> void:

@@ -48,12 +48,13 @@ func _ready() -> void:
 	patrol_wait_time = 1.0
 	attack_cooldown = 1.0  # Fast attacks
 
+	super._ready()
+
 	# Boss can jump
 	can_jump = true
 	jump_velocity = -450.0
 	max_jump_distance = 200.0
 
-	super._ready()
 	print("=== BOSS BATTLE: CURSED KNIGHT ===")
 
 

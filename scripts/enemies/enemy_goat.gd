@@ -23,12 +23,12 @@ func _ready() -> void:
 	patrol_wait_time = 2.0
 	attack_cooldown = 1.5
 
+	super._ready()
+
 	# Goat can jump (agile animal)
 	can_jump = true
 	jump_velocity = -420.0
 	max_jump_distance = 160.0
-
-	super._ready()
 
 
 func take_damage(amount: int, knockback_direction: Vector2 = Vector2.ZERO) -> void:
