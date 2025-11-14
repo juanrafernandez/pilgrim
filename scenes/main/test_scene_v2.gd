@@ -31,6 +31,9 @@ func _ready() -> void:
 	# Initialize UI
 	_update_ui()
 
+	# Improve UI readability
+	_setup_ui_backgrounds()
+
 
 func _physics_process(_delta: float) -> void:
 	_update_debug_info()
@@ -115,3 +118,17 @@ func _on_death_zone_entered(body: Node2D) -> void:
 
 func _on_state_changed(new_state: String) -> void:
 	state_label.text = "Estado: %s" % new_state
+
+
+func _setup_ui_backgrounds() -> void:
+	"""Add text outlines for better readability"""
+	# Add outline to all labels
+	for label in [health_label, phase_label, state_label, debug_label]:
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		label.add_theme_constant_override("outline_size", 2)
+
+	# InfoLabel needs special handling
+	var info_label = $UI/InfoLabel
+	if info_label:
+		info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		info_label.add_theme_constant_override("outline_size", 2)

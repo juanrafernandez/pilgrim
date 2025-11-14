@@ -37,6 +37,9 @@ func _ready() -> void:
 	# Initialize UI
 	_update_ui()
 
+	# Improve UI readability
+	_setup_ui_backgrounds()
+
 
 func _physics_process(_delta: float) -> void:
 	_update_debug_info()
@@ -150,6 +153,8 @@ func _show_victory_message() -> void:
 	var victory_label = Label.new()
 	victory_label.text = "¡TODOS LOS ENEMIGOS DERROTADOS!"
 	victory_label.add_theme_font_size_override("font_size", 48)
+	victory_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	victory_label.add_theme_constant_override("outline_size", 4)
 	victory_label.modulate = Color(1.0, 1.0, 0.0)
 	victory_label.position = Vector2(200, 800)
 
@@ -161,3 +166,17 @@ func _show_victory_message() -> void:
 	tween.tween_property(victory_label, "modulate:a", 0.0, 1.0)
 	await tween.finished
 	victory_label.queue_free()
+
+
+func _setup_ui_backgrounds() -> void:
+	"""Add text outlines for better readability"""
+	# Add outline to all labels
+	for label in [health_label, enemy_count_label, debug_label]:
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		label.add_theme_constant_override("outline_size", 2)
+
+	# InfoLabel needs special handling (it's in UI CanvasLayer)
+	var info_label = $UI/InfoLabel
+	if info_label:
+		info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		info_label.add_theme_constant_override("outline_size", 2)

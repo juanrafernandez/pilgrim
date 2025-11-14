@@ -5,9 +5,10 @@ class_name CameraController
 ## Follows player with scrolling boundaries and backward limit
 
 @export var target: Node2D  # Player to follow
-@export var backward_limit_distance: float = 300.0  # Max distance player can go back
+@export var backward_limit_distance: float = 600.0  # Max distance player can go back
 @export var forward_buffer: float = 200.0  # Distance ahead of player camera can see
 @export var smooth_speed: float = 5.0  # Camera smoothing
+@export var vertical_offset: float = 300.0  # How far down from player to position camera
 
 var max_x_reached: float = 0.0  # Furthest right position reached
 var min_allowed_x: float = 0.0  # Left boundary (can't go further left)
@@ -45,8 +46,8 @@ func _physics_process(delta: float) -> void:
 	var new_x = lerp(global_position.x, target_x, smooth_speed * delta)
 	global_position.x = new_x
 
-	# Y follows player directly (no smoothing for vertical)
-	global_position.y = target.global_position.y
+	# Y follows player with offset (shows more ground below)
+	global_position.y = target.global_position.y + vertical_offset
 
 
 func get_left_boundary() -> float:
