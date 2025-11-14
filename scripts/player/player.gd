@@ -35,6 +35,9 @@ var is_dead: bool = false
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var state_machine: PlayerStateMachine = $StateMachine
 
+# Camera reference (optional - for boundary checking)
+var camera_controller: CameraController = null
+
 # Attack properties
 var attack_damage: int = 10
 var attack_range: float = 80.0
@@ -56,8 +59,22 @@ func _physics_process(delta: float) -> void:
 	# Let state machine handle movement
 	state_machine.physics_update(delta)
 
+	# Apply backward limit before moving
+	if camera_controller:
+		var left_boundary = camera_controller.get_left_boundary()
+		# If trying to move left and would go past boundary, clamp velocity
+		if input_direction.x < 0 and global_position.x <= left_boundary:
+			velocity.x = max(velocity.x, 0)  # Don't allow leftward velocity
+
 	# Move
 	move_and_slide()
+
+	# Enforce hard boundary after movement (in case of knockback, etc.)
+	if camera_controller:
+		var left_boundary = camera_controller.get_left_boundary()
+		if global_position.x < left_boundary:
+			global_position.x = left_boundary
+			velocity.x = max(velocity.x, 0)  # Stop leftward movement
 
 	# Check if just landed
 	if is_on_floor() and velocity.y >= 0:
@@ -241,6 +258,13 @@ func reset() -> void:
 	current_health = max_health
 	velocity = Vector2.ZERO
 	health_changed.emit(current_health, max_health)
+
+
+## Camera setup
+func set_camera_controller(camera: CameraController) -> void:
+	"""Set the camera controller for boundary checking"""
+	camera_controller = camera
+	print("Player: Camera controller set for boundary checking")
 
 
 ## Getters

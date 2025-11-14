@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dxw8yjnau57w"]
+[gd_scene load_steps=4 format=3 uid="uid://dxw8yjnau57w"]
 
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scenes/main/test_scene_v2.gd" id="2_script"]
+[ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="3_camera"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
 size = Vector2(1080, 220)
@@ -16,6 +17,12 @@ color = Color(0.2, 0.25, 0.3, 1)
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(540, 960)
+
+[node name="Camera" type="Camera2D" parent="."]
+position = Vector2(540, 960)
+script = ExtResource("3_camera")
+backward_limit_distance = 300.0
+forward_buffer = 200.0
 
 [node name="Ground" type="StaticBody2D" parent="."]
 position = Vector2(0, 1700)

@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://test_enemies"]
+[gd_scene load_steps=7 format=3 uid="uid://test_enemies"]
 
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://cow123456" path="res://scenes/enemies/enemy_cow.tscn" id="2_cow"]
 [ext_resource type="PackedScene" uid="uid://wolf123456" path="res://scenes/enemies/enemy_wolf.tscn" id="3_wolf"]
 [ext_resource type="PackedScene" uid="uid://boar123456" path="res://scenes/enemies/enemy_boar.tscn" id="4_boar"]
 [ext_resource type="Script" path="res://scenes/main/test_scene_enemies.gd" id="5_script"]
+[ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="6_camera"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
 size = Vector2(2000, 220)
@@ -19,6 +20,12 @@ color = Color(0.15, 0.2, 0.25, 1)
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(200, 1600)
+
+[node name="Camera" type="Camera2D" parent="."]
+position = Vector2(540, 960)
+script = ExtResource("6_camera")
+backward_limit_distance = 300.0
+forward_buffer = 200.0
 
 [node name="Ground" type="StaticBody2D" parent="."]
 position = Vector2(0, 1700)

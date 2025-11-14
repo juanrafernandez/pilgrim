@@ -4,6 +4,7 @@ extends Node2D
 ## Test scene for complete Player system with State Machine
 
 @onready var player: Player = $Player
+@onready var camera: CameraController = $Camera
 @onready var health_bar: ProgressBar = $UI/HealthBar
 @onready var health_label: Label = $UI/HealthLabel
 @onready var phase_label: Label = $UI/PhaseLabel
@@ -13,6 +14,9 @@ extends Node2D
 
 func _ready() -> void:
 	print("Test Scene V2 loaded - Player System Complete")
+
+	# Setup camera for player
+	player.set_camera_controller(camera)
 
 	# Connect to player signals
 	player.health_changed.connect(_on_player_health_changed)

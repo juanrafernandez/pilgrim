@@ -4,6 +4,7 @@ extends Node2D
 ## Test scene for enemy AI and combat system
 
 @onready var player: Player = $Player
+@onready var camera: CameraController = $Camera
 @onready var enemies_node: Node2D = $Enemies
 @onready var health_bar: ProgressBar = $UI/HealthBar
 @onready var health_label: Label = $UI/HealthLabel
@@ -15,6 +16,9 @@ var enemy_count: int = 0
 
 func _ready() -> void:
 	print("Test Scene Enemies loaded")
+
+	# Setup camera for player
+	player.set_camera_controller(camera)
 
 	# Connect player signals
 	player.health_changed.connect(_on_player_health_changed)
