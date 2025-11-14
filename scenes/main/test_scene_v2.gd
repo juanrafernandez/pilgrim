@@ -5,6 +5,7 @@ extends Node2D
 
 @onready var player: Player = $Player
 @onready var camera: CameraController = $Camera
+@onready var death_zone: Area2D = $DeathZone
 @onready var health_bar: ProgressBar = $UI/HealthBar
 @onready var health_label: Label = $UI/HealthLabel
 @onready var phase_label: Label = $UI/PhaseLabel
@@ -23,6 +24,9 @@ func _ready() -> void:
 	player.phase_changed.connect(_on_player_phase_changed)
 	player.died.connect(_on_player_died)
 	player.state_machine.state_changed.connect(_on_state_changed)
+
+	# Connect death zone
+	death_zone.body_entered.connect(_on_death_zone_entered)
 
 	# Initialize UI
 	_update_ui()
@@ -100,6 +104,13 @@ func _on_player_phase_changed(new_phase: GameManager.PlayerPhase) -> void:
 
 func _on_player_died() -> void:
 	print("Player died!")
+
+
+func _on_death_zone_entered(body: Node2D) -> void:
+	"""Handle player falling into death zone"""
+	if body == player:
+		print("Player fell into the pit!")
+		player.die()
 
 
 func _on_state_changed(new_state: String) -> void:

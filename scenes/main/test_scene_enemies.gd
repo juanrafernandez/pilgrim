@@ -6,6 +6,7 @@ extends Node2D
 @onready var player: Player = $Player
 @onready var camera: CameraController = $Camera
 @onready var enemies_node: Node2D = $Enemies
+@onready var death_zone: Area2D = $DeathZone
 @onready var health_bar: ProgressBar = $UI/HealthBar
 @onready var health_label: Label = $UI/HealthLabel
 @onready var enemy_count_label: Label = $UI/EnemyCountLabel
@@ -23,6 +24,9 @@ func _ready() -> void:
 	# Connect player signals
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
+
+	# Connect death zone
+	death_zone.body_entered.connect(_on_death_zone_entered)
 
 	# Connect to all enemy signals
 	_setup_enemy_connections()
@@ -114,6 +118,13 @@ func _on_player_health_changed(new_health: int, max_hp: int) -> void:
 
 func _on_player_died() -> void:
 	print("Player died in enemy test scene")
+
+
+func _on_death_zone_entered(body: Node2D) -> void:
+	"""Handle player falling into death zone"""
+	if body == player:
+		print("Player fell into the pit!")
+		player.die()
 
 
 func _on_enemy_died(enemy: Enemy) -> void:
