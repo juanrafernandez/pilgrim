@@ -1,0 +1,97 @@
+[gd_scene load_steps=3 format=3 uid="uid://dxw8yjnau57w"]
+
+[ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scenes/main/test_scene_v2.gd" id="2_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(1080, 220)
+
+[node name="TestScene" type="Node2D"]
+script = ExtResource("2_script")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1080.0
+offset_bottom = 1920.0
+color = Color(0.2, 0.25, 0.3, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(540, 960)
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(0, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="GroundSprite" type="ColorRect" parent="Ground"]
+offset_right = 1080.0
+offset_bottom = 220.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2(540, 110)
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InfoLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1060.0
+offset_bottom = 400.0
+theme_override_font_sizes/font_size = 28
+text = "ESCENA DE PRUEBA - PLAYER COMPLETO
+
+Controles:
+A/D o Flechas: Mover
+Espacio: Saltar
+J o Z: Atacar
+K: Recibir da\u00f1o (test)
+L: Cambiar fase
+ESC: Volver al men\u00fa
+
+Sistema completo con:
+- State Machine (Idle/Walk/Jump/Fall/Attack/Death)
+- Sistema de vida (100 HP)
+- 4 Fases (Ni\u00f1o/Adolescente/Caballero/Anciano)
+- Invencibilidad tras da\u00f1o"
+
+[node name="HealthBar" type="ProgressBar" parent="UI"]
+offset_left = 20.0
+offset_top = 450.0
+offset_right = 520.0
+offset_bottom = 490.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 500.0
+offset_right = 520.0
+offset_bottom = 540.0
+theme_override_font_sizes/font_size = 24
+text = "Salud: 100/100"
+
+[node name="PhaseLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 550.0
+offset_right = 520.0
+offset_bottom = 590.0
+theme_override_font_sizes/font_size = 24
+text = "Fase: NI\u00d1O"
+
+[node name="StateLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 600.0
+offset_right = 520.0
+offset_bottom = 640.0
+theme_override_font_sizes/font_size = 24
+text = "Estado: Idle"
+
+[node name="DebugLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 1820.0
+offset_right = 1060.0
+offset_bottom = 1900.0
+theme_override_font_sizes/font_size = 24
+text = "FPS: 60"
