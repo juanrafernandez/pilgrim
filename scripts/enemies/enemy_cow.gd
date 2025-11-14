@@ -24,6 +24,59 @@ func _ready() -> void:
 	super._ready()
 
 
+func _ai_idle(delta: float) -> void:
+	"""Cow idle behavior - check edges even while idle"""
+	velocity.x = move_toward(velocity.x, 0, move_speed * delta * 5)
+
+	# Even while idle, check if we're near an edge
+	if is_on_floor() and _check_edge_ahead():
+		# Step back from edge
+		facing_right = not facing_right
+		if sprite:
+			sprite.scale.x = 1.0 if facing_right else -1.0
+		# Move away from edge slightly
+		velocity.x = (1 if facing_right else -1) * move_speed * 0.3
+
+	# Check for player in range
+	if player and _is_player_in_range(detection_range):
+		change_state(State.CHASE)
+	elif patrol_timer <= 0:
+		change_state(State.PATROL)
+
+
+func _ai_patrol(delta: float) -> void:
+	"""Cow patrols carefully, ALWAYS checking edges (can't jump)"""
+	# Set patrol target if not set
+	if patrol_target == Vector2.ZERO:
+		_set_random_patrol_target()
+
+	# CRITICAL: Check for edges FIRST (cow can't jump!)
+	if _check_edge_ahead():
+		# Turn around immediately - this is top priority
+		facing_right = not facing_right
+		if sprite:
+			sprite.scale.x = 1.0 if facing_right else -1.0
+		# Reset patrol target to avoid going that direction
+		patrol_target = Vector2.ZERO
+		change_state(State.IDLE)
+		return
+
+	# Move towards patrol target
+	var direction = sign(patrol_target.x - global_position.x)
+	velocity.x = direction * patrol_speed
+	_update_sprite_direction()
+
+	# Check if reached patrol target
+	if abs(patrol_target.x - global_position.x) < 20:
+		patrol_timer = patrol_wait_time
+		patrol_target = Vector2.ZERO
+		change_state(State.IDLE)
+
+	# Check for player
+	if player and _is_player_in_range(detection_range):
+		change_state(State.CHASE)
+
+
 func _ai_chase(delta: float) -> void:
 	"""Cow runs AWAY from player instead of chasing"""
 	if not player or player.is_dead:
@@ -36,12 +89,25 @@ func _ai_chase(delta: float) -> void:
 		change_state(State.PATROL)
 		return
 
-	# Check for edges when fleeing (cow will turn around if edge ahead)
+	# CRITICAL: Check for edges when fleeing (top priority - cow can't jump!)
 	if _check_edge_ahead():
-		# Cow can't jump, so turn around if cornered
+		# Turn around to face away from edge
 		facing_right = not facing_right
 		if sprite:
 			sprite.scale.x = 1.0 if facing_right else -1.0
+
+		# If cornered between player and edge, stop and face player (prepare to panic)
+		if _is_player_in_range(attack_range * 2.0):
+			velocity.x = 0
+			# Face the player
+			facing_right = player.global_position.x > global_position.x
+			if sprite:
+				sprite.scale.x = 1.0 if facing_right else -1.0
+			return
+		else:
+			# Not cornered yet, can move along the edge
+			velocity.x = (1 if facing_right else -1) * chase_speed * 0.5
+			return
 
 	# Run AWAY from player (opposite direction)
 	var direction = -sign(player.global_position.x - global_position.x)
