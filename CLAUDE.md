@@ -33,18 +33,27 @@ This CLAUDE.md file serves as a knowledge base for AI assistants working on this
 **Repository:** juanrafernandez/pilgrim
 
 ### Purpose
-[To be filled in: Brief description of what this project does and its main goals]
+**Camino Maldito: La Cruz del Peregrino** - A 2D action arcade game in pixel-art style for iOS, set on the medieval Camino de Santiago (Way of St. James). The game combines action gameplay, Templar spirituality, and educational elements about real historical locations along the French Way pilgrimage route. Players journey through 4 life phases (childhood, adolescence, adulthood as a Templar knight, and old age) across 32 levels.
 
 ### Tech Stack
-[To be filled in as technologies are chosen]
-- **Language:** TBD
-- **Framework:** TBD
-- **Build Tool:** TBD
-- **Testing:** TBD
-- **Package Manager:** TBD
+- **Game Engine:** Godot 4.3+ (open source, 2D optimized)
+- **Language:** GDScript (primary) / C# (optional)
+- **Platform:** iOS (portrait 1080×1920)
+- **Art Style:** Pixel art 16-bit (placeholders initially)
+- **Version Control:** Git
+- **IDE:** Godot Editor + VS Code (optional)
+
+### Development Strategy
+- **Phase 1 (Current):** Development with placeholder graphics (geometric shapes, solid colors)
+- **Phase 2 (Final):** Professional pixel art and audio integration after gameplay validation
+- See `PLACEHOLDER_STRATEGY.md` for complete development approach
 
 ### Key Dependencies
-[To be filled in as dependencies are added]
+- **Godot 4.3+** (game engine)
+- **Xcode** (iOS export and testing)
+- **Git** (version control)
+- **Aseprite** (future pixel art integration, $20)
+- **Audio:** Freesound.org, Incompetech (temporary audio, free)
 
 ---
 
@@ -54,19 +63,62 @@ This CLAUDE.md file serves as a knowledge base for AI assistants working on this
 pilgrim/
 ├── .git/                    # Git repository metadata
 ├── CLAUDE.md               # This file - AI assistant guide
-├── README.md               # Project documentation (to be created)
+├── README.md               # Project overview
+├── PROJECT_ROADMAP.md      # Complete development plan
+├── AI_AGENTS_WORKSTREAM.md # AI agent task organization
+├── MOTOR_DECISION.md       # Engine selection analysis
+├── PLACEHOLDER_STRATEGY.md # Development with placeholders strategy
 ├── .gitignore             # Git ignore patterns (to be created)
-└── [Additional structure to be defined]
+├── project.godot          # Godot project file (to be created)
+├── export_presets.cfg     # iOS export configuration (to be created)
+│
+├── assets/                # Game assets (to be created)
+│   ├── sprites/          # Placeholder sprites, later pixel art
+│   ├── audio/            # Temporary audio files
+│   │   ├── music/
+│   │   └── sfx/
+│   ├── fonts/            # UI fonts
+│   └── concepts/         # AI-generated concept art (not in game)
+│
+├── scenes/               # Godot scene files (.tscn)
+│   ├── main/            # Main game scenes
+│   ├── levels/          # 32 level scenes
+│   ├── ui/              # UI/HUD scenes
+│   ├── characters/      # Player and NPC scenes
+│   └── enemies/         # Enemy scenes
+│
+├── scripts/             # GDScript files
+│   ├── core/           # Core systems (GameManager, SceneManager)
+│   ├── player/         # Player controller and states
+│   ├── enemies/        # Enemy AI scripts
+│   ├── ui/             # UI controllers
+│   ├── systems/        # Game systems (Virtue, Combat, etc.)
+│   └── data/           # Data structures and constants
+│
+├── levels/              # Level definitions (JSON)
+│   ├── phase_1/        # Childhood levels 1-8
+│   ├── phase_2/        # Adolescence levels 9-16
+│   ├── phase_3/        # Adulthood levels 17-24
+│   └── phase_4/        # Old age levels 25-32
+│
+├── tests/               # Unit tests (GDScript)
+│   ├── unit/
+│   └── integration/
+│
+└── docs/                # Additional documentation
+    ├── ARCHITECTURE.md
+    ├── GAMEPLAY.md
+    └── LEVEL_DESIGN_GUIDE.md
 ```
 
-### Directory Conventions
-[To be defined as project structure emerges]
+### Directory Conventions (Godot-specific)
 
-- **Source code:** TBD (e.g., `src/`, `lib/`, etc.)
-- **Tests:** TBD (e.g., `tests/`, `__tests__/`, `spec/`, etc.)
-- **Documentation:** TBD (e.g., `docs/`, inline in README)
-- **Configuration:** TBD (root level or `config/`)
-- **Build output:** TBD (e.g., `dist/`, `build/`, `target/`, etc.)
+- **Source code:** `scripts/` directory for all GDScript files
+- **Scenes:** `scenes/` directory for all .tscn scene files
+- **Assets:** `assets/` directory with subdirectories by type
+- **Tests:** `tests/` directory using GUT (Godot Unit Testing)
+- **Documentation:** `docs/` directory for technical docs
+- **Build output:** `builds/` directory (git-ignored)
 
 ---
 
@@ -175,11 +227,86 @@ Added null check before accessing user properties.
    - Sanitize data before use
    - Use parameterized queries for database operations
 
-### Language-Specific Conventions
-[To be filled in based on chosen language]
+### Language-Specific Conventions (GDScript)
+
+**Naming Conventions:**
+- **Classes:** PascalCase (e.g., `PlayerController`, `EnemyWolf`)
+- **Variables:** snake_case (e.g., `player_velocity`, `max_health`)
+- **Constants:** SCREAMING_SNAKE_CASE (e.g., `MAX_SPEED`, `JUMP_HEIGHT`)
+- **Functions:** snake_case (e.g., `move_player()`, `calculate_damage()`)
+- **Signals:** snake_case with past tense (e.g., `health_changed`, `enemy_died`)
+- **Private vars:** Prefix with `_` (e.g., `_internal_state`)
+
+**Code Style:**
+```gdscript
+# Good example
+extends CharacterBody2D
+class_name Player
+
+# Constants at top
+const MAX_SPEED: float = 300.0
+const JUMP_VELOCITY: float = -400.0
+
+# Signals after constants
+signal health_changed(new_health: int)
+signal died()
+
+# Exports for Inspector
+@export var max_health: int = 100
+@export var attack_damage: int = 10
+
+# Private variables
+var _current_health: int
+var _is_attacking: bool = false
+
+func _ready() -> void:
+    _current_health = max_health
+
+func _physics_process(delta: float) -> void:
+    _handle_movement(delta)
+    move_and_slide()
+
+func _handle_movement(delta: float) -> void:
+    # Clear implementation with comments for complex logic
+    pass
+```
+
+**Best Practices:**
+- Use static typing (`: Type`) whenever possible for performance
+- One scene file per logical component
+- Prefer composition over inheritance
+- Use signals for communication between nodes
+- Keep scripts under 300 lines; refactor if larger
 
 ### File Organization
-[To be defined]
+
+**Scene Structure:**
+```
+PlayerScene
+├── Sprite2D (visual representation)
+├── CollisionShape2D (physics)
+├── AnimationPlayer (animations)
+├── AudioStreamPlayer (sounds)
+└── [Script attached: player.gd]
+```
+
+**Script Template:**
+```gdscript
+extends [BaseClass]
+class_name [ClassName]
+
+# 1. Signals
+# 2. Enums
+# 3. Constants
+# 4. Exported variables
+# 5. Public variables
+# 6. Private variables
+# 7. Onready variables
+
+# 8. Built-in virtual methods (_ready, _process, etc.)
+# 9. Public methods
+# 10. Private methods
+```
 
 ---
 
@@ -202,24 +329,52 @@ Added null check before accessing user properties.
    - Verify critical paths
 
 ### Running Tests
-[To be defined based on testing framework]
+
+Using **GUT (Godot Unit Test)** framework:
 
 ```bash
-# Example commands (to be updated)
-# Run all tests
-npm test
+# Install GUT from Asset Library within Godot Editor
+# Or add as git submodule
+
+# Run all tests (from Godot Editor)
+# Project → Tools → Run GUT Tests
+
+# Run tests from command line (for CI/CD)
+godot --path . -s addons/gut/gut_cmdln.gd
 
 # Run specific test file
-npm test path/to/test
+godot --path . -s addons/gut/gut_cmdln.gd -gtest=tests/unit/test_player.gd
+```
 
-# Run with coverage
-npm test -- --coverage
+**Test Example:**
+```gdscript
+extends GutTest
+
+func test_player_takes_damage():
+    var player = Player.new()
+    player.max_health = 100
+    player._ready()
+
+    player.take_damage(30)
+
+    assert_eq(player._current_health, 70, "Player should have 70 health")
+
+func test_player_dies_at_zero_health():
+    var player = Player.new()
+    player.max_health = 100
+    player._ready()
+
+    watch_signals(player)
+    player.take_damage(100)
+
+    assert_signal_emitted(player, "died")
 ```
 
 ### Test Coverage Goals
-- Aim for >80% code coverage
-- 100% coverage for critical paths
+- Aim for >70% code coverage (realistic for game dev)
+- 100% coverage for critical systems (Virtue, Combat, Save/Load)
 - All public APIs must have tests
+- Physics and movement can be tested manually (harder to unit test)
 
 ---
 
@@ -227,11 +382,50 @@ npm test -- --coverage
 
 ### Setting Up Development Environment
 
-[To be defined - will include:]
-1. Prerequisites (language runtime, tools, etc.)
-2. Installation steps
-3. Configuration requirements
-4. Verification steps
+**Prerequisites:**
+1. **Mac with macOS 12.0+** (required for iOS development)
+2. **Xcode 14.0+** with Command Line Tools
+3. **Godot 4.3+** (download from godotengine.org)
+4. **Git** (version control)
+
+**Installation Steps:**
+
+```bash
+# 1. Install Xcode from App Store
+# 2. Install Command Line Tools
+xcode-select --install
+
+# 3. Download Godot 4.3+ (standard version, not .NET)
+# From: https://godotengine.org/download/macos/
+
+# 4. Clone repository
+git clone https://github.com/juanrafernandez/pilgrim.git
+cd pilgrim
+
+# 5. Open project in Godot
+# File → Open Project → Select pilgrim folder
+
+# 6. Configure iOS export
+# Editor → Manage Export Templates → Download and Install
+# Project → Export → Add → iOS
+```
+
+**iOS Export Configuration:**
+1. Open Godot project
+2. Project → Export → Add → iOS
+3. Configure:
+   - App Name: "Camino Maldito"
+   - Bundle Identifier: com.yourname.caminomaldito
+   - Orientation: Portrait
+   - Display Resolution: 1080×1920
+4. Set provisioning profile (requires Apple Developer account $99/year)
+
+**Verification:**
+```bash
+# Test project opens in Godot
+# Press F5 to run game in Godot (desktop version)
+# Project → Export → iOS (will show any config issues)
+```
 
 ### Adding a New Feature
 
@@ -401,8 +595,34 @@ git add <files>
 git commit -m "message"
 git push -u origin <branch>
 
-# [Other commands to be added based on tech stack]
+# Godot operations
+godot --path . --editor                    # Open project in editor
+godot --path . -s scripts/main.gd          # Run specific script
+godot --path . --export-debug iOS          # Export to iOS (debug)
+godot --path . --export-release iOS        # Export to iOS (release)
+
+# Testing
+godot --path . -s addons/gut/gut_cmdln.gd  # Run all tests
+
+# iOS building (after Godot export)
+cd builds/ios
+xcodebuild -project CaminoMaldito.xcodeproj -scheme CaminoMaldito -configuration Debug
 ```
+
+### Godot-Specific Tips
+
+**Performance:**
+- Use `@onready var` for node references (faster than `get_node()` in `_ready()`)
+- Avoid `get_node()` in `_process()` or `_physics_process()`
+- Use object pooling for frequently spawned enemies
+- Profile with Godot's built-in profiler (Debug → Profiler)
+
+**iOS Specific:**
+- Test on real device early and often
+- Monitor memory usage (iOS is stricter than desktop)
+- Texture compression: Enable ASTC for iOS
+- Audio: Use Ogg Vorbis (not MP3) for better iOS performance
+- Safe areas: Handle notch and home indicator properly
 
 ---
 

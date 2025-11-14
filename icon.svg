@@ -1,0 +1,7 @@
+<svg height="128" width="128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Placeholder icon: Cruz templaria simple -->
+  <rect fill="#ffffff" height="128" width="128"/>
+  <!-- Cruz paté roja templaria -->
+  <path d="M 64,20 L 54,40 L 54,54 L 40,54 L 20,64 L 40,74 L 54,74 L 54,88 L 64,108 L 74,88 L 74,74 L 88,74 L 108,64 L 88,54 L 74,54 L 74,40 Z" fill="#f44336"/>
+  <circle cx="64" cy="64" r="8" fill="#ffffff"/>
+</svg>
