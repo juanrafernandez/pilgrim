@@ -59,9 +59,9 @@ theme_override_font_sizes/font_size = 26
 text = "PRUEBA DE ENEMIGOS
 
 Controles:
-A/D: Mover
-Espacio: Saltar
-J/Z: Atacar
+\u2190 \u2192: Mover
+A: Saltar
+S: Atacar
 ESC: Men\u00fa
 
 Enemigos:

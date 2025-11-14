@@ -43,9 +43,9 @@ theme_override_font_sizes/font_size = 32
 text = "ESCENA DE PRUEBA
 
 Controles:
-A/D o Flechas: Mover
-Espacio o W: Saltar
-ESC: Volver al menú
+\u2190 \u2192: Mover
+A: Saltar
+ESC: Volver al men\u00fa
 
 Este es un placeholder para validar
 que Godot funciona correctamente."

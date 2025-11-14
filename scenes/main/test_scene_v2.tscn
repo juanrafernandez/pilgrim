@@ -42,9 +42,11 @@ theme_override_font_sizes/font_size = 28
 text = "ESCENA DE PRUEBA - PLAYER COMPLETO
 
 Controles:
-A/D o Flechas: Mover
-Espacio: Saltar
-J o Z: Atacar
+\u2190 \u2192: Mover
+A: Saltar
+S: Atacar
+D: Dash (pr\u00f3ximamente)
+W: Habilidad especial (pr\u00f3ximamente)
 K: Recibir da\u00f1o (test)
 L: Cambiar fase
 ESC: Volver al men\u00fa
