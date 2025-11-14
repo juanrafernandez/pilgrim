@@ -134,7 +134,7 @@ func _show_victory_message() -> void:
 	"""Show victory message when all enemies defeated"""
 	var victory_label = Label.new()
 	victory_label.text = "¡TODOS LOS ENEMIGOS DERROTADOS!"
-	victory_label.theme_override_font_sizes/font_size = 48
+	victory_label.add_theme_font_size_override("font_size", 48)
 	victory_label.modulate = Color(1.0, 1.0, 0.0)
 	victory_label.position = Vector2(200, 800)
 
