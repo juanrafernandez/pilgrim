@@ -32,7 +32,7 @@ position = Vector2(540, 960)
 script = ExtResource("6_camera")
 backward_limit_distance = 600.0
 forward_buffer = 200.0
-vertical_offset = 300.0
+vertical_offset = -650.0
 
 [node name="Ground1" type="StaticBody2D" parent="."]
 position = Vector2(0, 1700)

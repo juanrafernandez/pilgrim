@@ -8,7 +8,7 @@ class_name CameraController
 @export var backward_limit_distance: float = 600.0  # Max distance player can go back
 @export var forward_buffer: float = 200.0  # Distance ahead of player camera can see
 @export var smooth_speed: float = 5.0  # Camera smoothing
-@export var vertical_offset: float = 300.0  # How far down from player to position camera
+@export var vertical_offset: float = -650.0  # How far from player to position camera (negative = above player)
 
 var max_x_reached: float = 0.0  # Furthest right position reached
 var min_allowed_x: float = 0.0  # Left boundary (can't go further left)
