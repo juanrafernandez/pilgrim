@@ -9,6 +9,8 @@ signal game_state_changed(new_state: GameState)
 signal player_phase_changed(new_phase: PlayerPhase)
 signal virtue_changed(new_virtue: int)
 signal level_completed(level_id: int, virtue_earned: int)
+signal lives_changed(new_lives: int)
+signal player_respawned()
 
 # Enums
 enum GameState {
@@ -197,16 +199,21 @@ func load_next_level() -> void:
 ## Restart current level
 func restart_level() -> void:
 	player_current_health = player_max_health
+	player_respawned.emit()
 	print("Restarting level %d" % current_level)
 
 
 ## Player died
 func player_died() -> void:
 	lives -= 1
+	lives_changed.emit(lives)
+	print("Player died! Lives remaining: %d" % lives)
 
 	if lives <= 0:
 		change_state(GameState.GAME_OVER)
 	else:
+		# Wait a moment before respawning
+		await get_tree().create_timer(1.0).timeout
 		restart_level()
 
 

@@ -137,6 +137,24 @@ func die() -> void:
 	GameManager.player_died()
 
 
+## Respawn at a position
+func respawn(respawn_position: Vector2) -> void:
+	"""Respawn player at checkpoint or start position"""
+	is_dead = false
+	current_health = max_health
+	health_changed.emit(current_health, max_health)
+
+	# Reset position
+	global_position = respawn_position
+	velocity = Vector2.ZERO
+
+	# Reset state to idle
+	if state_machine:
+		state_machine.change_state("Idle")
+
+	print("Player respawned at: %s" % respawn_position)
+
+
 ## Start invincibility frames
 func _start_invincibility() -> void:
 	is_invincible = true

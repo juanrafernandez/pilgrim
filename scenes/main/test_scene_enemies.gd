@@ -12,10 +12,14 @@ extends Node2D
 @onready var debug_label: Label = $DebugUI/DebugLabel
 
 var enemy_count: int = 0
+var spawn_position: Vector2 = Vector2(200, 1600)  # Initial spawn point
 
 
 func _ready() -> void:
 	print("Test Scene Enemies loaded")
+
+	# Initialize GameManager for test scene
+	GameManager.change_state(GameManager.GameState.PLAYING)
 
 	# Setup camera for player
 	player.set_camera_controller(camera)
@@ -23,6 +27,11 @@ func _ready() -> void:
 	# Connect player signals
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
+
+	# Connect GameManager signals
+	GameManager.lives_changed.connect(_on_lives_changed)
+	GameManager.player_respawned.connect(_on_player_respawned)
+	GameManager.game_state_changed.connect(_on_game_state_changed)
 
 	# Connect death zone
 	death_zone.body_entered.connect(_on_death_zone_entered)
@@ -73,7 +82,7 @@ func _update_ui() -> void:
 	"""Update UI elements"""
 	arcade_hud.set_health(player.current_health, player.max_health)
 	arcade_hud.set_score(0)  # TODO: Implement score system
-	arcade_hud.set_lives(3)  # TODO: Implement lives system
+	arcade_hud.set_lives(GameManager.lives)
 
 
 func _update_debug_info() -> void:
@@ -164,3 +173,47 @@ func _setup_ui_backgrounds() -> void:
 	for label in [enemy_count_label, debug_label]:
 		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 		label.add_theme_constant_override("outline_size", 2)
+
+
+func _on_lives_changed(new_lives: int) -> void:
+	"""Handle lives changed from GameManager"""
+	arcade_hud.set_lives(new_lives)
+	print("Lives changed: %d" % new_lives)
+
+
+func _on_player_respawned() -> void:
+	"""Handle player respawn from GameManager"""
+	player.respawn(spawn_position)
+	print("Player respawned at spawn position")
+
+
+func _on_game_state_changed(new_state: GameManager.GameState) -> void:
+	"""Handle game state changes"""
+	if new_state == GameManager.GameState.GAME_OVER:
+		_show_game_over_screen()
+
+
+func _show_game_over_screen() -> void:
+	"""Show Game Over screen"""
+	var game_over_label = Label.new()
+	game_over_label.text = "GAME OVER"
+	game_over_label.add_theme_font_size_override("font_size", 72)
+	game_over_label.add_theme_color_override("font_color", Color(1.0, 0.2, 0.2))
+	game_over_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	game_over_label.add_theme_constant_override("outline_size", 6)
+	game_over_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	game_over_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	game_over_label.position = Vector2(0, 800)
+	game_over_label.size = Vector2(1080, 200)
+
+	add_child(game_over_label)
+
+	# Animate
+	game_over_label.modulate.a = 0.0
+	var tween = create_tween()
+	tween.tween_property(game_over_label, "modulate:a", 1.0, 1.0)
+
+	# Wait and return to menu
+	await get_tree().create_timer(3.0).timeout
+	print("Returning to main menu (or reload scene)")
+	# TODO: SceneManager.load_scene("res://scenes/main/main_menu.tscn")
