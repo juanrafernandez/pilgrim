@@ -19,6 +19,10 @@ func _state_physics_update(delta: float) -> void:
 
 
 func check_transitions() -> void:
+	# If throw projectile pressed
+	if Input.is_action_just_pressed("special"):
+		player.throw_projectile()
+
 	# If stopped moving, go to Idle
 	if player.input_direction.x == 0:
 		state_machine.change_state("Idle")

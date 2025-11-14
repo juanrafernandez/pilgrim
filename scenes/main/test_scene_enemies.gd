@@ -27,6 +27,7 @@ func _ready() -> void:
 	# Connect player signals
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
+	player.weapon_changed.connect(_on_player_weapon_changed)
 
 	# Connect GameManager signals
 	GameManager.lives_changed.connect(_on_lives_changed)
@@ -83,6 +84,7 @@ func _update_ui() -> void:
 	arcade_hud.set_health(player.current_health, player.max_health)
 	arcade_hud.set_score(0)  # TODO: Implement score system
 	arcade_hud.set_lives(GameManager.lives)
+	arcade_hud.set_weapon(player.get_weapon_name())
 
 
 func _update_debug_info() -> void:
@@ -120,6 +122,12 @@ func _on_player_health_changed(new_health: int, max_hp: int) -> void:
 
 func _on_player_died() -> void:
 	print("Player died in enemy test scene")
+
+
+func _on_player_weapon_changed(new_weapon: Player.WeaponType) -> void:
+	"""Handle weapon changed from player"""
+	arcade_hud.set_weapon(player.get_weapon_name())
+	print("Weapon changed to: %s" % player.get_weapon_name())
 
 
 func _on_death_zone_entered(body: Node2D) -> void:

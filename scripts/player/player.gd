@@ -11,6 +11,16 @@ signal died()
 signal phase_changed(new_phase: GameManager.PlayerPhase)
 signal took_damage(amount: int)
 signal landed()
+signal weapon_changed(new_weapon: WeaponType)
+signal projectile_thrown(projectile: Projectile)
+
+# Enums
+enum WeaponType {
+	DAGGER,    # Fast, straight projectile
+	LANCE,     # Slower, more damage
+	AXE,       # Arc trajectory
+	TORCH      # Fire projectile with area damage
+}
 
 # Movement constants
 const SPEED: float = 400.0
@@ -21,6 +31,10 @@ const FRICTION: float = 1500.0
 # Combat constants
 const ATTACK_DURATION: float = 0.4
 const INVINCIBILITY_DURATION: float = 1.0
+const PROJECTILE_COOLDOWN: float = 0.5
+
+# Projectile scenes
+const PROJECTILE_DAGGER = preload("res://scenes/projectiles/projectile_dagger.tscn")
 
 # State
 var current_phase: GameManager.PlayerPhase = GameManager.PlayerPhase.CHILD
@@ -29,6 +43,11 @@ var current_health: int = 100
 var is_attacking: bool = false
 var is_invincible: bool = false
 var is_dead: bool = false
+
+# Weapon state
+var current_weapon: WeaponType = WeaponType.DAGGER
+var can_throw_projectile: bool = true
+var projectile_cooldown_timer: float = 0.0
 
 # References
 @onready var sprite: ColorRect = $Sprite
@@ -55,6 +74,12 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	# Get input
 	input_direction = _get_input_direction()
+
+	# Update projectile cooldown
+	if not can_throw_projectile:
+		projectile_cooldown_timer -= delta
+		if projectile_cooldown_timer <= 0:
+			can_throw_projectile = true
 
 	# Let state machine handle movement
 	state_machine.physics_update(delta)
@@ -234,6 +259,71 @@ func _show_attack_effect(pos: Vector2) -> void:
 
 	await get_tree().create_timer(0.2).timeout
 	effect.queue_free()
+
+
+## Throw projectile
+func throw_projectile() -> void:
+	"""Throw a projectile based on current weapon"""
+	if not can_throw_projectile or is_dead:
+		return
+
+	# Get projectile scene based on weapon type
+	var projectile_scene: PackedScene = _get_projectile_scene()
+	if not projectile_scene:
+		print("No projectile scene for weapon: %s" % WeaponType.keys()[current_weapon])
+		return
+
+	# Instantiate projectile
+	var projectile: Projectile = projectile_scene.instantiate()
+
+	# Position projectile at player's weapon hand (slightly in front)
+	var throw_direction = 1 if sprite.scale.x > 0 else -1
+	var spawn_offset = Vector2(40 * throw_direction, -20)  # Offset from center
+	projectile.global_position = global_position + spawn_offset
+
+	# Add to scene
+	get_parent().add_child(projectile)
+
+	# Launch projectile
+	projectile.launch(throw_direction, velocity * 0.3)  # Inherit some player velocity
+
+	# Emit signal
+	projectile_thrown.emit(projectile)
+
+	# Start cooldown
+	can_throw_projectile = false
+	projectile_cooldown_timer = PROJECTILE_COOLDOWN
+
+	print("Player threw %s" % WeaponType.keys()[current_weapon])
+
+
+func _get_projectile_scene() -> PackedScene:
+	"""Get the projectile scene for current weapon"""
+	match current_weapon:
+		WeaponType.DAGGER:
+			return PROJECTILE_DAGGER
+		WeaponType.LANCE:
+			return null  # TODO: Implement lance
+		WeaponType.AXE:
+			return null  # TODO: Implement axe
+		WeaponType.TORCH:
+			return null  # TODO: Implement torch
+	return null
+
+
+func set_weapon(weapon: WeaponType) -> void:
+	"""Change current weapon"""
+	if weapon == current_weapon:
+		return
+
+	current_weapon = weapon
+	weapon_changed.emit(weapon)
+	print("Weapon changed to: %s" % WeaponType.keys()[weapon])
+
+
+func get_weapon_name() -> String:
+	"""Get current weapon name for UI"""
+	return WeaponType.keys()[current_weapon]
 
 
 ## Change player phase
