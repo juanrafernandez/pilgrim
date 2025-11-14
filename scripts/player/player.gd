@@ -89,8 +89,8 @@ func _get_input_direction() -> Vector2:
 	return dir
 
 
-## Take damage
-func take_damage(amount: int) -> void:
+## Take damage with knockback (Ghosts 'n Goblins style)
+func take_damage(amount: int, knockback: Vector2 = Vector2.ZERO) -> void:
 	if is_invincible or is_dead:
 		return
 
@@ -98,11 +98,19 @@ func take_damage(amount: int) -> void:
 	health_changed.emit(current_health, max_health)
 	took_damage.emit(amount)
 
+	# Apply knockback velocity
+	if knockback != Vector2.ZERO:
+		velocity = knockback
+	else:
+		# Default knockback if none provided
+		velocity = Vector2(-200, -400)
+
 	print("Player took %d damage. Health: %d/%d" % [amount, current_health, max_health])
 
 	if current_health <= 0:
 		die()
 	else:
+		state_machine.change_state("Hurt")
 		_start_invincibility()
 
 
@@ -190,7 +198,7 @@ func _perform_attack() -> void:
 	for result in results:
 		var body = result["collider"]
 		if body.has_method("take_damage"):
-			var knockback = Vector2(attack_dir * 200, -100)
+			var knockback = Vector2(attack_dir * 400, -250)  # Stronger knockback
 			body.take_damage(attack_damage, knockback)
 			print("Player hit %s for %d damage!" % [body.name, attack_damage])
 

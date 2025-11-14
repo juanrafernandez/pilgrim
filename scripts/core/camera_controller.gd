@@ -9,6 +9,7 @@ class_name CameraController
 @export var forward_buffer: float = 200.0  # Distance ahead of player camera can see
 @export var smooth_speed: float = 5.0  # Camera smoothing
 @export var vertical_offset: float = -650.0  # How far from player to position camera (negative = above player)
+@export var horizontal_offset: float = 240.0  # Horizontal offset to show more ahead (player on left third)
 
 var max_x_reached: float = 0.0  # Furthest right position reached
 var min_allowed_x: float = 0.0  # Left boundary (can't go further left)
@@ -20,8 +21,8 @@ func _ready() -> void:
 		target = get_parent().get_node_or_null("Player")
 
 	if target:
-		global_position.x = target.global_position.x
-		global_position.y = target.global_position.y
+		global_position.x = target.global_position.x + horizontal_offset
+		global_position.y = target.global_position.y + vertical_offset
 		max_x_reached = target.global_position.x
 		min_allowed_x = max_x_reached - backward_limit_distance
 	make_current()
@@ -36,8 +37,8 @@ func _physics_process(delta: float) -> void:
 		max_x_reached = target.global_position.x
 		min_allowed_x = max_x_reached - backward_limit_distance
 
-	# Calculate target camera position
-	var target_x = target.global_position.x
+	# Calculate target camera position with horizontal offset (player on left side)
+	var target_x = target.global_position.x + horizontal_offset
 
 	# Clamp target to minimum allowed position
 	target_x = max(target_x, min_allowed_x + forward_buffer)

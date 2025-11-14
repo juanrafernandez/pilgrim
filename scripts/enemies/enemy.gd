@@ -216,9 +216,13 @@ func _update_sprite_direction() -> void:
 
 
 func _perform_attack() -> void:
-	"""Perform attack on player"""
+	"""Perform attack on player with knockback"""
 	if player and _is_player_in_range(attack_range):
-		player.take_damage(attack_damage)
+		# Calculate knockback direction (away from enemy)
+		var knockback_dir = sign(player.global_position.x - global_position.x)
+		var knockback = Vector2(knockback_dir * 350, -450)  # Strong knockback (GnG style)
+
+		player.take_damage(attack_damage, knockback)
 		attacked.emit(player)
 		print("%s attacked player for %d damage" % [name, attack_damage])
 

@@ -9,8 +9,7 @@ var hurt_timer: float = 0.0
 
 func _state_enter() -> void:
 	hurt_timer = 0.0
-	# Knockback
-	player.velocity.y = -300.0
+	# Knockback already applied by take_damage(), don't override it
 
 
 func _state_physics_update(delta: float) -> void:
@@ -19,8 +18,8 @@ func _state_physics_update(delta: float) -> void:
 	# Apply gravity
 	apply_gravity(delta)
 
-	# Slight knockback movement
-	player.velocity.x = move_toward(player.velocity.x, 0, player.FRICTION * delta)
+	# Preserve knockback horizontal momentum (slow decay for dramatic effect)
+	player.velocity.x = move_toward(player.velocity.x, 0, player.FRICTION * 0.5 * delta)
 
 	# Check transitions
 	check_transitions()
