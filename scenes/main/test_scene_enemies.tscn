@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://test_enemies"]
+[gd_scene load_steps=8 format=3 uid="uid://test_enemies"]
 
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://cow123456" path="res://scenes/enemies/enemy_cow.tscn" id="2_cow"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://boar123456" path="res://scenes/enemies/enemy_boar.tscn" id="4_boar"]
 [ext_resource type="Script" path="res://scenes/main/test_scene_enemies.gd" id="5_script"]
 [ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="6_camera"]
+[ext_resource type="PackedScene" uid="uid://c8q7x5r2m3v1p" path="res://scenes/ui/arcade_hud.tscn" id="7_hud"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_start"]
 size = Vector2(600, 220)
@@ -171,55 +172,20 @@ position = Vector2(2700, 1450)
 [node name="Wolf2" parent="Enemies" instance=ExtResource("3_wolf")]
 position = Vector2(3500, 1650)
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="ArcadeHUD" parent="." instance=ExtResource("7_hud")]
 
-[node name="InfoLabel" type="Label" parent="UI"]
+[node name="DebugUI" type="CanvasLayer" parent="."]
+layer = 101
+
+[node name="EnemyCountLabel" type="Label" parent="DebugUI"]
 offset_left = 20.0
-offset_top = 20.0
-offset_right = 1060.0
-offset_bottom = 350.0
-theme_override_font_sizes/font_size = 26
-text = "PRUEBA DE ENEMIGOS
-
-Controles:
-\u2190 \u2192: Mover
-A: Saltar
-S: Atacar
-ESC: Men\u00fa
-
-Enemigos:
-🐄 VACA (marr\u00f3n) - Pasiva, huye del jugador
-🐺 LOBO (gris) - Agresiva, persigue r\u00e1pido
-🐗 JABAL\u00cd (marr\u00f3n oscuro) - Carga al jugador
-
-¡Prueba el combate!"
-
-[node name="HealthBar" type="ProgressBar" parent="UI"]
-offset_left = 20.0
-offset_top = 380.0
+offset_top = 150.0
 offset_right = 420.0
-offset_bottom = 420.0
-max_value = 100.0
-value = 100.0
-show_percentage = false
-
-[node name="HealthLabel" type="Label" parent="UI"]
-offset_left = 20.0
-offset_top = 430.0
-offset_right = 420.0
-offset_bottom = 470.0
-theme_override_font_sizes/font_size = 24
-text = "Salud: 100/100"
-
-[node name="EnemyCountLabel" type="Label" parent="UI"]
-offset_left = 20.0
-offset_top = 480.0
-offset_right = 420.0
-offset_bottom = 520.0
-theme_override_font_sizes/font_size = 24
+offset_bottom = 190.0
+theme_override_font_sizes/font_size = 20
 text = "Enemigos: 4"
 
-[node name="DebugLabel" type="Label" parent="UI"]
+[node name="DebugLabel" type="Label" parent="DebugUI"]
 offset_left = 20.0
 offset_top = 1820.0
 offset_right = 1060.0

@@ -7,10 +7,9 @@ extends Node2D
 @onready var camera: CameraController = $Camera
 @onready var enemies_node: Node2D = $Enemies
 @onready var death_zone: Area2D = $DeathZone
-@onready var health_bar: ProgressBar = $UI/HealthBar
-@onready var health_label: Label = $UI/HealthLabel
-@onready var enemy_count_label: Label = $UI/EnemyCountLabel
-@onready var debug_label: Label = $UI/DebugLabel
+@onready var arcade_hud: ArcadeHUD = $ArcadeHUD
+@onready var enemy_count_label: Label = $DebugUI/EnemyCountLabel
+@onready var debug_label: Label = $DebugUI/DebugLabel
 
 var enemy_count: int = 0
 
@@ -72,9 +71,9 @@ func _update_enemy_count() -> void:
 
 func _update_ui() -> void:
 	"""Update UI elements"""
-	health_bar.max_value = player.max_health
-	health_bar.value = player.current_health
-	health_label.text = "Salud: %d/%d" % [player.current_health, player.max_health]
+	arcade_hud.set_health(player.current_health, player.max_health)
+	arcade_hud.set_score(0)  # TODO: Implement score system
+	arcade_hud.set_lives(3)  # TODO: Implement lives system
 
 
 func _update_debug_info() -> void:
@@ -107,16 +106,7 @@ func _update_debug_info() -> void:
 
 ## Signal handlers
 func _on_player_health_changed(new_health: int, max_hp: int) -> void:
-	health_bar.value = new_health
-	health_label.text = "Salud: %d/%d" % [new_health, max_hp]
-
-	# Color code health bar
-	if new_health <= max_hp * 0.25:
-		health_bar.modulate = Color(1.0, 0.0, 0.0)  # Red
-	elif new_health <= max_hp * 0.5:
-		health_bar.modulate = Color(1.0, 0.5, 0.0)  # Orange
-	else:
-		health_bar.modulate = Color(0.0, 1.0, 0.0)  # Green
+	arcade_hud.set_health(new_health, max_hp)
 
 
 func _on_player_died() -> void:
@@ -170,13 +160,7 @@ func _show_victory_message() -> void:
 
 func _setup_ui_backgrounds() -> void:
 	"""Add text outlines for better readability"""
-	# Add outline to all labels
-	for label in [health_label, enemy_count_label, debug_label]:
+	# Add outline to debug labels
+	for label in [enemy_count_label, debug_label]:
 		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 		label.add_theme_constant_override("outline_size", 2)
-
-	# InfoLabel needs special handling (it's in UI CanvasLayer)
-	var info_label = $UI/InfoLabel
-	if info_label:
-		info_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
-		info_label.add_theme_constant_override("outline_size", 2)
