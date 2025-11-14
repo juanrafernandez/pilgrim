@@ -1,9 +1,8 @@
 extends Node
-class_name GameManager
 
 ## GameManager
 ## Singleton that manages global game state, progression, and systems coordination
-## Access via: GameManager.instance
+## Access via: GameManager (global autoload)
 
 # Signals
 signal game_state_changed(new_state: GameState)
@@ -33,9 +32,6 @@ const LEVELS_PER_PHASE: int = 8
 const TOTAL_LEVELS: int = 32
 const MAX_VIRTUE: int = 1000
 
-# Singleton instance
-static var instance: GameManager
-
 # Game state
 var current_state: GameState = GameState.MAIN_MENU
 var current_phase: PlayerPhase = PlayerPhase.CHILD
@@ -58,14 +54,9 @@ var sfx_volume: float = 1.0
 
 
 func _ready() -> void:
-	if instance == null:
-		instance = self
-		process_mode = Node.PROCESS_MODE_ALWAYS  # Continue running when paused
-	else:
-		queue_free()  # Ensure singleton
-		return
-
+	process_mode = Node.PROCESS_MODE_ALWAYS  # Continue running when paused
 	_initialize_game()
+	print("GameManager initialized")
 
 
 func _initialize_game() -> void:
@@ -78,8 +69,6 @@ func _initialize_game() -> void:
 	player_current_health = player_max_health
 	levels_completed.clear()
 	virtue_per_level.clear()
-
-	print("GameManager initialized")
 
 
 ## Start a new game

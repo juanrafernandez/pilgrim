@@ -1,16 +1,12 @@
 extends Node
-class_name AudioManager
 
 ## AudioManager
 ## Manages music and sound effects playback
-## Access via: AudioManager.instance
+## Access via: AudioManager (global autoload)
 
 # Signals
 signal music_changed(track_name: String)
 signal volume_changed(bus_name: String, volume: float)
-
-# Singleton instance
-static var instance: AudioManager
 
 # Audio buses
 const BUS_MASTER = "Master"
@@ -70,12 +66,7 @@ var sfx_library: Dictionary = {
 
 
 func _ready() -> void:
-	if instance == null:
-		instance = self
-		process_mode = Node.PROCESS_MODE_ALWAYS
-	else:
-		queue_free()
-		return
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	_setup_audio_players()
 	_setup_audio_buses()
@@ -236,13 +227,13 @@ func set_muted(muted: bool) -> void:
 
 
 ## Play music based on game phase
-func play_music_for_phase(phase: GameManager.PlayerPhase) -> void:
+func play_music_for_phase(phase: int) -> void:
 	match phase:
-		GameManager.PlayerPhase.CHILD:
+		0:  # GameManager.PlayerPhase.CHILD
 			play_music("phase_1")
-		GameManager.PlayerPhase.ADOLESCENT:
+		1:  # GameManager.PlayerPhase.ADOLESCENT
 			play_music("phase_2")
-		GameManager.PlayerPhase.KNIGHT:
+		2:  # GameManager.PlayerPhase.KNIGHT
 			play_music("phase_3")
-		GameManager.PlayerPhase.ELDER:
+		3:  # GameManager.PlayerPhase.ELDER
 			play_music("phase_4")
