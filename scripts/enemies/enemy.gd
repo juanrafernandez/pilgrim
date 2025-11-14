@@ -33,6 +33,12 @@ var attack_range: float = 60.0
 var detection_range: float = 400.0
 var lose_player_range: float = 600.0
 
+# Movement capabilities
+var can_jump: bool = false  # Can this enemy jump?
+var jump_velocity: float = -400.0  # Jump strength
+var max_jump_distance: float = 150.0  # Max horizontal distance enemy can jump
+var edge_check_distance: float = 50.0  # How far ahead to check for edges
+
 # State
 var current_state: State = State.IDLE
 var is_dead: bool = false
@@ -127,6 +133,9 @@ func _ai_patrol(delta: float) -> void:
 	if patrol_target == Vector2.ZERO:
 		_set_random_patrol_target()
 
+	# Check for edges before moving
+	_handle_edge_behavior()
+
 	# Move towards patrol target
 	var direction = sign(patrol_target.x - global_position.x)
 	velocity.x = direction * patrol_speed
@@ -160,6 +169,18 @@ func _ai_chase(delta: float) -> void:
 	if _is_player_in_range(attack_range) and can_attack:
 		change_state(State.ATTACK)
 		return
+
+	# Check for edges before moving (but be more aggressive when chasing)
+	if _check_edge_ahead():
+		if can_jump:
+			# Try to jump if chasing player
+			if _can_jump_gap():
+				velocity.y = jump_velocity
+				print("%s jumping to chase player" % name)
+		else:
+			# If can't jump and edge ahead, stop chasing
+			change_state(State.IDLE)
+			return
 
 	# Move towards player
 	var direction = sign(player.global_position.x - global_position.x)
@@ -213,6 +234,71 @@ func _update_sprite_direction() -> void:
 	if sprite and velocity.x != 0:
 		facing_right = velocity.x > 0
 		sprite.scale.x = 1.0 if facing_right else -1.0
+
+
+func _check_edge_ahead() -> bool:
+	"""Check if there's an edge/cliff ahead using raycast"""
+	if not is_on_floor():
+		return false
+
+	# Check direction enemy is moving
+	var direction = 1 if facing_right else -1
+	var check_position = global_position + Vector2(edge_check_distance * direction, 0)
+
+	# Raycast down to check for ground
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(
+		check_position,
+		check_position + Vector2(0, 100)  # Check 100 pixels down
+	)
+	query.collision_mask = 2  # Ground layer
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	var result = space_state.intersect_ray(query)
+
+	# If no ground detected, there's an edge
+	return result.is_empty()
+
+
+func _can_jump_gap() -> bool:
+	"""Check if enemy can jump across the gap ahead"""
+	if not can_jump:
+		return false
+
+	# Check if gap is within jumpable distance
+	var direction = 1 if facing_right else -1
+
+	# Check at max jump distance
+	var check_position = global_position + Vector2(max_jump_distance * direction, 0)
+
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(
+		check_position,
+		check_position + Vector2(0, 100)
+	)
+	query.collision_mask = 2  # Ground layer
+
+	var result = space_state.intersect_ray(query)
+
+	# If there's ground at jump distance, we can jump
+	return not result.is_empty()
+
+
+func _handle_edge_behavior() -> void:
+	"""Handle what to do when edge is detected"""
+	if _check_edge_ahead():
+		if can_jump and _can_jump_gap():
+			# Jump across the gap
+			velocity.y = jump_velocity
+			print("%s jumping across gap" % name)
+		else:
+			# Turn around
+			facing_right = not facing_right
+			if sprite:
+				sprite.scale.x = 1.0 if facing_right else -1.0
+			velocity.x *= -1  # Reverse direction
+			print("%s turning around at edge" % name)
 
 
 func _perform_attack() -> void:

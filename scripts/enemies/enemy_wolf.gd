@@ -20,6 +20,11 @@ func _ready() -> void:
 	patrol_wait_time = 1.0
 	attack_cooldown = 1.2  # Attacks frequently
 
+	# Wolf can jump (agile predator)
+	can_jump = true
+	jump_velocity = -450.0  # Good jump height
+	max_jump_distance = 180.0  # Can jump decent gaps
+
 	super._ready()
 
 
@@ -40,6 +45,12 @@ func _ai_chase(delta: float) -> void:
 	if _is_player_in_range(attack_range) and can_attack:
 		change_state(State.ATTACK)
 		return
+
+	# Check for edges (wolves will jump aggressively)
+	if _check_edge_ahead():
+		if can_jump and _can_jump_gap():
+			velocity.y = jump_velocity
+			print("%s jumping to chase player" % name)
 
 	# Chase with increased speed when close
 	var distance_to_player = global_position.distance_to(player.global_position)

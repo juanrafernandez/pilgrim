@@ -23,6 +23,11 @@ func _ready() -> void:
 	patrol_wait_time = 2.5
 	attack_cooldown = 2.0  # Slower attacks but devastating
 
+	# Boar can jump (charges aggressively)
+	can_jump = true
+	jump_velocity = -380.0  # Moderate jump
+	max_jump_distance = 160.0  # Can jump medium gaps
+
 	super._ready()
 
 
@@ -34,6 +39,12 @@ func _ai_attack(delta: float) -> void:
 		charge_distance = 0.0
 		var direction = sign(player.global_position.x - global_position.x)
 		velocity.x = direction * chase_speed * 1.5  # Charge speed
+
+	# Check for edges during charge (boar will jump)
+	if _check_edge_ahead():
+		if can_jump and _can_jump_gap():
+			velocity.y = jump_velocity
+			print("%s jumping during charge" % name)
 
 	# Continue charge
 	charge_distance += abs(velocity.x) * delta

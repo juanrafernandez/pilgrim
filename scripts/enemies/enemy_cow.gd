@@ -18,6 +18,9 @@ func _ready() -> void:
 	patrol_distance = 150.0
 	patrol_wait_time = 3.0
 
+	# Cow cannot jump (heavy, passive animal)
+	can_jump = false
+
 	super._ready()
 
 
@@ -32,6 +35,13 @@ func _ai_chase(delta: float) -> void:
 		player = null
 		change_state(State.PATROL)
 		return
+
+	# Check for edges when fleeing (cow will turn around if edge ahead)
+	if _check_edge_ahead():
+		# Cow can't jump, so turn around if cornered
+		facing_right = not facing_right
+		if sprite:
+			sprite.scale.x = 1.0 if facing_right else -1.0
 
 	# Run AWAY from player (opposite direction)
 	var direction = -sign(player.global_position.x - global_position.x)
