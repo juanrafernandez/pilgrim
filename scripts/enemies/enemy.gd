@@ -309,7 +309,7 @@ func _perform_attack() -> void:
 		var knockback_dir = sign(player.global_position.x - global_position.x)
 		var knockback = Vector2(knockback_dir * 350, -450)  # Strong knockback (GnG style)
 
-		player.take_damage(attack_damage, knockback)
+		player.take_damage(attack_damage, knockback, self)  # Pass self as attacker for parry
 		attacked.emit(player)
 		print("%s attacked player for %d damage" % [name, attack_damage])
 
