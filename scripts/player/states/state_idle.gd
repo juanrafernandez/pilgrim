@@ -6,6 +6,9 @@ extends PlayerState
 
 func _state_enter() -> void:
 	player.velocity.x = 0
+	# Play idle animation
+	if player.sprite:
+		player.sprite.play("idle")
 
 
 func _state_physics_update(delta: float) -> void:
@@ -20,9 +23,19 @@ func _state_physics_update(delta: float) -> void:
 
 
 func check_transitions() -> void:
+	# If block pressed and can block, go to Block
+	if Input.is_action_just_pressed("block") and player.can_block():
+		state_machine.change_state("Block")
+		return
+
 	# If throw projectile pressed
 	if Input.is_action_just_pressed("special"):
 		player.throw_projectile()
+
+	# If crouch pressed, go to Crouch
+	if Input.is_action_pressed("crouch") and player.is_on_floor():
+		state_machine.change_state("Crouch")
+		return
 
 	# If moving, go to Walk
 	if player.input_direction.x != 0:

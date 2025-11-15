@@ -19,6 +19,11 @@ func _state_physics_update(delta: float) -> void:
 
 
 func check_transitions() -> void:
+	# If block pressed and can block, go to Block
+	if Input.is_action_just_pressed("block") and player.can_block():
+		state_machine.change_state("Block")
+		return
+
 	# If throw projectile pressed
 	if Input.is_action_just_pressed("special"):
 		player.throw_projectile()

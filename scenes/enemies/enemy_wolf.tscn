@@ -1,6 +1,38 @@
-[gd_scene load_steps=3 format=3 uid="uid://wolf123456"]
+[gd_scene load_steps=8 format=3 uid="uid://wolf123456"]
 
 [ext_resource type="Script" path="res://scripts/enemies/enemy_wolf.gd" id="1_wolf"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/animations/wolf_walk_1.png" id="2_walk1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/animations/wolf_walk_2.png" id="3_walk2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/animations/wolf_walk_3.png" id="4_walk3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/animations/wolf_walk_4.png" id="5_walk4"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wolf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_walk1")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_walk1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_walk2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_walk3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_walk4")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 10.0
+}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wolf"]
 size = Vector2(70, 50)
@@ -13,12 +45,10 @@ collision_layer = 4
 collision_mask = 3
 script = ExtResource("1_wolf")
 
-[node name="Sprite" type="ColorRect" parent="."]
-offset_left = -35.0
-offset_top = -25.0
-offset_right = 35.0
-offset_bottom = 25.0
-color = Color(0.3, 0.3, 0.3, 1)
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_wolf")
+animation = &"walk"
+autoplay = "walk"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_wolf")

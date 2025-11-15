@@ -110,6 +110,12 @@ layout_mode = 2
 [node name="BuffIndicatorPanel" parent="HUDContainer/VBox" instance=ExtResource("7_buffs")]
 layout_mode = 2
 
+[node name="ComboLabel" type="Label" parent="HUDContainer/VBox"]
+layout_mode = 2
+text = "COMBO x5  (2.0x)"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_normal")
+
 [node name="ComboMeter" parent="HUDContainer/VBox" instance=ExtResource("8_combo")]
 layout_mode = 2
 
