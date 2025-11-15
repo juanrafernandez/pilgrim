@@ -5,7 +5,7 @@ class_name ArcadeHUD
 ## Minimal, clean interface inspired by Ghosts 'n Goblins and Maldita Castilla
 ## Displays score, lives, weapon, and health
 
-# UI Elements
+# UI Elements - Basic HUD
 @onready var score_label: Label = $HUDContainer/VBox/TopRow/ScoreLabel
 @onready var high_score_label: Label = $HUDContainer/VBox/TopRow/HighScoreLabel
 @onready var lives_container: HBoxContainer = $HUDContainer/VBox/MiddleRow/LivesContainer
@@ -15,6 +15,22 @@ class_name ArcadeHUD
 @onready var weapon_durability_bar: ProgressBar = $HUDContainer/VBox/WeaponDurabilityBar
 @onready var combo_label: Label = $HUDContainer/VBox/ComboLabel
 @onready var virtue_display: VirtueDisplay = $HUDContainer/VBox/VirtueDisplay
+
+# UI Elements - Enhanced Components (High Priority)
+@onready var boss_health_bar: BossHealthBar = $BossHealthBar
+@onready var stage_indicator: StageIndicator = $HUDContainer/VBox/TopRow/StageIndicator
+@onready var level_timer: LevelTimer = $HUDContainer/VBox/TopRow/LevelTimer
+@onready var low_health_warning: LowHealthWarning = $LowHealthWarning
+
+# UI Elements - Enhanced Components (Medium Priority)
+@onready var buff_indicator_panel: BuffIndicatorPanel = $HUDContainer/VBox/BuffIndicatorPanel
+@onready var combo_meter: ComboMeter = $HUDContainer/VBox/ComboMeter
+@onready var pause_menu: PauseMenu = $PauseMenu
+
+# UI Elements - Polish Effects (Low Priority)
+@onready var crt_effect: CRTEffect = $CRTEffect
+@onready var level_complete_screen: LevelCompleteScreen = $LevelCompleteScreen
+@onready var arcade_frame: ArcadeFrame = $ArcadeFrame
 
 # Data
 var current_score: int = 0
@@ -85,6 +101,10 @@ func set_health(current: int, maximum: int) -> void:
 		else:
 			health_bar.modulate = Color(0.2, 1.0, 0.2)  # Green (neon)
 
+	# Update low health warning
+	if low_health_warning:
+		low_health_warning.update_health_status(current, maximum)
+
 
 func set_weapon_durability(current: int, maximum: int) -> void:
 	"""Update weapon durability bar"""
@@ -141,7 +161,7 @@ func _update_weapon_display() -> void:
 
 
 func set_combo(combo_count: int, multiplier: float) -> void:
-	"""Update combo display"""
+	"""Update combo display (legacy - consider using combo_meter)"""
 	if not combo_label:
 		return
 
@@ -158,6 +178,10 @@ func set_combo(combo_count: int, multiplier: float) -> void:
 			combo_label.add_theme_color_override("font_color", Color(0.2, 1.0, 1.0))  # Cyan (good)
 	else:
 		combo_label.visible = false
+
+	# Also update combo meter if available
+	if combo_meter:
+		combo_meter.increment_combo(combo_count, multiplier)
 
 
 ## Shield System Methods
@@ -190,3 +214,165 @@ func on_shield_recharged() -> void:
 	"""Visual feedback when shield recharges"""
 	if shield_bar:
 		shield_bar.shield_recharged()
+
+
+## Enhanced HUD Component Methods
+
+func show_boss_health(boss_name: String, max_health: int) -> void:
+	"""Show boss health bar"""
+	if boss_health_bar:
+		boss_health_bar.show_boss_bar(boss_name, max_health)
+
+
+func update_boss_health(current_health: int) -> void:
+	"""Update boss health"""
+	if boss_health_bar:
+		boss_health_bar.update_boss_health(current_health)
+
+
+func hide_boss_health() -> void:
+	"""Hide boss health bar"""
+	if boss_health_bar:
+		boss_health_bar.hide_boss_bar()
+
+
+func set_stage_info(stage: int, level: int, location: String = "", phase: String = "") -> void:
+	"""Set stage/level information"""
+	if stage_indicator:
+		stage_indicator.set_stage_info(stage, level, location, phase)
+
+
+func show_stage_intro(duration: float = 3.0) -> void:
+	"""Show stage intro animation"""
+	if stage_indicator:
+		stage_indicator.show_stage_intro(duration)
+
+
+func start_level_timer(time_limit: float = 0.0) -> void:
+	"""Start level timer (0 = count up, >0 = countdown)"""
+	if level_timer:
+		level_timer.start_timer(time_limit)
+
+
+func stop_level_timer() -> void:
+	"""Stop level timer"""
+	if level_timer:
+		level_timer.stop_timer()
+
+
+func get_elapsed_time() -> float:
+	"""Get elapsed time from timer"""
+	if level_timer:
+		return level_timer.get_elapsed_time()
+	return 0.0
+
+
+## Medium Priority Component Methods
+
+func add_buff(buff_name: String, icon: String, duration: float, color: Color = Color(1.0, 1.0, 1.0)) -> void:
+	"""Add a buff/power-up indicator"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_buff(buff_name, icon, duration, color)
+
+
+func remove_buff(buff_name: String) -> void:
+	"""Remove a buff indicator"""
+	if buff_indicator_panel:
+		buff_indicator_panel.remove_buff(buff_name)
+
+
+func add_shield_buff(duration: float = 30.0) -> void:
+	"""Quick method: Add shield buff"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_shield_buff(duration)
+
+
+func add_damage_buff(duration: float = 20.0) -> void:
+	"""Quick method: Add damage buff"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_damage_buff(duration)
+
+
+func add_speed_buff(duration: float = 15.0) -> void:
+	"""Quick method: Add speed buff"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_speed_buff(duration)
+
+
+func toggle_pause() -> void:
+	"""Toggle pause menu"""
+	if pause_menu:
+		if pause_menu.is_paused:
+			pause_menu.hide_pause_menu()
+		else:
+			pause_menu.show_pause_menu()
+
+
+func show_pause() -> void:
+	"""Show pause menu"""
+	if pause_menu:
+		pause_menu.show_pause_menu()
+
+
+func hide_pause() -> void:
+	"""Hide pause menu"""
+	if pause_menu:
+		pause_menu.hide_pause_menu()
+
+
+## Polish Effects Methods (Low Priority)
+
+func enable_crt_effect(enabled: bool = true) -> void:
+	"""Enable/disable CRT scanline effect"""
+	if crt_effect:
+		crt_effect.enable_all_effects(enabled)
+
+
+func set_crt_preset(preset: String) -> void:
+	"""Set CRT effect preset: 'off', 'light', 'medium', 'heavy'"""
+	if not crt_effect:
+		return
+
+	match preset.to_lower():
+		"off":
+			crt_effect.apply_preset_off()
+		"light":
+			crt_effect.apply_preset_light()
+		"medium":
+			crt_effect.apply_preset_medium()
+		"heavy":
+			crt_effect.apply_preset_heavy()
+
+
+func show_level_complete(level: int, score: int, virtue: int, combo: int, time: float) -> void:
+	"""Show level complete summary screen"""
+	if level_complete_screen:
+		level_complete_screen.show_screen(level, score, virtue, combo, time)
+
+
+func hide_level_complete() -> void:
+	"""Hide level complete screen"""
+	if level_complete_screen:
+		level_complete_screen.hide_screen()
+
+
+func enable_arcade_frame(enabled: bool = true) -> void:
+	"""Enable/disable decorative arcade frame"""
+	if arcade_frame:
+		arcade_frame.enable_frame(enabled)
+
+
+func set_frame_theme(theme: String) -> void:
+	"""Set arcade frame theme: 'wood', 'metal', 'gold', 'off'"""
+	if not arcade_frame:
+		return
+
+	match theme.to_lower():
+		"wood":
+			arcade_frame.apply_theme_wood()
+		"metal":
+			arcade_frame.apply_theme_metal()
+		"gold":
+			arcade_frame.apply_theme_gold()
+		"off":
+			arcade_frame.apply_theme_off()

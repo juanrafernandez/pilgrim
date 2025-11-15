@@ -1,0 +1,99 @@
+[gd_scene load_steps=3 format=3 uid="uid://d7k9m3p2n5x8q"]
+
+[ext_resource type="Script" path="res://scripts/ui/arcade_frame.gd" id="1_frame"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_decoration"]
+font_size = 32
+font_color = Color(1, 0.84, 0, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="ArcadeFrame" type="CanvasLayer"]
+layer = 1
+script = ExtResource("1_frame")
+
+[node name="TopBorder" type="ColorRect" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 8.0
+grow_horizontal = 2
+color = Color(0.2, 0.15, 0.1, 1)
+
+[node name="BottomBorder" type="ColorRect" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.2, 0.15, 0.1, 1)
+
+[node name="LeftBorder" type="ColorRect" parent="."]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 8.0
+grow_vertical = 2
+color = Color(0.2, 0.15, 0.1, 1)
+
+[node name="RightBorder" type="ColorRect" parent="."]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+color = Color(0.2, 0.15, 0.1, 1)
+
+[node name="CornerTL" type="ColorRect" parent="."]
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(0.15, 0.1, 0.05, 1)
+
+[node name="CornerTR" type="ColorRect" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -16.0
+offset_bottom = 16.0
+grow_horizontal = 0
+color = Color(0.15, 0.1, 0.05, 1)
+
+[node name="CornerBL" type="ColorRect" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+offset_right = 16.0
+grow_vertical = 0
+color = Color(0.15, 0.1, 0.05, 1)
+
+[node name="CornerBR" type="ColorRect" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+color = Color(0.15, 0.1, 0.05, 1)
+
+[node name="DecorationLabel" type="Label" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "✝   🐚   ⭐   ✝   🐚"
+label_settings = SubResource("LabelSettings_decoration")
+horizontal_alignment = 1
+vertical_alignment = 1

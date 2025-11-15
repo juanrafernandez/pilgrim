@@ -1,0 +1,63 @@
+[gd_scene load_steps=2 format=3 uid="uid://c9x2k5m7p3q8n"]
+
+[ext_resource type="Script" path="res://scripts/ui/low_health_warning.gd" id="1_warning"]
+
+[node name="LowHealthWarning" type="CanvasLayer"]
+layer = 99
+script = ExtResource("1_warning")
+
+[node name="WarningBorder" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0, 0, 0)
+
+[node name="BorderTop" type="ColorRect" parent="WarningBorder"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 8.0
+grow_horizontal = 2
+color = Color(1, 0, 0, 1)
+
+[node name="BorderBottom" type="ColorRect" parent="WarningBorder"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(1, 0, 0, 1)
+
+[node name="BorderLeft" type="ColorRect" parent="WarningBorder"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 8.0
+grow_vertical = 2
+color = Color(1, 0, 0, 1)
+
+[node name="BorderRight" type="ColorRect" parent="WarningBorder"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+color = Color(1, 0, 0, 1)
+
+[node name="Vignette" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.3)
