@@ -1,12 +1,29 @@
-[gd_scene load_steps=23 format=3 uid="uid://b8xm3k9p2vwq1"]
+[gd_scene load_steps=41 format=3 uid="uid://b8xm3k9p2vwq1"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_01.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="3_camera"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy_wolf.tscn" id="4_wolf"]
-[ext_resource type="Texture2D" path="res://assets/sprites/decorations/arrow.png" id="5_arrow"]
-[ext_resource type="Texture2D" path="res://assets/sprites/decorations/shell.png" id="6_shell"]
-[ext_resource type="Texture2D" path="res://assets/sprites/decorations/cross.png" id="7_cross"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/sky_gradient.png" id="5_sky"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/clouds.png" id="6_clouds"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/mountains_far.png" id="7_mountains_far"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/mountains_near.png" id="8_mountains_near"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/arrow.png" id="9_arrow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/shell_detailed.png" id="10_shell"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/cross_detailed.png" id="11_cross"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/tree_detailed.png" id="12_tree"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_1000x220.png" id="13_ground1000"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_300x220.png" id="14_ground300"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_600x220.png" id="15_ground600"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_500x220.png" id="16_ground500"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_550x220.png" id="17_ground550"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_800x220.png" id="18_ground800"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_900x220.png" id="19_ground900"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/ground_1400x220.png" id="20_ground1400"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/platform_200x32.png" id="21_plat200"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/platform_250x32.png" id="22_plat250"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/platform_180x32.png" id="23_plat180"]
+[ext_resource type="Texture2D" path="res://assets/tiles/tiled/bridge_300x40.png" id="24_bridge"]
 
 [sub_resource type="RectangleShape2D" id="trigger_shape"]
 size = Vector2(100, 300)
@@ -74,29 +91,40 @@ size = Vector2(10000, 100)
 [node name="Level01" type="Node2D"]
 script = ExtResource("1_script")
 
-[node name="Background" type="Node2D" parent="."]
-z_index = -100
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+scroll_ignore_camera_zoom = true
 
-[node name="Sky" type="ColorRect" parent="Background"]
-offset_right = 9000.0
-offset_bottom = 1920.0
-color = Color(0.227451, 0.290196, 0.352941, 1)
+[node name="Sky" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0, 0)
+motion_mirroring = Vector2(1080, 0)
 
-[node name="Mountains" type="ColorRect" parent="Background"]
-z_index = -90
-offset_left = 0.0
-offset_top = 1200.0
-offset_right = 9000.0
-offset_bottom = 1600.0
-color = Color(0.176471, 0.207843, 0.25098, 1)
+[node name="SkySprite" type="Sprite2D" parent="ParallaxBackground/Sky"]
+position = Vector2(540, 200)
+texture = ExtResource("5_sky")
 
-[node name="ForestBack" type="ColorRect" parent="Background"]
-z_index = -80
-offset_left = 0.0
-offset_top = 1400.0
-offset_right = 9000.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Clouds" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.1, 0)
+motion_mirroring = Vector2(1080, 0)
+
+[node name="CloudsSprite" type="Sprite2D" parent="ParallaxBackground/Clouds"]
+position = Vector2(540, 100)
+texture = ExtResource("6_clouds")
+
+[node name="MountainsFar" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.3, 0)
+motion_mirroring = Vector2(1080, 0)
+
+[node name="MountainsFarSprite" type="Sprite2D" parent="ParallaxBackground/MountainsFar"]
+position = Vector2(540, 1100)
+texture = ExtResource("7_mountains_far")
+
+[node name="MountainsNear" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.5, 0)
+motion_mirroring = Vector2(1080, 0)
+
+[node name="MountainsNearSprite" type="Sprite2D" parent="ParallaxBackground/MountainsNear"]
+position = Vector2(540, 1225)
+texture = ExtResource("8_mountains_near")
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(150, 1600)
@@ -116,10 +144,9 @@ position = Vector2(0, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/Section1Ground"]
-offset_right = 1000.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/Section1Ground"]
+position = Vector2(500, 110)
+texture = ExtResource("13_ground1000")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section1Ground"]
 position = Vector2(500, 110)
@@ -130,10 +157,9 @@ position = Vector2(800, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/Section2Ground"]
-offset_right = 300.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/Section2Ground"]
+position = Vector2(150, 110)
+texture = ExtResource("14_ground300")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section2Ground"]
 position = Vector2(150, 110)
@@ -144,10 +170,9 @@ position = Vector2(1200, 1600)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform1"]
-offset_right = 200.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform1"]
+position = Vector2(100, 16)
+texture = ExtResource("21_plat200")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform1"]
 position = Vector2(100, 16)
@@ -158,10 +183,9 @@ position = Vector2(1500, 1550)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform2"]
-offset_right = 200.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform2"]
+position = Vector2(100, 16)
+texture = ExtResource("21_plat200")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform2"]
 position = Vector2(100, 16)
@@ -172,10 +196,9 @@ position = Vector2(1800, 1650)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform3"]
-offset_right = 250.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform3"]
+position = Vector2(125, 16)
+texture = ExtResource("22_plat250")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform3"]
 position = Vector2(125, 16)
@@ -186,10 +209,9 @@ position = Vector2(2100, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/Section3Ground"]
-offset_right = 600.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/Section3Ground"]
+position = Vector2(300, 110)
+texture = ExtResource("15_ground600")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section3Ground"]
 position = Vector2(300, 110)
@@ -200,10 +222,9 @@ position = Vector2(2750, 1680)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/BridgeLog"]
-offset_right = 300.0
-offset_bottom = 40.0
-color = Color(0.4, 0.266667, 0.133333, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/BridgeLog"]
+position = Vector2(150, 20)
+texture = ExtResource("24_bridge")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/BridgeLog"]
 position = Vector2(150, 20)
@@ -214,10 +235,9 @@ position = Vector2(2400, 1500)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform4High"]
-offset_right = 180.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform4High"]
+position = Vector2(90, 16)
+texture = ExtResource("23_plat180")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform4High"]
 position = Vector2(90, 16)
@@ -228,10 +248,9 @@ position = Vector2(2600, 1650)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform4Low"]
-offset_right = 180.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform4Low"]
+position = Vector2(90, 16)
+texture = ExtResource("23_plat180")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform4Low"]
 position = Vector2(90, 16)
@@ -242,10 +261,9 @@ position = Vector2(3100, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/Section4Ground"]
-offset_right = 500.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/Section4Ground"]
+position = Vector2(250, 110)
+texture = ExtResource("16_ground500")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section4Ground"]
 position = Vector2(250, 110)
@@ -256,10 +274,9 @@ position = Vector2(3650, 1550)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform5Elevated"]
-offset_right = 250.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform5Elevated"]
+position = Vector2(125, 16)
+texture = ExtResource("22_plat250")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform5Elevated"]
 position = Vector2(125, 16)
@@ -270,10 +287,9 @@ position = Vector2(3950, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/FinalGround"]
-offset_right = 550.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/FinalGround"]
+position = Vector2(275, 110)
+texture = ExtResource("17_ground550")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/FinalGround"]
 position = Vector2(275, 110)
@@ -284,10 +300,9 @@ position = Vector2(4550, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/Section5Ground"]
-offset_right = 800.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/Section5Ground"]
+position = Vector2(400, 110)
+texture = ExtResource("18_ground800")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section5Ground"]
 position = Vector2(400, 110)
@@ -298,10 +313,9 @@ position = Vector2(5450, 1600)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform6"]
-offset_right = 200.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform6"]
+position = Vector2(100, 16)
+texture = ExtResource("21_plat200")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform6"]
 position = Vector2(100, 16)
@@ -312,10 +326,9 @@ position = Vector2(5750, 1500)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform7"]
-offset_right = 200.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform7"]
+position = Vector2(100, 16)
+texture = ExtResource("21_plat200")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform7"]
 position = Vector2(100, 16)
@@ -326,10 +339,9 @@ position = Vector2(6000, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/Section6Ground"]
-offset_right = 900.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/Section6Ground"]
+position = Vector2(450, 110)
+texture = ExtResource("19_ground900")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section6Ground"]
 position = Vector2(450, 110)
@@ -340,10 +352,9 @@ position = Vector2(7000, 1550)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform8"]
-offset_right = 250.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform8"]
+position = Vector2(125, 16)
+texture = ExtResource("22_plat250")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform8"]
 position = Vector2(125, 16)
@@ -354,10 +365,9 @@ position = Vector2(7350, 1650)
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite" type="ColorRect" parent="Terrain/Platform9"]
-offset_right = 200.0
-offset_bottom = 32.0
-color = Color(0.533333, 0.466667, 0.4, 1)
+[node name="Sprite" type="Sprite2D" parent="Terrain/Platform9"]
+position = Vector2(100, 16)
+texture = ExtResource("21_plat200")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform9"]
 position = Vector2(100, 16)
@@ -368,10 +378,9 @@ position = Vector2(7600, 1700)
 collision_layer = 2
 collision_mask = 1
 
-[node name="GroundSprite" type="ColorRect" parent="Terrain/Section7Ground"]
-offset_right = 1400.0
-offset_bottom = 220.0
-color = Color(0.4, 0.333333, 0.266667, 1)
+[node name="GroundSprite" type="Sprite2D" parent="Terrain/Section7Ground"]
+position = Vector2(700, 110)
+texture = ExtResource("20_ground1400")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section7Ground"]
 position = Vector2(700, 110)
@@ -382,18 +391,18 @@ z_index = -50
 
 [node name="Sign_YellowArrow" type="Sprite2D" parent="Decoration"]
 position = Vector2(250, 1550)
-texture = ExtResource("5_arrow")
-scale = Vector2(2, 2)
+texture = ExtResource("9_arrow")
+scale = Vector2(3, 3)
 
 [node name="Shell_Pilgrim" type="Sprite2D" parent="Decoration"]
 position = Vector2(500, 1560)
-texture = ExtResource("6_shell")
-scale = Vector2(2, 2)
+texture = ExtResource("10_shell")
+scale = Vector2(3, 3)
 
 [node name="Cross_Santiago" type="Sprite2D" parent="Decoration"]
 position = Vector2(1900, 1540)
-texture = ExtResource("7_cross")
-scale = Vector2(2, 2)
+texture = ExtResource("11_cross")
+scale = Vector2(3, 3)
 
 [node name="Rock_WithSymbol" type="Node2D" parent="Decoration"]
 position = Vector2(2800, 1650)
@@ -414,61 +423,45 @@ color = Color(0.8, 0.2, 0.2, 1)
 
 [node name="Trees" type="Node2D" parent="Decoration"]
 
-[node name="Tree1" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 700.0
-offset_top = 1500.0
-offset_right = 720.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree1" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(700, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
-[node name="Tree2" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 1400.0
-offset_top = 1550.0
-offset_right = 1420.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree2" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(1400, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
-[node name="Tree3" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 2200.0
-offset_top = 1520.0
-offset_right = 2220.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree3" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(2200, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
-[node name="Tree4" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 3200.0
-offset_top = 1480.0
-offset_right = 3220.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree4" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(3200, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
-[node name="Tree5" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 4800.0
-offset_top = 1500.0
-offset_right = 4820.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree5" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(4800, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
-[node name="Tree6" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 5900.0
-offset_top = 1520.0
-offset_right = 5920.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree6" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(5900, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
-[node name="Tree7" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 7100.0
-offset_top = 1490.0
-offset_right = 7120.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree7" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(7100, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
-[node name="Tree8" type="ColorRect" parent="Decoration/Trees"]
-offset_left = 8000.0
-offset_top = 1500.0
-offset_right = 8020.0
-offset_bottom = 1700.0
-color = Color(0.176471, 0.313726, 0.0862745, 1)
+[node name="Tree8" type="Sprite2D" parent="Decoration/Trees"]
+position = Vector2(8000, 1640)
+texture = ExtResource("12_tree")
+scale = Vector2(2, 2)
 
 [node name="FinalLight" type="ColorRect" parent="Decoration"]
 offset_left = 8300.0

@@ -1,0 +1,23 @@
+[gd_resource type="TileSet" load_steps=4 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/tiles/ground/ground_grass_top.png" id="1_grass"]
+[ext_resource type="Texture2D" path="res://assets/tiles/ground/ground_dirt.png" id="2_dirt"]
+[ext_resource type="Texture2D" path="res://assets/tiles/platforms/platform_stone.png" id="3_platform"]
+
+[resource]
+tile_size = Vector2i(32, 32)
+
+[sub_resource type="TileSetAtlasSource" id="atlas_ground"]
+texture = ExtResource("1_grass")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="atlas_dirt"]
+texture = ExtResource("2_dirt")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="atlas_platform"]
+texture = ExtResource("3_platform")
+texture_region_size = Vector2i(32, 16)
+0:0/0 = 0
