@@ -101,9 +101,9 @@ func set_health(current: int, maximum: int) -> void:
 		else:
 			health_bar.modulate = Color(0.2, 1.0, 0.2)  # Green (neon)
 
-	# Update low health warning
-	if low_health_warning:
-		low_health_warning.update_health_status(current, maximum)
+	# Update low health warning (DISABLED - user request)
+	# if low_health_warning:
+	# 	low_health_warning.update_health_status(current, maximum)
 
 
 func set_weapon_durability(current: int, maximum: int) -> void:

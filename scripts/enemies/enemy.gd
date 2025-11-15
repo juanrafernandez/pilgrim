@@ -5,12 +5,12 @@ class_name Enemy
 ## All enemies inherit from this class
 ## Handles health, damage, movement, and basic AI
 
-# Signals
+# Signals (DECOUPLED - no specific type constraints)
 signal health_changed(new_health: int, max_health: int)
 signal died()
-signal player_detected(player: Player)
-signal player_lost()
-signal attacked(target: Node2D)
+signal target_detected(detected_target)  # Renamed from player_detected, no type constraint
+signal target_lost()  # Renamed from player_lost
+signal attacked(attacked_target)  # No specific type (was Node2D)
 
 # Enums
 enum State {
@@ -65,8 +65,8 @@ var attack_cooldown: float = 1.5
 var can_attack: bool = true
 var attack_state_timer: float = 0.0
 
-# References
-var player: Player = null
+# References (DECOUPLED - using duck typing instead of concrete types)
+var target = null  # Any damageable entity (Player, NPC, etc.) - no type hint for flexibility
 var spawn_position: Vector2
 var patrol_target: Vector2
 var patrol_timer: float = 0.0
@@ -173,8 +173,8 @@ func _ai_idle(delta: float) -> void:
 	"""Idle behavior"""
 	velocity.x = move_toward(velocity.x, 0, move_speed * delta * 5)
 
-	# Check for player in range
-	if player and _is_player_in_range(detection_range):
+	# Check for target in range
+	if target and _is_target_in_range(detection_range):
 		change_state(State.CHASE)
 	elif patrol_timer <= 0:
 		change_state(State.PATROL)
@@ -210,52 +210,54 @@ func _ai_patrol(delta: float) -> void:
 	velocity.x = direction * patrol_speed
 	_update_sprite_direction()
 
-	# Check for player
-	if player and _is_player_in_range(detection_range):
+	# Check for target
+	if target and _is_target_in_range(detection_range):
 		change_state(State.CHASE)
 
 
 func _ai_chase(delta: float) -> void:
-	"""Chase player behavior"""
-	if not player or player.is_dead:
+	"""Chase target behavior (DECOUPLED - works with any damageable entity)"""
+	# Check if target is still valid and alive
+	if not target or (target.has_method("is_dead") and target.is_dead):
 		change_state(State.IDLE)
 		return
 
-	# Check if player is too far
-	if not _is_player_in_range(lose_player_range):
-		player_lost.emit()
-		player = null
+	# Check if target is too far
+	if not _is_target_in_range(lose_player_range):
+		target_lost.emit()
+		target = null
 		change_state(State.PATROL)
 		return
 
 	# Check if in attack range
-	if _is_player_in_range(attack_range) and can_attack:
+	if _is_target_in_range(attack_range) and can_attack:
 		change_state(State.ATTACK)
 		return
 
 	# Check for edges before moving (but be more aggressive when chasing)
 	if _check_edge_ahead():
 		if can_jump:
-			# Try to jump if chasing player
+			# Try to jump if chasing target
 			if _can_jump_gap():
 				velocity.y = jump_velocity
-				print("%s jumping to chase player" % name)
+				print("%s jumping to chase target" % name)
 		else:
 			# If can't jump and edge ahead, stop chasing
 			change_state(State.IDLE)
 			return
 
-	# Move towards player
-	var direction = sign(player.global_position.x - global_position.x)
+	# Move towards target
+	var direction = sign(target.global_position.x - global_position.x)
 	velocity.x = direction * chase_speed
 	_update_sprite_direction()
 
 
 func _ai_attack(delta: float) -> void:
-	"""Attack behavior with knockback"""
+	"""Attack behavior with knockback (DECOUPLED)"""
 	# First frame of attack: perform attack and apply self-knockback
 	if attack_state_timer <= 0:
-		if not player or player.is_dead:
+		# Check if target is still valid
+		if not target or (target.has_method("is_dead") and target.is_dead):
 			change_state(State.IDLE)
 			return
 
@@ -263,7 +265,7 @@ func _ai_attack(delta: float) -> void:
 		_perform_attack()
 
 		# Enemy recoils backward after attacking
-		var recoil_dir = -sign(player.global_position.x - global_position.x)
+		var recoil_dir = -sign(target.global_position.x - global_position.x)
 		velocity.x = recoil_dir * attack_knockback_self
 
 		# Set attack duration
@@ -297,11 +299,11 @@ func _set_random_patrol_target() -> void:
 	patrol_target = spawn_position + Vector2(offset, 0)
 
 
-func _is_player_in_range(range: float) -> bool:
-	"""Check if player is within range"""
-	if not player:
+func _is_target_in_range(range: float) -> bool:
+	"""Check if target is within range (DECOUPLED - works with any Node2D)"""
+	if not target:
 		return false
-	return global_position.distance_to(player.global_position) <= range
+	return global_position.distance_to(target.global_position) <= range
 
 
 func _update_sprite_direction() -> void:
@@ -377,15 +379,17 @@ func _handle_edge_behavior() -> void:
 
 
 func _perform_attack() -> void:
-	"""Perform attack on player with knockback"""
-	if player and _is_player_in_range(attack_range):
+	"""Perform attack on target with knockback (DECOUPLED - duck typing)"""
+	# Verify target has take_damage method (duck typing instead of type checking)
+	if target and _is_target_in_range(attack_range) and target.has_method("take_damage"):
 		# Calculate knockback direction (away from enemy)
-		var knockback_dir = sign(player.global_position.x - global_position.x)
+		var knockback_dir = sign(target.global_position.x - global_position.x)
 		var knockback = Vector2(knockback_dir * 350, -450)  # Strong knockback (GnG style)
 
-		player.take_damage(attack_damage, knockback, self)  # Pass self as attacker for parry
-		attacked.emit(player)
-		print("%s attacked player for %d damage" % [name, attack_damage])
+		# Call take_damage using duck typing (any object with this method will work)
+		target.take_damage(attack_damage, knockback, self)  # Pass self as attacker for parry
+		attacked.emit(target)
+		print("%s attacked target for %d damage" % [name, attack_damage])
 
 
 ## Take damage
@@ -420,16 +424,16 @@ func die() -> void:
 
 	is_dead = true
 	change_state(State.DEATH)
+
+	# Emit died signal - let the level/manager handle scoring (DECOUPLED)
+	# The signal carries score_value, allowing the listener to decide what to do
 	died.emit()
 
 	print("%s died" % name)
 
-	# Award score to player using new managers (SOLID principle - dependency on abstraction)
-	if has_node("/root/ScoreManager"):
-		get_node("/root/ScoreManager").add_score(score_value)
-
-	if has_node("/root/ComboManager"):
-		get_node("/root/ComboManager").add_combo_hit()
+	# NOTE: Scoring is now handled externally via signal connection
+	# The level script connects to died signal and awards points
+	# This decouples Enemy from ScoreManager and ComboManager
 
 	# Fade out and remove
 	_death_animation()
@@ -447,7 +451,7 @@ func _death_animation() -> void:
 
 ## Set enemy active/inactive state
 func set_active(active: bool) -> void:
-	"""Enable or disable enemy AI and visibility"""
+	"""Enable or disable enemy AI and visibility (DECOUPLED)"""
 	set_physics_process(active)
 	visible = active
 
@@ -455,7 +459,7 @@ func set_active(active: bool) -> void:
 		# Deactivate enemy - set to idle and stop movement
 		change_state(State.IDLE)
 		velocity = Vector2.ZERO
-		player = null
+		target = null
 	else:
 		# Activate enemy - start patrolling
 		patrol_distance_walked = 0.0
@@ -473,56 +477,64 @@ func change_state(new_state: State) -> void:
 	# print("%s: State changed to %s" % [name, State.keys()[new_state]])
 
 
-## Detection callbacks
+## Detection callbacks (DECOUPLED - uses duck typing)
 func _on_body_entered_detection(body: Node2D) -> void:
-	"""Called when body enters detection area"""
-	if body is Player and not body.is_dead:
-		player = body
-		player_detected.emit(player)
-		print("%s detected player" % name)
+	"""Called when body enters detection area - uses duck typing for flexibility"""
+	# Check if body is a valid target (has take_damage method and not dead)
+	if body.has_method("take_damage") and body.is_in_group("player"):
+		# Additional check: verify it's alive if it has is_dead property
+		if not (body.has_method("is_dead") and body.is_dead):
+			target = body
+			target_detected.emit(target)
+			print("%s detected target" % name)
 
 
 func _on_body_exited_detection(body: Node2D) -> void:
 	"""Called when body exits detection area"""
-	if body is Player:
-		# Don't immediately lose player, wait for chase AI to handle it
-		pass
+	# Don't immediately lose target, wait for chase AI to handle it based on distance
+	if body == target:
+		pass  # Chase AI will handle losing the target via distance check
 
 
-## Contact damage callbacks
+## Contact damage callbacks (DECOUPLED - uses duck typing)
 func _on_body_entered_contact(body: Node2D) -> void:
-	"""Called when body enters contact area (continuous damage on touch)"""
-	if body is Player and not body.is_dead and not is_dead:
-		# IMPORTANT: Only deal contact damage in PATROL and CHASE states
-		# During ATTACK (enemy is recoiling), HURT, or DEATH, enemy should pass through player harmlessly
-		if current_state != State.PATROL and current_state != State.CHASE:
-			return  # Enemy can pass through player during attack/hurt/death
+	"""Called when body enters contact area (continuous damage on touch) - DECOUPLED"""
+	# Duck typing: check if body can take damage and is in player group
+	if not body.has_method("take_damage") or not body.is_in_group("player"):
+		return
 
-		# Check if enough time has passed since last contact damage
-		var current_time = Time.get_ticks_msec() / 1000.0
-		if current_time - last_contact_damage_time >= contact_damage_cooldown:
-			# Deal contact damage to player
-			var knockback_dir = sign(body.global_position.x - global_position.x)
-			var knockback = Vector2(knockback_dir * 250, -350)  # Softer than attacks
-			body.take_damage(contact_damage, knockback, self)
-			last_contact_damage_time = current_time
+	# Check if target is dead using duck typing
+	if (body.has_method("is_dead") and body.is_dead) or is_dead:
+		return
 
-			# Enemy also recoils slightly (bounces back momentarily)
-			# Recoil direction is OPPOSITE to player (away from collision)
-			var enemy_recoil_dir = -knockback_dir  # Opposite direction
-			var enemy_recoil = enemy_recoil_dir * 150.0  # Small recoil (150 units)
-			velocity.x = enemy_recoil
-			# Enemy will continue in original direction after recoil fades naturally
+	# IMPORTANT: Only deal contact damage in PATROL and CHASE states
+	# During ATTACK (enemy is recoiling), HURT, or DEATH, enemy should pass through harmlessly
+	if current_state != State.PATROL and current_state != State.CHASE:
+		return  # Enemy can pass through during attack/hurt/death
 
-			# Lighter screenshake for contact damage (distinct from attack hits)
-			if body.has_method("get") and body.camera_controller:
-				body.camera_controller.add_trauma(0.2)  # Lighter shake than normal hits
+	# Check if enough time has passed since last contact damage
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time - last_contact_damage_time >= contact_damage_cooldown:
+		# Deal contact damage
+		var knockback_dir = sign(body.global_position.x - global_position.x)
+		var knockback = Vector2(knockback_dir * 250, -350)  # Softer than attacks
+		body.take_damage(contact_damage, knockback, self)
+		last_contact_damage_time = current_time
 
-			print("%s dealt %d contact damage to player (enemy recoiled %.0f units)" % [name, contact_damage, enemy_recoil])
+		# Enemy also recoils slightly (bounces back momentarily)
+		var enemy_recoil_dir = -knockback_dir  # Opposite direction
+		var enemy_recoil = enemy_recoil_dir * 150.0  # Small recoil (150 units)
+		velocity.x = enemy_recoil
+
+		# Lighter screenshake for contact damage (duck typing check for camera)
+		if body.has_method("get") and body.get("camera_controller"):
+			body.camera_controller.add_trauma(0.2)  # Lighter shake than normal hits
+
+		print("%s dealt %d contact damage to target (enemy recoiled %.0f units)" % [name, contact_damage, enemy_recoil])
 
 
 func _on_body_exited_contact(body: Node2D) -> void:
-	"""Called when body exits contact area"""
-	# Reset contact damage timer when player leaves
-	if body is Player:
+	"""Called when body exits contact area (DECOUPLED)"""
+	# Reset contact damage timer when target leaves
+	if body.is_in_group("player"):
 		last_contact_damage_time = 0.0

@@ -62,12 +62,13 @@ func _physics_process(_delta: float) -> void:
 
 
 func _setup_enemy_connections() -> void:
-	"""Connect to all enemy signals"""
+	"""Connect to all enemy signals (UPDATED for decoupled enemy signals)"""
 	for enemy in enemies_node.get_children():
 		if enemy.has_signal("died"):
 			enemy.died.connect(_on_enemy_died.bind(enemy))
-		if enemy.has_signal("player_detected"):
-			enemy.player_detected.connect(_on_enemy_detected_player.bind(enemy))
+		# Updated signal names: target_detected instead of player_detected
+		if enemy.has_signal("target_detected"):
+			enemy.target_detected.connect(_on_enemy_detected_target.bind(enemy))
 		if enemy.has_signal("attacked"):
 			enemy.attacked.connect(_on_enemy_attacked.bind(enemy))
 
@@ -140,6 +141,14 @@ func _on_death_zone_entered(body: Node2D) -> void:
 
 func _on_enemy_died(enemy: Enemy) -> void:
 	print("Enemy died: %s" % enemy.name)
+
+	# Award score and combo (DECOUPLED - level handles scoring, not enemy)
+	if has_node("/root/ScoreManager"):
+		get_node("/root/ScoreManager").add_score(enemy.score_value)
+
+	if has_node("/root/ComboManager"):
+		get_node("/root/ComboManager").add_combo_hit()
+
 	_update_enemy_count()
 
 	# Check if all enemies defeated
@@ -148,8 +157,9 @@ func _on_enemy_died(enemy: Enemy) -> void:
 		_show_victory_message()
 
 
-func _on_enemy_detected_player(player_ref: Player, enemy: Enemy) -> void:
-	print("%s detected player!" % enemy.name)
+func _on_enemy_detected_target(target_ref, enemy: Enemy) -> void:
+	"""Handle enemy detecting a target (DECOUPLED - no type constraint)"""
+	print("%s detected target!" % enemy.name)
 
 
 func _on_enemy_attacked(target: Node2D, enemy: Enemy) -> void:
