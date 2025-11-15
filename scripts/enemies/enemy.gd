@@ -475,6 +475,11 @@ func _on_body_exited_detection(body: Node2D) -> void:
 func _on_body_entered_contact(body: Node2D) -> void:
 	"""Called when body enters contact area (continuous damage on touch)"""
 	if body is Player and not body.is_dead and not is_dead:
+		# IMPORTANT: Only deal contact damage in PATROL and CHASE states
+		# During ATTACK (enemy is recoiling), HURT, or DEATH, enemy should pass through player harmlessly
+		if current_state != State.PATROL and current_state != State.CHASE:
+			return  # Enemy can pass through player during attack/hurt/death
+
 		# Check if enough time has passed since last contact damage
 		var current_time = Time.get_ticks_msec() / 1000.0
 		if current_time - last_contact_damage_time >= contact_damage_cooldown:
