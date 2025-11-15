@@ -483,18 +483,24 @@ func _on_body_entered_contact(body: Node2D) -> void:
 		# Check if enough time has passed since last contact damage
 		var current_time = Time.get_ticks_msec() / 1000.0
 		if current_time - last_contact_damage_time >= contact_damage_cooldown:
-			# Deal contact damage (70% of attack damage by default)
-			# Reduced knockback for contact damage (feels less punishing than attacks)
+			# Deal contact damage to player
 			var knockback_dir = sign(body.global_position.x - global_position.x)
 			var knockback = Vector2(knockback_dir * 250, -350)  # Softer than attacks
 			body.take_damage(contact_damage, knockback, self)
 			last_contact_damage_time = current_time
 
+			# Enemy also recoils slightly (bounces back momentarily)
+			# Recoil direction is OPPOSITE to player (away from collision)
+			var enemy_recoil_dir = -knockback_dir  # Opposite direction
+			var enemy_recoil = enemy_recoil_dir * 150.0  # Small recoil (150 units)
+			velocity.x = enemy_recoil
+			# Enemy will continue in original direction after recoil fades naturally
+
 			# Lighter screenshake for contact damage (distinct from attack hits)
 			if body.has_method("get") and body.camera_controller:
 				body.camera_controller.add_trauma(0.2)  # Lighter shake than normal hits
 
-			print("%s dealt %d contact damage to player" % [name, contact_damage])
+			print("%s dealt %d contact damage to player (enemy recoiled %.0f units)" % [name, contact_damage, enemy_recoil])
 
 
 func _on_body_exited_contact(body: Node2D) -> void:
