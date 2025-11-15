@@ -1,12 +1,8 @@
-[gd_scene load_steps=20 format=3 uid="uid://b8xm3k9p2vwq1"]
+[gd_scene load_steps=18 format=3 uid="uid://b8xm3lap2vwq1"]
 
-[ext_resource type="Script" path="res://scripts/levels/level_01.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="3_camera"]
-[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_wolf.tscn" id="4_wolf"]
-
-[sub_resource type="RectangleShape2D" id="trigger_shape"]
-size = Vector2(100, 300)
+[ext_resource type="Script" uid="uid://c5506nctj42y7" path="res://scripts/core/camera_controller.gd" id="3_camera"]
+[ext_resource type="PackedScene" uid="uid://wolf123456" path="res://scenes/enemies/enemy_wolf.tscn" id="4_wolf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_s1"]
 size = Vector2(1000, 220)
@@ -44,11 +40,13 @@ size = Vector2(250, 32)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_final"]
 size = Vector2(550, 220)
 
+[sub_resource type="RectangleShape2D" id="trigger_shape"]
+size = Vector2(100, 300)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_deathzone"]
 size = Vector2(5000, 100)
 
 [node name="Level01" type="Node2D"]
-script = ExtResource("1_script")
 
 [node name="Background" type="Node2D" parent="."]
 z_index = -100
@@ -60,7 +58,6 @@ color = Color(0.227451, 0.290196, 0.352941, 1)
 
 [node name="Mountains" type="ColorRect" parent="Background"]
 z_index = -90
-offset_left = 0.0
 offset_top = 1200.0
 offset_right = 4500.0
 offset_bottom = 1600.0
@@ -68,7 +65,6 @@ color = Color(0.176471, 0.207843, 0.25098, 1)
 
 [node name="ForestBack" type="ColorRect" parent="Background"]
 z_index = -80
-offset_left = 0.0
 offset_top = 1400.0
 offset_right = 4500.0
 offset_bottom = 1700.0
@@ -80,7 +76,6 @@ position = Vector2(150, 1600)
 [node name="Camera" type="Camera2D" parent="."]
 position = Vector2(540, 960)
 script = ExtResource("3_camera")
-backward_limit_distance = 600.0
 forward_buffer = 300.0
 vertical_offset = -600.0
 horizontal_offset = 200.0
@@ -90,7 +85,6 @@ horizontal_offset = 200.0
 [node name="Section1Ground" type="StaticBody2D" parent="Terrain"]
 position = Vector2(0, 1700)
 collision_layer = 2
-collision_mask = 1
 
 [node name="GroundSprite" type="ColorRect" parent="Terrain/Section1Ground"]
 offset_right = 1000.0
@@ -104,7 +98,6 @@ shape = SubResource("RectangleShape2D_ground_s1")
 [node name="Section2Ground" type="StaticBody2D" parent="Terrain"]
 position = Vector2(800, 1700)
 collision_layer = 2
-collision_mask = 1
 
 [node name="GroundSprite" type="ColorRect" parent="Terrain/Section2Ground"]
 offset_right = 300.0
@@ -118,7 +111,6 @@ shape = SubResource("RectangleShape2D_ground_s2a")
 [node name="Platform1" type="StaticBody2D" parent="Terrain"]
 position = Vector2(1200, 1600)
 collision_layer = 2
-collision_mask = 1
 
 [node name="Sprite" type="ColorRect" parent="Terrain/Platform1"]
 offset_right = 200.0
@@ -132,7 +124,6 @@ shape = SubResource("RectangleShape2D_platform1")
 [node name="Platform2" type="StaticBody2D" parent="Terrain"]
 position = Vector2(1500, 1550)
 collision_layer = 2
-collision_mask = 1
 
 [node name="Sprite" type="ColorRect" parent="Terrain/Platform2"]
 offset_right = 200.0
@@ -146,7 +137,6 @@ shape = SubResource("RectangleShape2D_platform2")
 [node name="Platform3" type="StaticBody2D" parent="Terrain"]
 position = Vector2(1800, 1650)
 collision_layer = 2
-collision_mask = 1
 
 [node name="Sprite" type="ColorRect" parent="Terrain/Platform3"]
 offset_right = 250.0
@@ -160,7 +150,6 @@ shape = SubResource("RectangleShape2D_platform3")
 [node name="Section3Ground" type="StaticBody2D" parent="Terrain"]
 position = Vector2(2100, 1700)
 collision_layer = 2
-collision_mask = 1
 
 [node name="GroundSprite" type="ColorRect" parent="Terrain/Section3Ground"]
 offset_right = 600.0
@@ -174,7 +163,6 @@ shape = SubResource("RectangleShape2D_ground_s3")
 [node name="BridgeLog" type="StaticBody2D" parent="Terrain"]
 position = Vector2(2750, 1680)
 collision_layer = 2
-collision_mask = 1
 
 [node name="Sprite" type="ColorRect" parent="Terrain/BridgeLog"]
 offset_right = 300.0
@@ -188,7 +176,6 @@ shape = SubResource("RectangleShape2D_bridge")
 [node name="Platform4High" type="StaticBody2D" parent="Terrain"]
 position = Vector2(2400, 1500)
 collision_layer = 2
-collision_mask = 1
 
 [node name="Sprite" type="ColorRect" parent="Terrain/Platform4High"]
 offset_right = 180.0
@@ -202,7 +189,6 @@ shape = SubResource("RectangleShape2D_platform4h")
 [node name="Platform4Low" type="StaticBody2D" parent="Terrain"]
 position = Vector2(2600, 1650)
 collision_layer = 2
-collision_mask = 1
 
 [node name="Sprite" type="ColorRect" parent="Terrain/Platform4Low"]
 offset_right = 180.0
@@ -216,7 +202,6 @@ shape = SubResource("RectangleShape2D_platform4l")
 [node name="Section4Ground" type="StaticBody2D" parent="Terrain"]
 position = Vector2(3100, 1700)
 collision_layer = 2
-collision_mask = 1
 
 [node name="GroundSprite" type="ColorRect" parent="Terrain/Section4Ground"]
 offset_right = 500.0
@@ -230,7 +215,6 @@ shape = SubResource("RectangleShape2D_ground_s4a")
 [node name="Platform5Elevated" type="StaticBody2D" parent="Terrain"]
 position = Vector2(3650, 1550)
 collision_layer = 2
-collision_mask = 1
 
 [node name="Sprite" type="ColorRect" parent="Terrain/Platform5Elevated"]
 offset_right = 250.0
@@ -244,7 +228,6 @@ shape = SubResource("RectangleShape2D_platform5")
 [node name="FinalGround" type="StaticBody2D" parent="Terrain"]
 position = Vector2(3950, 1700)
 collision_layer = 2
-collision_mask = 1
 
 [node name="GroundSprite" type="ColorRect" parent="Terrain/FinalGround"]
 offset_right = 550.0
@@ -394,7 +377,6 @@ position = Vector2(3850, 1600)
 [node name="TriggerWolf1" type="Area2D" parent="Triggers"]
 position = Vector2(500, 1600)
 collision_layer = 0
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerWolf1"]
 shape = SubResource("trigger_shape")
@@ -402,7 +384,6 @@ shape = SubResource("trigger_shape")
 [node name="TriggerWolf2" type="Area2D" parent="Triggers"]
 position = Vector2(1300, 1600)
 collision_layer = 0
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerWolf2"]
 shape = SubResource("trigger_shape")
@@ -410,7 +391,6 @@ shape = SubResource("trigger_shape")
 [node name="TriggerSection3" type="Area2D" parent="Triggers"]
 position = Vector2(2300, 1600)
 collision_layer = 0
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerSection3"]
 shape = SubResource("trigger_shape")
@@ -418,7 +398,6 @@ shape = SubResource("trigger_shape")
 [node name="TriggerSection4" type="Area2D" parent="Triggers"]
 position = Vector2(3150, 1600)
 collision_layer = 0
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerSection4"]
 shape = SubResource("trigger_shape")
@@ -426,7 +405,6 @@ shape = SubResource("trigger_shape")
 [node name="TriggerEnd" type="Area2D" parent="Triggers"]
 position = Vector2(4250, 1600)
 collision_layer = 0
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerEnd"]
 shape = SubResource("trigger_shape")
@@ -434,7 +412,6 @@ shape = SubResource("trigger_shape")
 [node name="DeathZone" type="Area2D" parent="."]
 position = Vector2(0, 2100)
 collision_layer = 0
-collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone"]
 position = Vector2(2500, 0)
