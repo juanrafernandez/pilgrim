@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://b8xm3k9p2vwq1"]
+[gd_scene load_steps=42 format=3 uid="uid://b8xm3k9p2vwq1"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_01.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="2_player"]
@@ -24,6 +24,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/tiled/platform_250x32.png" id="22_plat250"]
 [ext_resource type="Texture2D" path="res://assets/tiles/tiled/platform_180x32.png" id="23_plat180"]
 [ext_resource type="Texture2D" path="res://assets/tiles/tiled/bridge_300x40.png" id="24_bridge"]
+[ext_resource type="PackedScene" uid="uid://c8q7x5r2m3v1p" path="res://scenes/ui/arcade_hud.tscn" id="25_hud"]
 
 [sub_resource type="RectangleShape2D" id="trigger_shape"]
 size = Vector2(100, 300)
@@ -582,3 +583,5 @@ collision_mask = 1
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone"]
 position = Vector2(2500, 0)
 shape = SubResource("RectangleShape2D_deathzone")
+
+[node name="ArcadeHUD" parent="." instance=ExtResource("25_hud")]
