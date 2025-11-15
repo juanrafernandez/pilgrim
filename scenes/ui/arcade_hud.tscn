@@ -1,7 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://c8q7x5r2m3v1p"]
+[gd_scene load_steps=7 format=3 uid="uid://c8q7x5r2m3v1p"]
 
 [ext_resource type="Script" path="res://scripts/ui/arcade_hud.gd" id="1_arcade_hud"]
 [ext_resource type="PackedScene" uid="uid://bvk7y3p4m8x2q" path="res://scenes/ui/virtue_display.tscn" id="2_virtue_display"]
+[ext_resource type="PackedScene" uid="uid://c4h9k2x7n1m3b" path="res://scenes/ui/boss_health_bar.tscn" id="3_boss_health"]
+[ext_resource type="PackedScene" uid="uid://d3j8m5k2p9q1r" path="res://scenes/ui/stage_indicator.tscn" id="4_stage"]
+[ext_resource type="PackedScene" uid="uid://b7n3k9m2q5x1p" path="res://scenes/ui/level_timer.tscn" id="5_timer"]
+[ext_resource type="PackedScene" uid="uid://c9x2k5m7p3q8n" path="res://scenes/ui/low_health_warning.tscn" id="6_warning"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_score"]
 font_size = 24
@@ -35,13 +39,19 @@ theme_override_constants/separation = 10
 
 [node name="TopRow" type="HBoxContainer" parent="HUDContainer/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 40
+theme_override_constants/separation = 20
 
 [node name="ScoreLabel" type="Label" parent="HUDContainer/VBox/TopRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SCORE 0000000"
 label_settings = SubResource("LabelSettings_score")
+
+[node name="StageIndicator" parent="HUDContainer/VBox/TopRow" instance=ExtResource("4_stage")]
+layout_mode = 2
+
+[node name="LevelTimer" parent="HUDContainer/VBox/TopRow" instance=ExtResource("5_timer")]
+layout_mode = 2
 
 [node name="HighScoreLabel" type="Label" parent="HUDContainer/VBox/TopRow"]
 layout_mode = 2
@@ -79,3 +89,8 @@ show_percentage = false
 
 [node name="VirtueDisplay" parent="HUDContainer/VBox" instance=ExtResource("2_virtue_display")]
 layout_mode = 2
+
+[node name="BossHealthBar" parent="." instance=ExtResource("3_boss_health")]
+layer = 101
+
+[node name="LowHealthWarning" parent="." instance=ExtResource("6_warning")]

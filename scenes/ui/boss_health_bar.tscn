@@ -1,0 +1,43 @@
+[gd_scene load_steps=3 format=3 uid="uid://c4h9k2x7n1m3b"]
+
+[ext_resource type="Script" path="res://scripts/ui/boss_health_bar.gd" id="1_boss_health"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_boss"]
+font_size = 28
+font_color = Color(1, 0.2, 0.2, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[node name="BossHealthBar" type="Control"]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+script = ExtResource("1_boss_health")
+
+[node name="BossContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 100.0
+offset_right = -100.0
+offset_bottom = 80.0
+grow_horizontal = 2
+
+[node name="VBox" type="VBoxContainer" parent="BossContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BossNameLabel" type="Label" parent="BossContainer/VBox"]
+layout_mode = 2
+text = "☠ BOSS: LOBO ALFA"
+label_settings = SubResource("LabelSettings_boss")
+horizontal_alignment = 1
+
+[node name="BossHealthBar" type="ProgressBar" parent="BossContainer/VBox"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false

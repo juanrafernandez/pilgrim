@@ -5,7 +5,7 @@ class_name ArcadeHUD
 ## Minimal, clean interface inspired by Ghosts 'n Goblins and Maldita Castilla
 ## Displays score, lives, weapon, and health
 
-# UI Elements
+# UI Elements - Basic HUD
 @onready var score_label: Label = $HUDContainer/VBox/TopRow/ScoreLabel
 @onready var high_score_label: Label = $HUDContainer/VBox/TopRow/HighScoreLabel
 @onready var lives_container: HBoxContainer = $HUDContainer/VBox/MiddleRow/LivesContainer
@@ -14,6 +14,12 @@ class_name ArcadeHUD
 @onready var weapon_durability_bar: ProgressBar = $HUDContainer/VBox/WeaponDurabilityBar
 @onready var combo_label: Label = $HUDContainer/VBox/ComboLabel
 @onready var virtue_display: VirtueDisplay = $HUDContainer/VBox/VirtueDisplay
+
+# UI Elements - Enhanced Components
+@onready var boss_health_bar: BossHealthBar = $BossHealthBar
+@onready var stage_indicator: StageIndicator = $HUDContainer/VBox/TopRow/StageIndicator
+@onready var level_timer: LevelTimer = $HUDContainer/VBox/TopRow/LevelTimer
+@onready var low_health_warning: LowHealthWarning = $LowHealthWarning
 
 # Data
 var current_score: int = 0
@@ -83,6 +89,10 @@ func set_health(current: int, maximum: int) -> void:
 			health_bar.modulate = Color(1.0, 0.6, 0.0)  # Orange
 		else:
 			health_bar.modulate = Color(0.2, 1.0, 0.2)  # Green (neon)
+
+	# Update low health warning
+	if low_health_warning:
+		low_health_warning.update_health_status(current, maximum)
 
 
 func set_weapon_durability(current: int, maximum: int) -> void:
@@ -157,3 +167,54 @@ func set_combo(combo_count: int, multiplier: float) -> void:
 			combo_label.add_theme_color_override("font_color", Color(0.2, 1.0, 1.0))  # Cyan (good)
 	else:
 		combo_label.visible = false
+
+
+## Enhanced HUD Component Methods
+
+func show_boss_health(boss_name: String, max_health: int) -> void:
+	"""Show boss health bar"""
+	if boss_health_bar:
+		boss_health_bar.show_boss_bar(boss_name, max_health)
+
+
+func update_boss_health(current_health: int) -> void:
+	"""Update boss health"""
+	if boss_health_bar:
+		boss_health_bar.update_boss_health(current_health)
+
+
+func hide_boss_health() -> void:
+	"""Hide boss health bar"""
+	if boss_health_bar:
+		boss_health_bar.hide_boss_bar()
+
+
+func set_stage_info(stage: int, level: int, location: String = "", phase: String = "") -> void:
+	"""Set stage/level information"""
+	if stage_indicator:
+		stage_indicator.set_stage_info(stage, level, location, phase)
+
+
+func show_stage_intro(duration: float = 3.0) -> void:
+	"""Show stage intro animation"""
+	if stage_indicator:
+		stage_indicator.show_stage_intro(duration)
+
+
+func start_level_timer(time_limit: float = 0.0) -> void:
+	"""Start level timer (0 = count up, >0 = countdown)"""
+	if level_timer:
+		level_timer.start_timer(time_limit)
+
+
+func stop_level_timer() -> void:
+	"""Stop level timer"""
+	if level_timer:
+		level_timer.stop_timer()
+
+
+func get_elapsed_time() -> float:
+	"""Get elapsed time from timer"""
+	if level_timer:
+		return level_timer.get_elapsed_time()
+	return 0.0

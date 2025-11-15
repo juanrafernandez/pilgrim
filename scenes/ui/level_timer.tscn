@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3 uid="uid://b7n3k9m2q5x1p"]
+
+[ext_resource type="Script" path="res://scripts/ui/level_timer.gd" id="1_timer"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_timer"]
+font_size = 22
+font_color = Color(1, 1, 1, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="LevelTimer" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 150.0
+offset_bottom = 40.0
+script = ExtResource("1_timer")
+
+[node name="TimerLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "TIME: 0:00"
+label_settings = SubResource("LabelSettings_timer")
+horizontal_alignment = 1
+vertical_alignment = 1
