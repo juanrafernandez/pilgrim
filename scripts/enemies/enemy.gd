@@ -253,25 +253,16 @@ func _ai_chase(delta: float) -> void:
 		return
 
 	# FIX: Check if target is BEHIND the enemy (player jumped over enemy)
-	# BUT ONLY if target is on the ground - don't change direction while target is in the air!
+	# Enemy should only chase if target is in front
 	var direction_to_target = sign(target.global_position.x - global_position.x)
 	var facing_direction = 1 if facing_right else -1
 
-	# Check if target is on ground (using duck typing)
-	var target_on_ground = false
-	if target.has_method("is_on_floor"):
-		target_on_ground = target.is_on_floor()
-
-	# Only change direction if target is on ground AND behind us
-	if direction_to_target != facing_direction and target_on_ground:
-		# Target is behind us AND on ground - stop chasing, return to normal patrol
-		print("%s: Target is behind me (on ground), returning to patrol" % name)
+	if direction_to_target != facing_direction:
+		# Target is behind us - stop chasing, return to normal patrol
+		print("%s: Target is behind me, returning to patrol" % name)
 		target = null
 		change_state(State.PATROL)
 		return
-	elif direction_to_target != facing_direction and not target_on_ground:
-		# Target is behind but in the air - keep current direction, don't turn!
-		print("%s: Target in air behind me, keeping direction" % name)
 
 	# Check if in attack range
 	if _is_target_in_range(attack_range) and can_attack:
@@ -290,16 +281,8 @@ func _ai_chase(delta: float) -> void:
 			change_state(State.IDLE)
 			return
 
-	# Move towards target
-	# If target is in air and behind us, keep current direction (don't recalculate)
-	var direction: int
-	if direction_to_target != facing_direction and not target_on_ground:
-		# Target in air behind us - maintain current facing direction
-		direction = facing_direction
-	else:
-		# Target in front or on ground - move toward target
-		direction = sign(target.global_position.x - global_position.x)
-
+	# Move towards target (simple, no cooldown - target is in front)
+	var direction = sign(target.global_position.x - global_position.x)
 	velocity.x = direction * chase_speed
 	_update_sprite_direction()
 
