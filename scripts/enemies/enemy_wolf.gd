@@ -29,20 +29,21 @@ func _ready() -> void:
 
 
 func _ai_chase(delta: float) -> void:
-	"""Wolf is more aggressive in chase"""
-	if not player or player.is_dead:
+	"""Wolf is more aggressive in chase (UPDATED for decoupled base class)"""
+	# Check if target is still valid
+	if not target or (target.has_method("is_dead") and target.is_dead):
 		change_state(State.IDLE)
 		return
 
 	# Wolves don't give up easily
-	if not _is_player_in_range(lose_player_range):
-		player_lost.emit()
-		player = null
+	if not _is_target_in_range(lose_player_range):
+		target_lost.emit()
+		target = null
 		change_state(State.PATROL)
 		return
 
 	# Check if in attack range
-	if _is_player_in_range(attack_range) and can_attack:
+	if _is_target_in_range(attack_range) and can_attack:
 		change_state(State.ATTACK)
 		return
 
@@ -50,21 +51,22 @@ func _ai_chase(delta: float) -> void:
 	if _check_edge_ahead():
 		if can_jump and _can_jump_gap():
 			velocity.y = jump_velocity
-			print("%s jumping to chase player" % name)
+			print("%s jumping to chase target" % name)
 
 	# Chase with increased speed when close
-	var distance_to_player = global_position.distance_to(player.global_position)
-	var speed_multiplier = 1.2 if distance_to_player < 200 else 1.0
+	var distance_to_target = global_position.distance_to(target.global_position)
+	var speed_multiplier = 1.2 if distance_to_target < 200 else 1.0
 
-	var direction = sign(player.global_position.x - global_position.x)
+	var direction = sign(target.global_position.x - global_position.x)
 	velocity.x = direction * chase_speed * speed_multiplier
 	_update_sprite_direction()
 
 
 func _perform_attack() -> void:
-	"""Wolf lunges at player"""
-	# Lunge forward
-	var direction = sign(player.global_position.x - global_position.x)
-	velocity.x = direction * 400.0  # Lunge speed
+	"""Wolf lunges at target (UPDATED for decoupled base class)"""
+	# Lunge forward only if target exists
+	if target:
+		var direction = sign(target.global_position.x - global_position.x)
+		velocity.x = direction * 400.0  # Lunge speed
 
 	super._perform_attack()

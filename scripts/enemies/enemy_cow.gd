@@ -68,8 +68,8 @@ func _ai_idle(delta: float) -> void:
 			# Move away from edge slightly
 			velocity.x = (1 if facing_right else -1) * move_speed * 0.3
 
-	# Check for player in range
-	if player and _is_player_in_range(detection_range):
+	# Check for target in range
+	if target and _is_target_in_range(detection_range):
 		change_state(State.CHASE)
 	elif patrol_timer <= 0:
 		change_state(State.PATROL)
@@ -106,38 +106,39 @@ func _ai_patrol(delta: float) -> void:
 		patrol_target = Vector2.ZERO
 		change_state(State.IDLE)
 
-	# Check for player
-	if player and _is_player_in_range(detection_range):
+	# Check for target
+	if target and _is_target_in_range(detection_range):
 		change_state(State.CHASE)
 
 
 func _ai_chase(delta: float) -> void:
-	"""Cow runs AWAY from player instead of chasing"""
-	if not player or player.is_dead:
+	"""Cow runs AWAY from target instead of chasing (UPDATED for decoupled base class)"""
+	# Check if target is still valid
+	if not target or (target.has_method("is_dead") and target.is_dead):
 		change_state(State.IDLE)
 		return
 
-	# Check if player is far enough
-	if not _is_player_in_range(detection_range):
-		player = null
+	# Check if target is far enough
+	if not _is_target_in_range(detection_range):
+		target = null
 		change_state(State.PATROL)
 		return
 
-	# Calculate flee direction (AWAY from player)
-	var flee_direction = -sign(player.global_position.x - global_position.x)
+	# Calculate flee direction (AWAY from target)
+	var flee_direction = -sign(target.global_position.x - global_position.x)
 
 	# CRITICAL: Check for edges in FLEE direction (top priority - cow can't jump!)
 	if _check_edge_in_direction(int(flee_direction)):
 		print("%s: Edge ahead while fleeing! Cow is cornered." % name)
 
-		# If cornered between player and edge, stop and face player (prepare to panic)
-		if _is_player_in_range(attack_range * 2.0):
+		# If cornered between target and edge, stop and face target (prepare to panic)
+		if _is_target_in_range(attack_range * 2.0):
 			velocity.x = 0
-			# Face the player
-			facing_right = player.global_position.x > global_position.x
+			# Face the target
+			facing_right = target.global_position.x > global_position.x
 			if sprite:
 				sprite.scale.x = 1.0 if facing_right else -1.0
-			print("%s: Cornered! Stopping and facing player." % name)
+			print("%s: Cornered! Stopping and facing target." % name)
 			return
 		else:
 			# Not too close yet, try moving perpendicular to edge (stay on platform)
@@ -149,8 +150,8 @@ func _ai_chase(delta: float) -> void:
 	velocity.x = flee_direction * chase_speed
 	_update_sprite_direction()
 
-	# If cornered and player too close, panic attack
-	if _is_player_in_range(attack_range * 0.7) and can_attack:
+	# If cornered and target too close, panic attack
+	if _is_target_in_range(attack_range * 0.7) and can_attack:
 		change_state(State.ATTACK)
 
 

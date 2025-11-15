@@ -32,38 +32,39 @@ func _ready() -> void:
 
 
 func take_damage(amount: int, knockback_direction: Vector2 = Vector2.ZERO) -> void:
-	"""Goat gets pushed back and flees after 2 hits"""
+	"""Goat gets pushed back and flees after 2 hits (UPDATED for decoupled base class)"""
 	hit_count += 1
 
 	# After 2 hits, goat starts fleeing
 	if hit_count >= 2:
 		is_fleeing = true
-		player = null  # Stop tracking player
+		target = null  # Stop tracking target
 		print("%s is fleeing after %d hits!" % [name, hit_count])
 
 	super.take_damage(amount, knockback_direction)
 
 
 func _ai_chase(delta: float) -> void:
-	"""Goat chases aggressively unless fleeing"""
+	"""Goat chases aggressively unless fleeing (UPDATED for decoupled base class)"""
 	# If fleeing, run away
 	if is_fleeing:
 		_ai_flee(delta)
 		return
 
-	if not player or player.is_dead:
+	# Check if target is still valid
+	if not target or (target.has_method("is_dead") and target.is_dead):
 		change_state(State.IDLE)
 		return
 
-	# Check if player is too far
-	if not _is_player_in_range(lose_player_range):
-		player_lost.emit()
-		player = null
+	# Check if target is too far
+	if not _is_target_in_range(lose_player_range):
+		target_lost.emit()
+		target = null
 		change_state(State.PATROL)
 		return
 
 	# Check if in attack range
-	if _is_player_in_range(attack_range) and can_attack:
+	if _is_target_in_range(attack_range) and can_attack:
 		change_state(State.ATTACK)
 		return
 
@@ -71,10 +72,10 @@ func _ai_chase(delta: float) -> void:
 	if _check_edge_ahead():
 		if can_jump and _can_jump_gap():
 			velocity.y = jump_velocity
-			print("%s jumping to attack player" % name)
+			print("%s jumping to attack target" % name)
 
-	# Chase player aggressively
-	var direction = sign(player.global_position.x - global_position.x)
+	# Chase target aggressively
+	var direction = sign(target.global_position.x - global_position.x)
 	velocity.x = direction * chase_speed
 	_update_sprite_direction()
 
@@ -101,10 +102,11 @@ func _ai_flee(delta: float) -> void:
 
 
 func _perform_attack() -> void:
-	"""Goat headbutts player"""
+	"""Goat headbutts target (UPDATED for decoupled base class)"""
 	# Headbutt with forward movement
-	var direction = sign(player.global_position.x - global_position.x)
-	velocity.x = direction * 300.0
+	if target:
+		var direction = sign(target.global_position.x - global_position.x)
+		velocity.x = direction * 300.0
 
 	super._perform_attack()
-	print("%s headbutted player!" % name)
+	print("%s headbutted target!" % name)

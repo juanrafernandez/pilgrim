@@ -44,25 +44,26 @@ func _physics_process(delta: float) -> void:
 
 
 func _ai_chase(delta: float) -> void:
-	"""Chase player to steal, then flee"""
+	"""Chase target to steal, then flee (UPDATED for decoupled base class)"""
 	# If fleeing, run away
 	if is_fleeing:
 		_ai_flee(delta)
 		return
 
-	if not player or player.is_dead:
+	# Check if target is still valid
+	if not target or (target.has_method("is_dead") and target.is_dead):
 		change_state(State.IDLE)
 		return
 
-	# Check if player is too far (unless already stolen)
-	if not has_stolen_item and not _is_player_in_range(lose_player_range):
-		player_lost.emit()
-		player = null
+	# Check if target is too far (unless already stolen)
+	if not has_stolen_item and not _is_target_in_range(lose_player_range):
+		target_lost.emit()
+		target = null
 		change_state(State.PATROL)
 		return
 
 	# Check if in steal range
-	if _is_player_in_range(attack_range) and can_attack and not has_stolen_item:
+	if _is_target_in_range(attack_range) and can_attack and not has_stolen_item:
 		change_state(State.ATTACK)
 		return
 
@@ -72,19 +73,19 @@ func _ai_chase(delta: float) -> void:
 			velocity.y = jump_velocity
 			print("%s jumping to chase/flee" % name)
 
-	# Move towards or away from player
-	var direction = sign(player.global_position.x - global_position.x)
+	# Move towards or away from target
+	var direction = sign(target.global_position.x - global_position.x)
 	if not is_fleeing:
-		# Chase player
+		# Chase target
 		velocity.x = direction * chase_speed
 	_update_sprite_direction()
 
 
 func _ai_flee(delta: float) -> void:
-	"""Flee with stolen item"""
-	# Run away from player
-	if player:
-		var direction = -sign(player.global_position.x - global_position.x)
+	"""Flee with stolen item (UPDATED for decoupled base class)"""
+	# Run away from target
+	if target:
+		var direction = -sign(target.global_position.x - global_position.x)
 		velocity.x = direction * chase_speed * 1.3  # Run even faster when fleeing
 		_update_sprite_direction()
 
@@ -94,25 +95,25 @@ func _ai_flee(delta: float) -> void:
 			velocity.y = jump_velocity
 
 	# If far enough, disappear (escaped)
-	if player and global_position.distance_to(player.global_position) > 800:
+	if target and global_position.distance_to(target.global_position) > 800:
 		print("%s escaped with stolen item!" % name)
 		_escape()
 
 
 func _perform_attack() -> void:
-	"""Steal item from player"""
-	if player and _is_player_in_range(attack_range) and not has_stolen_item:
+	"""Steal item from target (UPDATED for decoupled base class)"""
+	if target and target.has_method("take_damage") and _is_target_in_range(attack_range) and not has_stolen_item:
 		# Steal item (TODO: implement inventory system)
 		has_stolen_item = true
 		steal_timer = 0.0
 
 		# Deal damage during theft
-		var knockback = Vector2(sign(player.global_position.x - global_position.x) * 150, -200)
-		player.take_damage(attack_damage, knockback, self)
+		var knockback = Vector2(sign(target.global_position.x - global_position.x) * 150, -200)
+		target.take_damage(attack_damage, knockback, self)
 
-		print("%s stole item from player!" % name)
+		print("%s stole item from target!" % name)
 
-		attacked.emit(player)
+		attacked.emit(target)
 
 
 func _start_fleeing() -> void:

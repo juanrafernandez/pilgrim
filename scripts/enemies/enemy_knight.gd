@@ -62,20 +62,21 @@ func _switch_stance() -> void:
 
 
 func _ai_chase(delta: float) -> void:
-	"""Knight chases methodically"""
-	if not player or player.is_dead:
+	"""Knight chases methodically (UPDATED for decoupled base class)"""
+	# Check if target is still valid
+	if not target or (target.has_method("is_dead") and target.is_dead):
 		change_state(State.IDLE)
 		return
 
-	# Check if player is too far
-	if not _is_player_in_range(lose_player_range):
-		player_lost.emit()
-		player = null
+	# Check if target is too far
+	if not _is_target_in_range(lose_player_range):
+		target_lost.emit()
+		target = null
 		change_state(State.PATROL)
 		return
 
 	# Check if in attack range and not guarding
-	if _is_player_in_range(attack_range) and can_attack and knight_state == KnightState.ATTACKING:
+	if _is_target_in_range(attack_range) and can_attack and knight_state == KnightState.ATTACKING:
 		change_state(State.ATTACK)
 		return
 
@@ -84,22 +85,23 @@ func _ai_chase(delta: float) -> void:
 		if can_jump and _can_jump_gap():
 			velocity.y = jump_velocity
 
-	# Move towards player (slower when guarding)
-	var direction = sign(player.global_position.x - global_position.x)
+	# Move towards target (slower when guarding)
+	var direction = sign(target.global_position.x - global_position.x)
 	var speed = chase_speed if knight_state == KnightState.ATTACKING else chase_speed * 0.5
 	velocity.x = direction * speed
 	_update_sprite_direction()
 
 
 func _perform_attack() -> void:
-	"""Knight's powerful sword slash"""
+	"""Knight's powerful sword slash (UPDATED for decoupled base class)"""
 	# Can only attack when not guarding
 	if knight_state == KnightState.GUARDING:
 		return
 
 	# Heavy sword swing with knockback
-	var direction = sign(player.global_position.x - global_position.x)
-	velocity.x = direction * 150.0  # Small lunge forward
+	if target:
+		var direction = sign(target.global_position.x - global_position.x)
+		velocity.x = direction * 150.0  # Small lunge forward
 
 	super._perform_attack()
 	print("%s slashed with sword!" % name)
