@@ -16,6 +16,7 @@ signal weapon_durability_changed(current: int, max: int)
 signal projectile_thrown(projectile: Projectile)
 signal shield_energy_changed(current: int, max: int)
 signal perfect_parry(damage_returned: int)
+signal parry_window_active(is_active: bool)
 
 # Enums
 enum WeaponType {
@@ -539,6 +540,8 @@ func _initialize_shield() -> void:
 	shield.perfect_parry_triggered.connect(_on_perfect_parry_triggered)
 	shield.shield_depleted.connect(_on_shield_depleted)
 	shield.shield_recharged.connect(_on_shield_recharged)
+	shield.parry_window_started.connect(_on_parry_window_started)
+	shield.parry_window_ended.connect(_on_parry_window_ended)
 
 	print("Player: Shield initialized (Energy: %d/%d)" % [shield.current_energy, shield.max_energy])
 
@@ -559,6 +562,18 @@ func _on_shield_depleted() -> void:
 
 func _on_shield_recharged() -> void:
 	print("Player: Shield recharged!")
+
+
+func _on_parry_window_started() -> void:
+	"""Handle parry window started"""
+	parry_window_active.emit(true)
+	print("Player: PARRY WINDOW ACTIVE!")
+
+
+func _on_parry_window_ended() -> void:
+	"""Handle parry window ended"""
+	parry_window_active.emit(false)
+	print("Player: Parry window ended")
 
 
 ## Shield getters

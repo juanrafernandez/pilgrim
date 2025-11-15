@@ -1,0 +1,98 @@
+extends HBoxContainer
+class_name ShieldBar
+
+## Shield Energy Bar UI Component
+## Displays shield energy with color coding and parry window indicator
+## Retro arcade style matching the game's aesthetic
+
+# UI Elements
+@onready var shield_label: Label = $ShieldLabel
+@onready var energy_bar: ProgressBar = $EnergyBar
+@onready var parry_indicator: Label = $ParryIndicator
+
+# Visual settings
+const COLOR_HIGH: Color = Color(0.2, 0.8, 1.0)  # Cyan (75-100% energy)
+const COLOR_MEDIUM: Color = Color(0.0, 0.6, 1.0)  # Blue (25-75% energy)
+const COLOR_LOW: Color = Color(1.0, 0.4, 0.0)  # Orange (0-25% energy)
+const COLOR_DEPLETED: Color = Color(0.5, 0.5, 0.5)  # Gray (depleted)
+const PARRY_COLOR: Color = Color(1.0, 0.8, 0.0)  # Gold (parry active)
+
+# Animation
+var parry_flash_timer: float = 0.0
+var parry_flash_visible: bool = true
+const PARRY_FLASH_INTERVAL: float = 0.1  # Flash every 0.1s
+
+
+func _ready() -> void:
+	_setup_style()
+	if parry_indicator:
+		parry_indicator.visible = false
+
+
+func _process(delta: float) -> void:
+	# Animate parry indicator flash
+	if parry_indicator and parry_indicator.visible:
+		parry_flash_timer += delta
+		if parry_flash_timer >= PARRY_FLASH_INTERVAL:
+			parry_flash_timer = 0.0
+			parry_flash_visible = not parry_flash_visible
+			parry_indicator.modulate.a = 1.0 if parry_flash_visible else 0.3
+
+
+func _setup_style() -> void:
+	"""Setup arcade-style appearance"""
+	if shield_label:
+		shield_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+		shield_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		shield_label.add_theme_constant_override("outline_size", 2)
+
+	if parry_indicator:
+		parry_indicator.add_theme_color_override("font_color", PARRY_COLOR)
+		parry_indicator.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		parry_indicator.add_theme_constant_override("outline_size", 2)
+
+
+func set_energy(current: int, maximum: int) -> void:
+	"""Update shield energy display"""
+	if not energy_bar:
+		return
+
+	energy_bar.max_value = maximum
+	energy_bar.value = current
+
+	# Color code based on energy percentage
+	var percentage = float(current) / float(maximum) if maximum > 0 else 0.0
+
+	if current <= 0:
+		energy_bar.modulate = COLOR_DEPLETED
+	elif percentage <= 0.25:
+		energy_bar.modulate = COLOR_LOW
+	elif percentage <= 0.75:
+		energy_bar.modulate = COLOR_MEDIUM
+	else:
+		energy_bar.modulate = COLOR_HIGH
+
+
+func show_parry_indicator(show: bool) -> void:
+	"""Show/hide parry window indicator"""
+	if parry_indicator:
+		parry_indicator.visible = show
+		if show:
+			parry_flash_timer = 0.0
+			parry_flash_visible = true
+
+
+func set_blocking(is_blocking: bool) -> void:
+	"""Visual feedback when blocking is active"""
+	if energy_bar:
+		# Add a subtle glow/highlight when blocking
+		if is_blocking:
+			energy_bar.modulate = energy_bar.modulate.lightened(0.2)
+		# Modulate will be reset by set_energy() call
+
+
+func get_energy_percentage() -> float:
+	"""Get current energy as percentage"""
+	if energy_bar and energy_bar.max_value > 0:
+		return energy_bar.value / energy_bar.max_value
+	return 0.0

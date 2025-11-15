@@ -12,6 +12,8 @@ signal shield_depleted()
 signal shield_recharged()
 signal block_started()
 signal block_ended()
+signal parry_window_started()
+signal parry_window_ended()
 
 # Constants
 const DEFAULT_MAX_ENERGY: int = 100
@@ -52,6 +54,7 @@ func update(delta: float) -> void:
 		if parry_timer >= PERFECT_PARRY_WINDOW:
 			parry_window_active = false
 			parry_timer = 0.0
+			parry_window_ended.emit()
 
 	# Energy consumption while blocking
 	if is_blocking:
@@ -78,7 +81,8 @@ func start_block() -> bool:
 	parry_timer = 0.0
 
 	block_started.emit()
-	print("Shield: Block started (Energy: %d/%d)" % [current_energy, max_energy])
+	parry_window_started.emit()
+	print("Shield: Block started - PARRY WINDOW ACTIVE (Energy: %d/%d)" % [current_energy, max_energy])
 
 	return true
 
