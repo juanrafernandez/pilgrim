@@ -32,12 +32,15 @@ func _ready() -> void:
 
 
 func _ai_attack(delta: float) -> void:
-	"""Boar charges at player"""
+	"""Boar charges at target (UPDATED for decoupled base class)"""
 	if not is_charging:
-		# Start charge
+		# Start charge - only if target exists
+		if not target:
+			change_state(State.IDLE)
+			return
 		is_charging = true
 		charge_distance = 0.0
-		var direction = sign(player.global_position.x - global_position.x)
+		var direction = sign(target.global_position.x - global_position.x)
 		velocity.x = direction * chase_speed * 1.5  # Charge speed
 
 	# Check for edges during charge (boar will jump)
@@ -49,8 +52,8 @@ func _ai_attack(delta: float) -> void:
 	# Continue charge
 	charge_distance += abs(velocity.x) * delta
 
-	# Check if hit player during charge
-	if player and _is_player_in_range(attack_range):
+	# Check if hit target during charge
+	if target and _is_target_in_range(attack_range):
 		_perform_attack()
 		is_charging = false
 		charge_distance = 0.0
@@ -73,11 +76,11 @@ func _ai_attack(delta: float) -> void:
 
 
 func _perform_attack() -> void:
-	"""Boar's charge attack does more damage"""
+	"""Boar's charge attack does more damage (UPDATED for decoupled base class)"""
 	if is_charging:
 		attack_damage = 18  # Extra damage during charge
 	else:
 		attack_damage = 12  # Normal damage
 
 	super._perform_attack()
-	print("%s charged into player!" % name)
+	print("%s charged into target!" % name)
