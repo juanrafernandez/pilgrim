@@ -13,6 +13,7 @@ class_name ArcadeHUD
 @onready var health_bar: ProgressBar = $HUDContainer/VBox/HealthBar
 @onready var weapon_durability_bar: ProgressBar = $HUDContainer/VBox/WeaponDurabilityBar
 @onready var combo_label: Label = $HUDContainer/VBox/ComboLabel
+@onready var virtue_display: VirtueDisplay = $HUDContainer/VBox/VirtueDisplay
 
 # Data
 var current_score: int = 0
