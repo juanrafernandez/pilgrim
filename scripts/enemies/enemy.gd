@@ -81,6 +81,16 @@ var attack_timer: float = 0.0
 # Contact damage tracking
 var last_contact_damage_time: float = 0.0
 
+# Recoil system (FIX for contact damage recoil)
+var is_recoiling: bool = false  # Flag to prevent AI from overriding recoil
+var recoil_timer: float = 0.0  # Time remaining in recoil
+var recoil_duration: float = 0.15  # How long recoil lasts (short bounce)
+
+# Direction change cooldown (FIX for enemies flipping while player in air)
+var direction_change_cooldown: float = 0.3  # Minimum time between direction changes
+var last_direction_change_time: float = 0.0  # Time of last direction change
+var current_chase_direction: int = 1  # Current chase direction (1 or -1)
+
 
 func _ready() -> void:
 	add_to_group("enemies")  # Add to enemies group for level management
@@ -113,8 +123,18 @@ func _physics_process(delta: float) -> void:
 	if attack_state_timer > 0:
 		attack_state_timer -= delta
 
-	# AI behavior based on state
-	_update_ai(delta)
+	# Update recoil timer (FIX for contact damage recoil)
+	if is_recoiling:
+		recoil_timer -= delta
+		if recoil_timer <= 0:
+			is_recoiling = false  # Recoil finished, AI can control movement again
+
+	# AI behavior based on state (but skip if recoiling)
+	if not is_recoiling:
+		_update_ai(delta)
+	else:
+		# During recoil, gradually slow down the recoil velocity
+		velocity.x = move_toward(velocity.x, 0, move_speed * delta * 3)
 
 	# Apply gravity
 	if not is_on_floor():
@@ -246,9 +266,26 @@ func _ai_chase(delta: float) -> void:
 			change_state(State.IDLE)
 			return
 
-	# Move towards target
-	var direction = sign(target.global_position.x - global_position.x)
-	velocity.x = direction * chase_speed
+	# Move towards target (FIX: use direction cooldown to prevent constant flipping)
+	var current_time = Time.get_ticks_msec() / 1000.0
+
+	# Calculate ideal direction
+	var ideal_direction = sign(target.global_position.x - global_position.x)
+
+	# Only update direction if enough time has passed OR direction is same
+	if ideal_direction != current_chase_direction:
+		# Direction would change - check cooldown
+		if current_time - last_direction_change_time >= direction_change_cooldown:
+			# Cooldown elapsed, can change direction
+			current_chase_direction = ideal_direction
+			last_direction_change_time = current_time
+			print("%s changed chase direction" % name)
+	else:
+		# Direction is same, just update it
+		current_chase_direction = ideal_direction
+
+	# Apply movement in current direction
+	velocity.x = current_chase_direction * chase_speed
 	_update_sprite_direction()
 
 
@@ -474,6 +511,12 @@ func change_state(new_state: State) -> void:
 		return
 
 	current_state = new_state
+
+	# Initialize chase direction when entering CHASE state
+	if new_state == State.CHASE and target:
+		current_chase_direction = sign(target.global_position.x - global_position.x)
+		last_direction_change_time = Time.get_ticks_msec() / 1000.0
+
 	# print("%s: State changed to %s" % [name, State.keys()[new_state]])
 
 
@@ -521,16 +564,20 @@ func _on_body_entered_contact(body: Node2D) -> void:
 		body.take_damage(contact_damage, knockback, self)
 		last_contact_damage_time = current_time
 
-		# Enemy also recoils slightly (bounces back momentarily)
+		# Enemy recoils with a short bounce (FIX: use recoil system)
 		var enemy_recoil_dir = -knockback_dir  # Opposite direction
-		var enemy_recoil = enemy_recoil_dir * 150.0  # Small recoil (150 units)
-		velocity.x = enemy_recoil
+		var enemy_recoil_velocity = enemy_recoil_dir * 200.0  # Short, snappy recoil
+
+		# Apply recoil impulse and activate recoil state
+		velocity.x = enemy_recoil_velocity
+		is_recoiling = true
+		recoil_timer = recoil_duration  # Lock AI for 0.15 seconds
 
 		# Lighter screenshake for contact damage (duck typing check for camera)
 		if body.has_method("get") and body.get("camera_controller"):
 			body.camera_controller.add_trauma(0.2)  # Lighter shake than normal hits
 
-		print("%s dealt %d contact damage to target (enemy recoiled %.0f units)" % [name, contact_damage, enemy_recoil])
+		print("%s dealt %d contact damage and recoiled (%.1fs)" % [name, contact_damage, recoil_duration])
 
 
 func _on_body_exited_contact(body: Node2D) -> void:
