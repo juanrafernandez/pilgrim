@@ -29,6 +29,7 @@ var move_speed: float = 150.0
 var patrol_speed: float = 100.0
 var chase_speed: float = 200.0
 var attack_damage: int = 10
+var contact_damage: int = 0  # Damage on collision (0 = auto-calculate as 70% of attack_damage)
 var attack_range: float = 60.0
 var detection_range: float = 400.0
 var lose_player_range: float = 600.0
@@ -43,7 +44,9 @@ var edge_check_distance: float = 50.0  # How far ahead to check for edges
 # Attack behavior
 var attack_knockback_self: float = 250.0  # Enemy recoils after attacking
 var attack_duration: float = 0.4  # How long attack state lasts
-var contact_damage_cooldown: float = 0.5  # Damage cooldown for contact hits
+var contact_damage_cooldown: float = 0.5  # Damage cooldown for contact hits (adjusted per enemy type)
+var contact_damage_cooldown_early_game: float = 0.75  # Longer cooldown for early game (child phase)
+var contact_damage_cooldown_late_game: float = 0.5  # Shorter cooldown for late game (knight phase)
 
 # State
 var current_state: State = State.IDLE
@@ -78,9 +81,17 @@ func _ready() -> void:
 	add_to_group("enemies")  # Add to enemies group for level management
 	spawn_position = global_position
 	current_health = max_health
+
+	# Auto-calculate contact damage if not set (70% of attack damage)
+	if contact_damage == 0:
+		contact_damage = int(attack_damage * 0.7)
+
+	# Adjust contact damage cooldown based on enemy difficulty
+	_adjust_contact_cooldown()
+
 	_setup_detection_area()
 	_setup_contact_area()
-	print("%s spawned at %s" % [name, spawn_position])
+	print("%s spawned at %s (Attack: %d, Contact: %d, Cooldown: %.2fs)" % [name, spawn_position, attack_damage, contact_damage, contact_damage_cooldown])
 
 
 func _physics_process(delta: float) -> void:
@@ -112,6 +123,20 @@ func _setup_detection_area() -> void:
 	if detection_area:
 		detection_area.body_entered.connect(_on_body_entered_detection)
 		detection_area.body_exited.connect(_on_body_exited_detection)
+
+
+func _adjust_contact_cooldown() -> void:
+	"""Adjust contact damage cooldown based on enemy difficulty (early vs late game)"""
+	# Early game enemies (≤12 damage): Longer cooldown for beginner-friendly gameplay
+	# Late game enemies (≥22 damage): Normal cooldown for skilled players
+	if attack_damage <= 12:
+		contact_damage_cooldown = contact_damage_cooldown_early_game  # 0.75s
+	elif attack_damage >= 22:
+		contact_damage_cooldown = contact_damage_cooldown_late_game  # 0.5s
+	else:
+		# Mid-game: Interpolate between early and late (12-22 damage range)
+		var t = (attack_damage - 12.0) / (22.0 - 12.0)  # 0.0 to 1.0
+		contact_damage_cooldown = lerp(contact_damage_cooldown_early_game, contact_damage_cooldown_late_game, t)
 
 
 func _setup_contact_area() -> void:
@@ -453,12 +478,18 @@ func _on_body_entered_contact(body: Node2D) -> void:
 		# Check if enough time has passed since last contact damage
 		var current_time = Time.get_ticks_msec() / 1000.0
 		if current_time - last_contact_damage_time >= contact_damage_cooldown:
-			# Deal contact damage
+			# Deal contact damage (70% of attack damage by default)
+			# Reduced knockback for contact damage (feels less punishing than attacks)
 			var knockback_dir = sign(body.global_position.x - global_position.x)
-			var knockback = Vector2(knockback_dir * 350, -450)
-			body.take_damage(attack_damage, knockback, self)
+			var knockback = Vector2(knockback_dir * 250, -350)  # Softer than attacks
+			body.take_damage(contact_damage, knockback, self)
 			last_contact_damage_time = current_time
-			print("%s dealt contact damage to player" % name)
+
+			# Lighter screenshake for contact damage (distinct from attack hits)
+			if body.has_method("get") and body.camera_controller:
+				body.camera_controller.add_trauma(0.2)  # Lighter shake than normal hits
+
+			print("%s dealt %d contact damage to player" % [name, contact_damage])
 
 
 func _on_body_exited_contact(body: Node2D) -> void:
