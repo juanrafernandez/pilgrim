@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvk7y3p4m8x2q"]
+
+[ext_resource type="Script" path="res://scripts/ui/virtue_display.gd" id="1_virtue_display"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_virtue"]
+font_size = 18
+font_color = Color(1, 1, 1, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="VirtueDisplay" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 400.0
+offset_bottom = 60.0
+script = ExtResource("1_virtue_display")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 5
+
+[node name="VirtueLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "VIRTUE: SEEKER (0/1000)"
+label_settings = SubResource("LabelSettings_virtue")
+
+[node name="VirtueBar" type="ProgressBar" parent="VBox"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+max_value = 1000.0
+show_percentage = false

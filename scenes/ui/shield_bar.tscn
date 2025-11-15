@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://bp8k3m5n9qw2r"]
+
+[ext_resource type="Script" path="res://scripts/ui/shield_bar.gd" id="1_shield_bar"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_shield"]
+font_size = 18
+font_color = Color(1, 1, 1, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="ShieldBar" type="HBoxContainer"]
+theme_override_constants/separation = 10
+script = ExtResource("1_shield_bar")
+
+[node name="ShieldLabel" type="Label" parent="."]
+layout_mode = 2
+text = "SHIELD:"
+label_settings = SubResource("LabelSettings_shield")
+
+[node name="EnergyBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(200, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="ParryIndicator" type="Label" parent="."]
+layout_mode = 2
+text = "⚡PARRY!"
+label_settings = SubResource("LabelSettings_shield")

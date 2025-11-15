@@ -12,7 +12,7 @@ func _ready() -> void:
 	move_speed = 200.0
 	patrol_speed = 120.0
 	chase_speed = 300.0  # Very fast
-	attack_damage = 15  # High damage
+	attack_damage = 12  # REBALANCED: 12 dmg (was 15) - balanced for early-mid game
 	attack_range = 70.0
 	detection_range = 500.0  # Detects from far
 	lose_player_range = 800.0

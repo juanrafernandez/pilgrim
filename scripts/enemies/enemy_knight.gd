@@ -23,7 +23,7 @@ func _ready() -> void:
 	move_speed = 100.0
 	patrol_speed = 60.0  # Slow patrol
 	chase_speed = 120.0  # Methodical pursuit
-	attack_damage = 30  # 30% damage - devastating
+	attack_damage = 28  # REBALANCED: 28 dmg (was 30) - balanced for mid-late game
 	attack_range = 90.0  # Long reach with sword
 	detection_range = 450.0
 	lose_player_range = 700.0

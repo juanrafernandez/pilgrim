@@ -29,6 +29,14 @@ func _ready() -> void:
 	player.died.connect(_on_player_died)
 	player.weapon_changed.connect(_on_player_weapon_changed)
 	player.weapon_durability_changed.connect(_on_weapon_durability_changed)
+	player.shield_energy_changed.connect(_on_shield_energy_changed)
+	player.perfect_parry.connect(_on_perfect_parry)
+	player.parry_window_active.connect(_on_parry_window_active)
+
+	# Shield state signals (from shield.gd via player)
+	if player.shield:
+		player.shield.shield_depleted.connect(_on_shield_depleted)
+		player.shield.shield_recharged.connect(_on_shield_recharged)
 
 	# Connect GameManager signals
 	GameManager.lives_changed.connect(_on_lives_changed)
@@ -260,3 +268,30 @@ func _on_score_changed(new_score: int) -> void:
 func _on_combo_changed(combo_count: int, multiplier: float) -> void:
 	"""Handle combo changed from GameManager"""
 	arcade_hud.set_combo(combo_count, multiplier)
+
+
+func _on_shield_energy_changed(current: int, maximum: int) -> void:
+	"""Handle shield energy changed from player"""
+	arcade_hud.set_shield_energy(current, maximum)
+
+
+func _on_perfect_parry(damage_returned: int) -> void:
+	"""Handle perfect parry from player"""
+	print("PERFECT PARRY! Returned %d damage!" % damage_returned)
+
+
+func _on_parry_window_active(is_active: bool) -> void:
+	"""Handle parry window state change"""
+	arcade_hud.show_parry_window(is_active)
+
+
+func _on_shield_depleted() -> void:
+	"""Handle shield depletion"""
+	arcade_hud.on_shield_depleted()
+	print("TEST SCENE: Shield depleted - visual feedback triggered")
+
+
+func _on_shield_recharged() -> void:
+	"""Handle shield recharge"""
+	arcade_hud.on_shield_recharged()
+	print("TEST SCENE: Shield recharged - visual feedback triggered")

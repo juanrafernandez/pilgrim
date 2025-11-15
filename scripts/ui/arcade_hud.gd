@@ -11,8 +11,10 @@ class_name ArcadeHUD
 @onready var lives_container: HBoxContainer = $HUDContainer/VBox/MiddleRow/LivesContainer
 @onready var weapon_label: Label = $HUDContainer/VBox/MiddleRow/WeaponLabel
 @onready var health_bar: ProgressBar = $HUDContainer/VBox/HealthBar
+@onready var shield_bar: ShieldBar = $HUDContainer/VBox/ShieldBar
 @onready var weapon_durability_bar: ProgressBar = $HUDContainer/VBox/WeaponDurabilityBar
 @onready var combo_label: Label = $HUDContainer/VBox/ComboLabel
+@onready var virtue_display: VirtueDisplay = $HUDContainer/VBox/VirtueDisplay
 
 # Data
 var current_score: int = 0
@@ -156,3 +158,35 @@ func set_combo(combo_count: int, multiplier: float) -> void:
 			combo_label.add_theme_color_override("font_color", Color(0.2, 1.0, 1.0))  # Cyan (good)
 	else:
 		combo_label.visible = false
+
+
+## Shield System Methods
+
+func set_shield_energy(current: int, maximum: int) -> void:
+	"""Update shield energy bar"""
+	if shield_bar:
+		shield_bar.set_energy(current, maximum)
+
+
+func show_parry_window(show: bool) -> void:
+	"""Show/hide parry window indicator"""
+	if shield_bar:
+		shield_bar.show_parry_indicator(show)
+
+
+func set_blocking(is_blocking: bool) -> void:
+	"""Visual feedback when player is blocking"""
+	if shield_bar:
+		shield_bar.set_blocking(is_blocking)
+
+
+func on_shield_depleted() -> void:
+	"""Visual feedback when shield breaks"""
+	if shield_bar:
+		shield_bar.shield_depleted()
+
+
+func on_shield_recharged() -> void:
+	"""Visual feedback when shield recharges"""
+	if shield_bar:
+		shield_bar.shield_recharged()

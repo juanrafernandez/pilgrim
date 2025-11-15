@@ -16,7 +16,7 @@ var max_health: int = 60
 var current_health: int = 60
 var float_speed: float = 100.0
 var chase_speed: float = 150.0
-var attack_damage: int = 25  # 25% damage - drains life force
+var attack_damage: int = 22  # REBALANCED: 22 dmg (was 25) - balanced for mid game
 var detection_range: float = 500.0
 var attack_range: float = 70.0
 var is_dead: bool = false
@@ -187,7 +187,7 @@ func _perform_attack() -> void:
 	"""Drain player's life force"""
 	if player and global_position.distance_to(player.global_position) < attack_range:
 		# No knockback - ghostly touch
-		player.take_damage(attack_damage, Vector2.ZERO)
+		player.take_damage(attack_damage, Vector2.ZERO, self)
 		print("%s drained life force!" % name)
 
 
