@@ -109,7 +109,7 @@ func _perform_attack() -> void:
 		if player and _is_player_in_range(attack_range):
 			var direction = sign(player.global_position.x - global_position.x)
 			var knockback = Vector2(direction * 500, -500)  # Massive knockback
-			player.take_damage(attack_damage, knockback)
+			player.take_damage(attack_damage, knockback, self)
 			attacked.emit(player)
 			print("%s lance strike!" % name)
 	else:

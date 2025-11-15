@@ -108,7 +108,7 @@ func _perform_attack() -> void:
 
 		# Deal damage during theft
 		var knockback = Vector2(sign(player.global_position.x - global_position.x) * 150, -200)
-		player.take_damage(attack_damage, knockback)
+		player.take_damage(attack_damage, knockback, self)
 
 		print("%s stole item from player!" % name)
 

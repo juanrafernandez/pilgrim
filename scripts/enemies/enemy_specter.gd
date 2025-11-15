@@ -187,7 +187,7 @@ func _perform_attack() -> void:
 	"""Drain player's life force"""
 	if player and global_position.distance_to(player.global_position) < attack_range:
 		# No knockback - ghostly touch
-		player.take_damage(attack_damage, Vector2.ZERO)
+		player.take_damage(attack_damage, Vector2.ZERO, self)
 		print("%s drained life force!" % name)
 
 

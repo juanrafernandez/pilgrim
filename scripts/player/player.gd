@@ -14,6 +14,8 @@ signal landed()
 signal weapon_changed(new_weapon)  # Weapon type (no type hint to avoid circular dependency)
 signal weapon_durability_changed(current: int, max: int)
 signal projectile_thrown(projectile: Projectile)
+signal shield_energy_changed(current: int, max: int)
+signal perfect_parry(damage_returned: int)
 
 # Enums
 enum WeaponType {
@@ -51,6 +53,9 @@ var equipped_weapon = null  # Weapon type - Current melee weapon (NEW SYSTEM)
 var can_throw_projectile: bool = true
 var projectile_cooldown_timer: float = 0.0
 
+# Shield state
+var shield: Shield = null  # Shield for blocking and parrying
+
 # References
 @onready var sprite: ColorRect = $Sprite
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -77,6 +82,7 @@ func _ready() -> void:
 	current_health = max_health
 	last_safe_position = global_position  # Initialize checkpoint
 	_equip_weapon_for_phase(current_phase)  # Equip initial weapon
+	_initialize_shield()  # Initialize shield system
 	print("Player initialized - Phase: %s" % GameManager.PlayerPhase.keys()[current_phase])
 
 
@@ -89,6 +95,10 @@ func _physics_process(delta: float) -> void:
 		projectile_cooldown_timer -= delta
 		if projectile_cooldown_timer <= 0:
 			can_throw_projectile = true
+
+	# Update shield (if not blocking, state_block handles it when blocking)
+	if shield and not shield.is_blocking:
+		shield.update(delta)
 
 	# Let state machine handle movement
 	state_machine.physics_update(delta)
@@ -131,31 +141,64 @@ func _get_input_direction() -> Vector2:
 
 
 ## Take damage with knockback (Ghosts 'n Goblins style)
-func take_damage(amount: int, knockback: Vector2 = Vector2.ZERO) -> void:
+func take_damage(amount: int, knockback: Vector2 = Vector2.ZERO, attacker = null) -> void:
 	if is_invincible or is_dead:
 		return
 
-	current_health = maxi(0, current_health - amount)
-	health_changed.emit(current_health, max_health)
-	took_damage.emit(amount)
+	var final_damage = amount
 
-	# Apply knockback velocity
-	if knockback != Vector2.ZERO:
-		velocity = knockback
+	# Shield damage reduction and parry
+	if shield and shield.is_blocking:
+		final_damage = shield.reduce_damage(amount)
+
+		# Perfect parry - return damage to attacker
+		if shield.is_in_parry_window() and attacker and attacker.has_method("take_damage"):
+			var parry_damage = shield.get_last_parry_damage()
+			# Return damage to attacker with knockback
+			var parry_knockback = Vector2(-knockback.x, knockback.y)  # Reverse knockback
+			attacker.take_damage(parry_damage, parry_knockback)
+			perfect_parry.emit(parry_damage)
+			print("Player: PERFECT PARRY! Returned %d damage to %s" % [parry_damage, attacker.name])
+
+			# Screenshake for successful parry
+			if camera_controller:
+				camera_controller.add_trauma(0.4)  # Medium shake for parry
+
+			# No damage taken, no knockback on perfect parry
+			return
+
+	# Apply damage
+	current_health = maxi(0, current_health - final_damage)
+	health_changed.emit(current_health, max_health)
+	took_damage.emit(final_damage)
+
+	# Apply knockback velocity (reduced if blocking)
+	if shield and shield.is_blocking:
+		# Reduced knockback when blocking
+		if knockback != Vector2.ZERO:
+			velocity = knockback * 0.3
+		else:
+			velocity = Vector2(-60, -120)  # Minimal knockback
 	else:
-		# Default knockback if none provided
-		velocity = Vector2(-200, -400)
+		# Normal knockback
+		if knockback != Vector2.ZERO:
+			velocity = knockback
+		else:
+			velocity = Vector2(-200, -400)
 
 	# Screenshake when taking damage
 	if camera_controller:
-		camera_controller.add_trauma(0.5)  # Strong shake when hurt
+		var trauma = 0.3 if (shield and shield.is_blocking) else 0.5
+		camera_controller.add_trauma(trauma)
 
-	print("Player took %d damage. Health: %d/%d" % [amount, current_health, max_health])
+	print("Player took %d damage. Health: %d/%d" % [final_damage, current_health, max_health])
 
 	if current_health <= 0:
 		die()
 	else:
-		state_machine.change_state("Hurt")
+		# Don't interrupt blocking state if blocking
+		if not (shield and shield.is_blocking):
+			state_machine.change_state("Hurt")
 		_start_invincibility()
 
 
@@ -484,3 +527,50 @@ func is_facing_right() -> bool:
 
 func set_facing_direction(right: bool) -> void:
 	sprite.scale.x = 1.0 if right else -1.0
+
+
+## Initialize shield system
+func _initialize_shield() -> void:
+	"""Initialize player shield"""
+	shield = Shield.new()
+
+	# Connect shield signals
+	shield.energy_changed.connect(_on_shield_energy_changed)
+	shield.perfect_parry_triggered.connect(_on_perfect_parry_triggered)
+	shield.shield_depleted.connect(_on_shield_depleted)
+	shield.shield_recharged.connect(_on_shield_recharged)
+
+	print("Player: Shield initialized (Energy: %d/%d)" % [shield.current_energy, shield.max_energy])
+
+
+## Shield signal handlers
+func _on_shield_energy_changed(current: int, max_energy: int) -> void:
+	shield_energy_changed.emit(current, max_energy)
+
+
+func _on_perfect_parry_triggered(damage: int) -> void:
+	# Already handled in take_damage()
+	pass
+
+
+func _on_shield_depleted() -> void:
+	print("Player: Shield depleted!")
+
+
+func _on_shield_recharged() -> void:
+	print("Player: Shield recharged!")
+
+
+## Shield getters
+func get_shield_energy_percentage() -> float:
+	"""Get shield energy as percentage"""
+	if shield:
+		return shield.get_energy_percentage()
+	return 0.0
+
+
+func can_block() -> bool:
+	"""Returns true if player can block"""
+	if shield:
+		return shield.can_block()
+	return false

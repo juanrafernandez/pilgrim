@@ -142,7 +142,7 @@ func _attack_phase_1() -> void:
 
 	if player and _is_player_in_range(attack_range):
 		var knockback = Vector2(direction * 400, -400)
-		player.take_damage(attack_damage, knockback)
+		player.take_damage(attack_damage, knockback, self)
 		attacked.emit(player)
 		print("BOSS: Heavy slash! [%d/%d combo]" % [combo_count + 1, max_combo])
 
@@ -155,7 +155,7 @@ func _attack_phase_2() -> void:
 	if player and _is_player_in_range(attack_range * 1.5):  # Longer range
 		var direction = sign(player.global_position.x - global_position.x)
 		var knockback = Vector2(direction * 350, -350)
-		player.take_damage(attack_damage, knockback)
+		player.take_damage(attack_damage, knockback, self)
 		attacked.emit(player)
 
 	# Chance to summon clone
@@ -170,7 +170,7 @@ func _attack_phase_3() -> void:
 
 	if player and _is_player_in_range(attack_range):
 		var knockback = Vector2(direction * 500, -500)
-		player.take_damage(attack_damage, knockback)
+		player.take_damage(attack_damage, knockback, self)
 		attacked.emit(player)
 		print("BOSS: Desperate strike!")
 

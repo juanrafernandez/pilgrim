@@ -128,7 +128,7 @@ func _perform_attack() -> void:
 	"""Peck attack while diving"""
 	if player and global_position.distance_to(player.global_position) < 60:
 		var knockback = Vector2(sign(player.global_position.x - global_position.x) * 200, -300)
-		player.take_damage(attack_damage, knockback)
+		player.take_damage(attack_damage, knockback, self)
 		print("%s pecked player!" % name)
 
 
