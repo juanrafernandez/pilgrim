@@ -41,6 +41,11 @@ var jump_velocity: float = -400.0  # Jump strength
 var max_jump_distance: float = 150.0  # Max horizontal distance enemy can jump
 var edge_check_distance: float = 50.0  # How far ahead to check for edges
 
+# Patrol behavior (new simple pattern: walk to edge, turn, walk X steps, turn)
+var patrol_walk_distance: float = 400.0  # Distance to walk after turning at edge (5-10 steps worth)
+var patrol_distance_walked: float = 0.0  # Track distance walked since last turn
+var patrol_last_position: Vector2 = Vector2.ZERO  # Last position to calculate distance
+
 # Attack behavior
 var attack_knockback_self: float = 250.0  # Enemy recoils after attacking
 var attack_duration: float = 0.4  # How long attack state lasts
@@ -80,6 +85,7 @@ var last_contact_damage_time: float = 0.0
 func _ready() -> void:
 	add_to_group("enemies")  # Add to enemies group for level management
 	spawn_position = global_position
+	patrol_last_position = global_position  # Initialize patrol tracking
 	current_health = max_health
 
 	# Auto-calculate contact damage if not set (70% of attack damage)
@@ -175,24 +181,34 @@ func _ai_idle(delta: float) -> void:
 
 
 func _ai_patrol(delta: float) -> void:
-	"""Patrol behavior"""
-	# Set patrol target if not set
-	if patrol_target == Vector2.ZERO:
-		_set_random_patrol_target()
+	"""Patrol behavior - walk to edge, turn, walk back X distance, turn, repeat"""
+	# Calculate distance walked this frame
+	var distance_this_frame = global_position.distance_to(patrol_last_position)
+	patrol_distance_walked += distance_this_frame
+	patrol_last_position = global_position
 
-	# Check for edges before moving
-	_handle_edge_behavior()
+	# Check if should turn around (either edge ahead OR walked enough distance)
+	var should_turn = false
 
-	# Move towards patrol target
-	var direction = sign(patrol_target.x - global_position.x)
+	if _check_edge_ahead():
+		# Hit an edge - turn around
+		should_turn = true
+		print("%s hit edge, turning around (walked %.0f units)" % [name, patrol_distance_walked])
+	elif patrol_distance_walked >= patrol_walk_distance:
+		# Walked enough distance - turn around
+		should_turn = true
+		print("%s walked %.0f units, turning around" % [name, patrol_distance_walked])
+
+	if should_turn:
+		facing_right = not facing_right
+		if sprite:
+			sprite.scale.x = 1.0 if facing_right else -1.0
+		patrol_distance_walked = 0.0  # Reset distance counter
+
+	# Move in current direction
+	var direction = 1 if facing_right else -1
 	velocity.x = direction * patrol_speed
 	_update_sprite_direction()
-
-	# Check if reached patrol target
-	if abs(patrol_target.x - global_position.x) < 20:
-		patrol_timer = patrol_wait_time
-		patrol_target = Vector2.ZERO
-		change_state(State.IDLE)
 
 	# Check for player
 	if player and _is_player_in_range(detection_range):
@@ -442,6 +458,8 @@ func set_active(active: bool) -> void:
 		player = null
 	else:
 		# Activate enemy - start patrolling
+		patrol_distance_walked = 0.0
+		patrol_last_position = global_position
 		change_state(State.PATROL)
 		print("%s activated!" % name)
 
