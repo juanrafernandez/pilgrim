@@ -1,6 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://c8q7x5r2m3v1p"]
 
 [ext_resource type="Script" path="res://scripts/ui/arcade_hud.gd" id="1_arcade_hud"]
+[ext_resource type="PackedScene" uid="uid://bp8k3m5n9qw2r" path="res://scenes/ui/shield_bar.tscn" id="2_shield_bar"]
 [ext_resource type="PackedScene" uid="uid://bvk7y3p4m8x2q" path="res://scenes/ui/virtue_display.tscn" id="2_virtue_display"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_score"]
@@ -77,5 +78,21 @@ max_value = 100.0
 value = 100.0
 show_percentage = false
 
+[node name="ShieldBar" parent="HUDContainer/VBox" instance=ExtResource("2_shield_bar")]
+layout_mode = 2
+
+[node name="WeaponDurabilityBar" type="ProgressBar" parent="HUDContainer/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
 [node name="VirtueDisplay" parent="HUDContainer/VBox" instance=ExtResource("2_virtue_display")]
 layout_mode = 2
+
+[node name="ComboLabel" type="Label" parent="HUDContainer/VBox"]
+layout_mode = 2
+text = "COMBO x5  (2.0x)"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_normal")

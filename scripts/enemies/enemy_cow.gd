@@ -12,7 +12,7 @@ func _ready() -> void:
 	move_speed = 120.0
 	patrol_speed = 80.0
 	chase_speed = 180.0  # Runs away
-	attack_damage = 5  # Minimal damage if cornered
+	attack_damage = 3  # REBALANCED: 3 dmg (was 5) - less punishing for Child phase
 	attack_range = 50.0
 	detection_range = 500.0  # Increased to react from farther away
 	patrol_distance = 150.0

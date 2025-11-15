@@ -16,6 +16,7 @@ signal weapon_durability_changed(current: int, max: int)
 signal projectile_thrown(projectile: Projectile)
 signal shield_energy_changed(current: int, max: int)
 signal perfect_parry(damage_returned: int)
+signal parry_window_active(is_active: bool)
 
 # Enums
 enum WeaponType {
@@ -161,6 +162,9 @@ func take_damage(amount: int, knockback: Vector2 = Vector2.ZERO, attacker = null
 			perfect_parry.emit(parry_damage)
 			print("Player: PERFECT PARRY! Returned %d damage to %s" % [parry_damage, attacker.name])
 
+			# Slow-motion effect for perfect parry (skill expression)
+			_trigger_slowmo_effect(0.25, 0.15)  # 25% speed for 0.15 seconds
+
 			# Screenshake for successful parry
 			if camera_controller:
 				camera_controller.add_trauma(0.4)  # Medium shake for parry
@@ -266,6 +270,42 @@ func _flash_sprite() -> void:
 		await get_tree().create_timer(flash_interval).timeout
 		sprite.modulate.a = 1.0
 		await get_tree().create_timer(flash_interval).timeout
+
+
+func _flash_sprite_color(flash_color: Color) -> void:
+	"""Flash sprite with a specific color for feedback"""
+	if not sprite:
+		return
+
+	var original_modulate = sprite.modulate
+	var flash_duration = 0.15  # Quick flash
+
+	# Flash to color
+	sprite.modulate = flash_color
+	await get_tree().create_timer(flash_duration).timeout
+
+	# Return to normal
+	sprite.modulate = original_modulate
+
+
+func _trigger_slowmo_effect(time_scale: float, duration: float) -> void:
+	"""Trigger slow-motion effect for perfect parry feedback
+
+	Args:
+		time_scale: Slow-motion scale (0.0-1.0, e.g., 0.25 = 25% speed)
+		duration: Duration in real-time seconds
+	"""
+	# Slow down time
+	Engine.time_scale = time_scale
+	print("SLOWMO: Time scale set to %.2f for %.2fs" % [time_scale, duration])
+
+	# Wait for duration (using real time, not affected by time_scale)
+	# process_in_physics = false means it uses real time
+	await get_tree().create_timer(duration, true, false, true).timeout
+
+	# Restore normal time
+	Engine.time_scale = 1.0
+	print("SLOWMO: Time scale restored to normal")
 
 
 ## Attack
@@ -467,6 +507,7 @@ func change_phase(new_phase: GameManager.PlayerPhase) -> void:
 	current_phase = new_phase
 	_setup_phase(new_phase)
 	_equip_weapon_for_phase(new_phase)  # Equip appropriate weapon for new phase
+	_configure_shield_for_phase(new_phase)  # Configure shield for new phase
 	phase_changed.emit(new_phase)
 
 	print("Player phase changed to: %s" % GameManager.PlayerPhase.keys()[new_phase])
@@ -540,8 +581,13 @@ func _initialize_shield() -> void:
 	shield.perfect_parry_triggered.connect(_on_perfect_parry_triggered)
 	shield.shield_depleted.connect(_on_shield_depleted)
 	shield.shield_recharged.connect(_on_shield_recharged)
+	shield.parry_window_started.connect(_on_parry_window_started)
+	shield.parry_window_ended.connect(_on_parry_window_ended)
 
-	print("Player: Shield initialized (Energy: %d/%d)" % [shield.current_energy, shield.max_energy])
+	# Configure shield for current phase
+	_configure_shield_for_phase(current_phase)
+
+	print("Player: Shield initialized (Energy: %d/%d, Reduction: %.0f%%)" % [shield.current_energy, shield.max_energy, shield.damage_reduction * 100])
 
 
 ## Shield signal handlers
@@ -555,11 +601,45 @@ func _on_perfect_parry_triggered(damage: int) -> void:
 
 
 func _on_shield_depleted() -> void:
+	"""Handle shield depletion with visual/audio feedback"""
 	print("Player: Shield depleted!")
+
+	# Strong camera shake for shield break
+	if camera_controller:
+		camera_controller.add_trauma(0.6)  # Strong shake
+
+	# Visual feedback - brief flash effect
+	_flash_sprite_color(Color(1.0, 0.3, 0.0))  # Orange flash
+
+	# Audio feedback (placeholder - would play "shield_break.wav")
+	print("AUDIO: Shield break sound! [PLACEHOLDER]")
 
 
 func _on_shield_recharged() -> void:
+	"""Handle shield recharge with positive feedback"""
 	print("Player: Shield recharged!")
+
+	# Gentle camera shake for shield restore
+	if camera_controller:
+		camera_controller.add_trauma(0.15)  # Gentle pulse
+
+	# Visual feedback - brief cyan flash
+	_flash_sprite_color(Color(0.2, 0.8, 1.0))  # Cyan flash
+
+	# Audio feedback (placeholder - would play "shield_restore.wav")
+	print("AUDIO: Shield restore sound! [PLACEHOLDER]")
+
+
+func _on_parry_window_started() -> void:
+	"""Handle parry window started"""
+	parry_window_active.emit(true)
+	print("Player: PARRY WINDOW ACTIVE!")
+
+
+func _on_parry_window_ended() -> void:
+	"""Handle parry window ended"""
+	parry_window_active.emit(false)
+	print("Player: Parry window ended")
 
 
 ## Shield getters
@@ -575,3 +655,53 @@ func can_block() -> bool:
 	if shield:
 		return shield.can_block()
 	return false
+
+
+func _configure_shield_for_phase(phase: GameManager.PlayerPhase) -> void:
+	"""Configure shield stats based on player phase (BALANCED SYSTEM)"""
+	if not shield:
+		return
+
+	match phase:
+		GameManager.PlayerPhase.CHILD:
+			# Child: Forgiving shield for beginners
+			shield.max_energy = 80
+			shield.energy_consumption_rate = 12.0  # 6.6 seconds max block
+			shield.energy_regen_rate = 10.0  # 8 seconds to recharge
+			shield.damage_reduction = 0.85  # 85% reduction (forgiving)
+			shield.parry_window_duration = 0.25  # 250ms window (easier)
+			shield.parry_energy_refund = 30  # +30 energy on parry
+
+		GameManager.PlayerPhase.ADOLESCENT:
+			# Adolescent: Balanced, standard gameplay
+			shield.max_energy = 100
+			shield.energy_consumption_rate = 10.0  # 10 seconds max block
+			shield.energy_regen_rate = 10.0  # 10 seconds to recharge (1:1 ratio)
+			shield.damage_reduction = 0.80  # 80% reduction (balanced)
+			shield.parry_window_duration = 0.20  # 200ms window (standard)
+			shield.parry_energy_refund = 30  # +30 energy on parry
+
+		GameManager.PlayerPhase.KNIGHT:
+			# Knight: Skill-based, aggressive play rewarded
+			shield.max_energy = 120
+			shield.energy_consumption_rate = 8.0  # 15 seconds max block
+			shield.energy_regen_rate = 12.0  # 10 seconds to recharge (better regen)
+			shield.damage_reduction = 0.70  # 70% reduction (encourages parry over tank)
+			shield.parry_window_duration = 0.15  # 150ms window (harder, rewards skill)
+			shield.parry_energy_refund = 40  # +40 energy on parry (bigger reward)
+
+		GameManager.PlayerPhase.ELDER:
+			# Elder: Wisdom = perfect timing, compensates for lower HP
+			shield.max_energy = 100
+			shield.energy_consumption_rate = 10.0  # 10 seconds max block
+			shield.energy_regen_rate = 12.0  # 8.3 seconds to recharge
+			shield.damage_reduction = 0.75  # 75% reduction (balanced)
+			shield.parry_window_duration = 0.30  # 300ms window (wisdom = easier timing)
+			shield.parry_energy_refund = 50  # +50 energy on parry (mastery reward)
+
+	# Restore to full energy after reconfiguration
+	shield.current_energy = shield.max_energy
+	shield.is_depleted = false
+
+	print("Shield configured for %s: Energy=%d, Reduction=%.0f%%, Parry=%.2fs" %
+		[GameManager.PlayerPhase.keys()[phase], shield.max_energy, shield.damage_reduction * 100, shield.parry_window_duration])
