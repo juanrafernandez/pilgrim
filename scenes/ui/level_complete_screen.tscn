@@ -1,0 +1,112 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8x3k7m2p5n9q"]
+
+[ext_resource type="Script" path="res://scripts/ui/level_complete_screen.gd" id="1_complete"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 40
+font_color = Color(1, 1, 1, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_stats"]
+font_size = 24
+font_color = Color(1, 1, 1, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_rank"]
+font_size = 64
+font_color = Color(1, 0.84, 0, 1)
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="LevelCompleteScreen" type="CanvasLayer"]
+layer = 128
+visible = false
+script = ExtResource("1_complete")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="ScreenContainer" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="ScreenContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="Spacer1" type="Control" parent="ScreenContainer/VBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="ScreenContainer/VBox"]
+layout_mode = 2
+text = "LEVEL 1 COMPLETE!"
+label_settings = SubResource("LabelSettings_title")
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="ScreenContainer/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="ScreenContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="ScoreLabel" type="Label" parent="ScreenContainer/VBox/StatsContainer"]
+layout_mode = 2
+text = "SCORE:         +2,500"
+label_settings = SubResource("LabelSettings_stats")
+horizontal_alignment = 1
+
+[node name="VirtueLabel" type="Label" parent="ScreenContainer/VBox/StatsContainer"]
+layout_mode = 2
+text = "VIRTUE:        +150"
+label_settings = SubResource("LabelSettings_stats")
+horizontal_alignment = 1
+
+[node name="ComboLabel" type="Label" parent="ScreenContainer/VBox/StatsContainer"]
+layout_mode = 2
+text = "MAX COMBO:     x12"
+label_settings = SubResource("LabelSettings_stats")
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="ScreenContainer/VBox/StatsContainer"]
+layout_mode = 2
+text = "TIME:          3:45"
+label_settings = SubResource("LabelSettings_stats")
+horizontal_alignment = 1
+
+[node name="Spacer3" type="Control" parent="ScreenContainer/VBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="RankLabel" type="Label" parent="ScreenContainer/VBox"]
+layout_mode = 2
+text = "RANK: A"
+label_settings = SubResource("LabelSettings_rank")
+horizontal_alignment = 1
+
+[node name="Spacer4" type="Control" parent="ScreenContainer/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="ContinueLabel" type="Label" parent="ScreenContainer/VBox"]
+layout_mode = 2
+text = "Press SPACE to continue"
+horizontal_alignment = 1

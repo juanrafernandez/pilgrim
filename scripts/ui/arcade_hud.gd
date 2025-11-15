@@ -26,6 +26,11 @@ class_name ArcadeHUD
 @onready var combo_meter: ComboMeter = $HUDContainer/VBox/ComboMeter
 @onready var pause_menu: PauseMenu = $PauseMenu
 
+# UI Elements - Polish Effects (Low Priority)
+@onready var crt_effect: CRTEffect = $CRTEffect
+@onready var level_complete_screen: LevelCompleteScreen = $LevelCompleteScreen
+@onready var arcade_frame: ArcadeFrame = $ArcadeFrame
+
 # Data
 var current_score: int = 0
 var high_score: int = 0
@@ -280,3 +285,61 @@ func hide_pause() -> void:
 	"""Hide pause menu"""
 	if pause_menu:
 		pause_menu.hide_pause_menu()
+
+
+## Polish Effects Methods (Low Priority)
+
+func enable_crt_effect(enabled: bool = true) -> void:
+	"""Enable/disable CRT scanline effect"""
+	if crt_effect:
+		crt_effect.enable_all_effects(enabled)
+
+
+func set_crt_preset(preset: String) -> void:
+	"""Set CRT effect preset: 'off', 'light', 'medium', 'heavy'"""
+	if not crt_effect:
+		return
+
+	match preset.to_lower():
+		"off":
+			crt_effect.apply_preset_off()
+		"light":
+			crt_effect.apply_preset_light()
+		"medium":
+			crt_effect.apply_preset_medium()
+		"heavy":
+			crt_effect.apply_preset_heavy()
+
+
+func show_level_complete(level: int, score: int, virtue: int, combo: int, time: float) -> void:
+	"""Show level complete summary screen"""
+	if level_complete_screen:
+		level_complete_screen.show_screen(level, score, virtue, combo, time)
+
+
+func hide_level_complete() -> void:
+	"""Hide level complete screen"""
+	if level_complete_screen:
+		level_complete_screen.hide_screen()
+
+
+func enable_arcade_frame(enabled: bool = true) -> void:
+	"""Enable/disable decorative arcade frame"""
+	if arcade_frame:
+		arcade_frame.enable_frame(enabled)
+
+
+func set_frame_theme(theme: String) -> void:
+	"""Set arcade frame theme: 'wood', 'metal', 'gold', 'off'"""
+	if not arcade_frame:
+		return
+
+	match theme.to_lower():
+		"wood":
+			arcade_frame.apply_theme_wood()
+		"metal":
+			arcade_frame.apply_theme_metal()
+		"gold":
+			arcade_frame.apply_theme_gold()
+		"off":
+			arcade_frame.apply_theme_off()

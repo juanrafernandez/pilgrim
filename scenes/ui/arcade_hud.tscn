@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8q7x5r2m3v1p"]
+[gd_scene load_steps=13 format=3 uid="uid://c8q7x5r2m3v1p"]
 
 [ext_resource type="Script" path="res://scripts/ui/arcade_hud.gd" id="1_arcade_hud"]
 [ext_resource type="PackedScene" uid="uid://bvk7y3p4m8x2q" path="res://scenes/ui/virtue_display.tscn" id="2_virtue_display"]
@@ -9,6 +9,9 @@
 [ext_resource type="PackedScene" uid="uid://d8k5p7m3n2q9x" path="res://scenes/ui/buff_indicator_panel.tscn" id="7_buffs"]
 [ext_resource type="PackedScene" uid="uid://b3m7k9p5n2x4q" path="res://scenes/ui/combo_meter.tscn" id="8_combo"]
 [ext_resource type="PackedScene" uid="uid://c7m9p2k5n3x8q" path="res://scenes/ui/pause_menu.tscn" id="9_pause"]
+[ext_resource type="PackedScene" uid="uid://d7k9m3p2n5x8q" path="res://scenes/ui/arcade_frame.tscn" id="10_frame"]
+[ext_resource type="PackedScene" uid="uid://b9x7k2m5n4p3q" path="res://scenes/ui/crt_effect.tscn" id="11_crt"]
+[ext_resource type="PackedScene" uid="uid://c8x3k7m2p5n9q" path="res://scenes/ui/level_complete_screen.tscn" id="12_complete"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_score"]
 font_size = 24
@@ -105,3 +108,9 @@ layer = 101
 [node name="LowHealthWarning" parent="." instance=ExtResource("6_warning")]
 
 [node name="PauseMenu" parent="." instance=ExtResource("9_pause")]
+
+[node name="ArcadeFrame" parent="." instance=ExtResource("10_frame")]
+
+[node name="CRTEffect" parent="." instance=ExtResource("11_crt")]
+
+[node name="LevelCompleteScreen" parent="." instance=ExtResource("12_complete")]

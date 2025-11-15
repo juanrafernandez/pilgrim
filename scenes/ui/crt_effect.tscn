@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://b9x7k2m5n4p3q"]
+
+[ext_resource type="Script" path="res://scripts/ui/crt_effect.gd" id="1_crt"]
+
+[node name="CRTEffect" type="CanvasLayer"]
+layer = 127
+script = ExtResource("1_crt")
+
+[node name="Scanlines" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.15)
+
+[node name="Vignette" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.3)
+
+[node name="NoiseOverlay" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.05)
