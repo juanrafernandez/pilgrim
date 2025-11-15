@@ -254,15 +254,17 @@ func _ai_chase(delta: float) -> void:
 
 	# FIX: Check if target is BEHIND the enemy (player jumped over enemy)
 	# Enemy should only chase if target is in front
+	# IMPORTANT: Only check when target is on ground (prevents turning while player is jumping over)
 	var direction_to_target = sign(target.global_position.x - global_position.x)
 	var facing_direction = 1 if facing_right else -1
 
-	if direction_to_target != facing_direction:
-		# Target is behind us - stop chasing, return to normal patrol
-		print("%s: Target is behind me, returning to patrol" % name)
-		target = null
-		change_state(State.PATROL)
-		return
+	if target.has_method("is_on_floor") and target.is_on_floor():
+		if direction_to_target != facing_direction:
+			# Target is behind us AND on ground - stop chasing, return to normal patrol
+			print("%s: Target is behind me (on ground), returning to patrol" % name)
+			target = null
+			change_state(State.PATROL)
+			return
 
 	# Check if in attack range
 	if _is_target_in_range(attack_range) and can_attack:
@@ -540,6 +542,10 @@ func _on_body_entered_contact(body: Node2D) -> void:
 
 	# Check if target is dead using duck typing
 	if (body.has_method("is_dead") and body.is_dead) or is_dead:
+		return
+
+	# CRITICAL FIX: Don't trigger contact damage while already recoiling (prevents multiple bounces)
+	if is_recoiling:
 		return
 
 	# IMPORTANT: Only deal contact damage in PATROL and CHASE states
