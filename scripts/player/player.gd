@@ -438,22 +438,22 @@ func _setup_phase(phase: GameManager.PlayerPhase) -> void:
 		GameManager.PlayerPhase.CHILD:
 			max_health = 80
 			attack_damage = 8
-			sprite.color = Color(0.3, 0.8, 0.3)  # Green
+			sprite.modulate = Color(0.3, 0.8, 0.3)  # Green
 
 		GameManager.PlayerPhase.ADOLESCENT:
 			max_health = 100
 			attack_damage = 12
-			sprite.color = Color(0.2, 0.5, 0.9)  # Blue
+			sprite.modulate = Color(0.2, 0.5, 0.9)  # Blue
 
 		GameManager.PlayerPhase.KNIGHT:
 			max_health = 150
 			attack_damage = 20
-			sprite.color = Color(0.95, 0.95, 0.95)  # White (templar)
+			sprite.modulate = Color(0.95, 0.95, 0.95)  # White (templar)
 
 		GameManager.PlayerPhase.ELDER:
 			max_health = 120
 			attack_damage = 15
-			sprite.color = Color(0.7, 0.7, 0.7)  # Gray
+			sprite.modulate = Color(0.7, 0.7, 0.7)  # Gray
 
 	# Restore health to new max
 	current_health = max_health
