@@ -26,9 +26,11 @@ var time_alive: float = 0.0
 
 
 func _ready() -> void:
-	# Set collision layers (projectiles on layer 3)
-	collision_layer = 4  # Layer 3 (2^2 = 4)
-	collision_mask = 2   # Collide with enemies (layer 2)
+	# Set collision layers
+	# Projectiles are on layer 3 (collision_layer = 4 = 2^2)
+	# Projectiles collide with enemies on layer 3 (collision_mask = 4 = 2^2)
+	collision_layer = 4  # Layer 3 (projectile layer)
+	collision_mask = 4   # Collide with enemies (layer 3)
 
 	# Connect to body entered
 	body_entered.connect(_on_body_entered)
@@ -68,9 +70,14 @@ func launch(dir: int, spawn_velocity: Vector2 = Vector2.ZERO) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	"""Handle collision with bodies (enemies, ground)"""
 	if body is Enemy:
-		# Deal damage to enemy
-		body.take_damage(damage)
+		# Calculate knockback direction (away from projectile)
+		var knockback_dir = sign(velocity.x)
+		var knockback = Vector2(knockback_dir * 300, -200)
+
+		# Deal damage to enemy with knockback
+		body.take_damage(damage, knockback)
 		hit_enemy.emit(body)
+		print("Projectile hit %s for %d damage!" % [body.name, damage])
 		_destroy()
 	elif body is TileMap or body is StaticBody2D:
 		# Hit terrain

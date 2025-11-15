@@ -40,6 +40,11 @@ var jump_velocity: float = -400.0  # Jump strength
 var max_jump_distance: float = 150.0  # Max horizontal distance enemy can jump
 var edge_check_distance: float = 50.0  # How far ahead to check for edges
 
+# Attack behavior
+var attack_knockback_self: float = 250.0  # Enemy recoils after attacking
+var attack_duration: float = 0.4  # How long attack state lasts
+var contact_damage_cooldown: float = 0.5  # Damage cooldown for contact hits
+
 # State
 var current_state: State = State.IDLE
 var is_dead: bool = false
@@ -50,6 +55,7 @@ var patrol_distance: float = 200.0
 var patrol_wait_time: float = 2.0
 var attack_cooldown: float = 1.5
 var can_attack: bool = true
+var attack_state_timer: float = 0.0
 
 # References
 var player: Player = null
@@ -62,12 +68,18 @@ var attack_timer: float = 0.0
 @onready var sprite: ColorRect = $Sprite if has_node("Sprite") else null
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var detection_area: Area2D = $DetectionArea if has_node("DetectionArea") else null
+@onready var contact_area: Area2D = $ContactArea if has_node("ContactArea") else null
+
+# Contact damage tracking
+var last_contact_damage_time: float = 0.0
 
 
 func _ready() -> void:
+	add_to_group("enemies")  # Add to enemies group for level management
 	spawn_position = global_position
 	current_health = max_health
 	_setup_detection_area()
+	_setup_contact_area()
 	print("%s spawned at %s" % [name, spawn_position])
 
 
@@ -81,6 +93,8 @@ func _physics_process(delta: float) -> void:
 	if attack_timer > 0:
 		attack_timer -= delta
 		can_attack = attack_timer <= 0
+	if attack_state_timer > 0:
+		attack_state_timer -= delta
 
 	# AI behavior based on state
 	_update_ai(delta)
@@ -98,6 +112,13 @@ func _setup_detection_area() -> void:
 	if detection_area:
 		detection_area.body_entered.connect(_on_body_entered_detection)
 		detection_area.body_exited.connect(_on_body_exited_detection)
+
+
+func _setup_contact_area() -> void:
+	"""Setup contact area for collision damage"""
+	if contact_area:
+		contact_area.body_entered.connect(_on_body_entered_contact)
+		contact_area.body_exited.connect(_on_body_exited_contact)
 
 
 func _update_ai(delta: float) -> void:
@@ -190,20 +211,32 @@ func _ai_chase(delta: float) -> void:
 
 
 func _ai_attack(delta: float) -> void:
-	"""Attack behavior"""
-	velocity.x = move_toward(velocity.x, 0, move_speed * delta * 10)
+	"""Attack behavior with knockback"""
+	# First frame of attack: perform attack and apply self-knockback
+	if attack_state_timer <= 0:
+		if not player or player.is_dead:
+			change_state(State.IDLE)
+			return
 
-	if not player or player.is_dead:
-		change_state(State.IDLE)
-		return
+		# Perform attack
+		_perform_attack()
 
-	# Perform attack
-	_perform_attack()
+		# Enemy recoils backward after attacking
+		var recoil_dir = -sign(player.global_position.x - global_position.x)
+		velocity.x = recoil_dir * attack_knockback_self
 
-	# Return to chase after attack
-	attack_timer = attack_cooldown
-	can_attack = false
-	change_state(State.CHASE)
+		# Set attack duration
+		attack_state_timer = attack_duration
+
+	# During attack animation, gradually slow down
+	else:
+		velocity.x = move_toward(velocity.x, 0, move_speed * delta * 8)
+
+	# After attack duration ends, return to chase
+	if attack_state_timer <= 0:
+		attack_timer = attack_cooldown
+		can_attack = false
+		change_state(State.CHASE)
 
 
 func _ai_hurt(delta: float) -> void:
@@ -371,6 +404,23 @@ func _death_animation() -> void:
 	queue_free()
 
 
+## Set enemy active/inactive state
+func set_active(active: bool) -> void:
+	"""Enable or disable enemy AI and visibility"""
+	set_physics_process(active)
+	visible = active
+
+	if not active:
+		# Deactivate enemy - set to idle and stop movement
+		change_state(State.IDLE)
+		velocity = Vector2.ZERO
+		player = null
+	else:
+		# Activate enemy - start patrolling
+		change_state(State.PATROL)
+		print("%s activated!" % name)
+
+
 ## Change state
 func change_state(new_state: State) -> void:
 	if current_state == new_state:
@@ -394,3 +444,25 @@ func _on_body_exited_detection(body: Node2D) -> void:
 	if body is Player:
 		# Don't immediately lose player, wait for chase AI to handle it
 		pass
+
+
+## Contact damage callbacks
+func _on_body_entered_contact(body: Node2D) -> void:
+	"""Called when body enters contact area (continuous damage on touch)"""
+	if body is Player and not body.is_dead and not is_dead:
+		# Check if enough time has passed since last contact damage
+		var current_time = Time.get_ticks_msec() / 1000.0
+		if current_time - last_contact_damage_time >= contact_damage_cooldown:
+			# Deal contact damage
+			var knockback_dir = sign(body.global_position.x - global_position.x)
+			var knockback = Vector2(knockback_dir * 350, -450)
+			body.take_damage(attack_damage, knockback, self)
+			last_contact_damage_time = current_time
+			print("%s dealt contact damage to player" % name)
+
+
+func _on_body_exited_contact(body: Node2D) -> void:
+	"""Called when body exits contact area"""
+	# Reset contact damage timer when player leaves
+	if body is Player:
+		last_contact_damage_time = 0.0

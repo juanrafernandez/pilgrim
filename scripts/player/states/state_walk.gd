@@ -28,6 +28,11 @@ func check_transitions() -> void:
 	if Input.is_action_just_pressed("special"):
 		player.throw_projectile()
 
+	# If crouch pressed, go to Crouch
+	if Input.is_action_pressed("crouch") and player.is_on_floor():
+		state_machine.change_state("Crouch")
+		return
+
 	# If stopped moving, go to Idle
 	if player.input_direction.x == 0:
 		state_machine.change_state("Idle")
