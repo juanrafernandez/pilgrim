@@ -322,7 +322,7 @@ func throw_projectile() -> void:
 	# Get projectile scene based on weapon type
 	var projectile_scene: PackedScene = _get_projectile_scene()
 	if not projectile_scene:
-		print("No projectile scene for weapon: %s" % WeaponType.keys()[current_weapon])
+		print("No projectile scene for weapon: %s" % WeaponType.keys()[current_weapon_type])
 		return
 
 	# Instantiate projectile
