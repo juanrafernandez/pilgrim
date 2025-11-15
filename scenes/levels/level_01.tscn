@@ -1,0 +1,441 @@
+[gd_scene load_steps=20 format=3 uid="uid://b8xm3k9p2vwq1"]
+
+[ext_resource type="Script" path="res://scripts/levels/level_01.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="3_camera"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_wolf.tscn" id="4_wolf"]
+
+[sub_resource type="RectangleShape2D" id="trigger_shape"]
+size = Vector2(100, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_s1"]
+size = Vector2(1000, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_s2a"]
+size = Vector2(300, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform1"]
+size = Vector2(200, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform2"]
+size = Vector2(200, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform3"]
+size = Vector2(250, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_s3"]
+size = Vector2(600, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bridge"]
+size = Vector2(300, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform4h"]
+size = Vector2(180, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform4l"]
+size = Vector2(180, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_s4a"]
+size = Vector2(500, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform5"]
+size = Vector2(250, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_final"]
+size = Vector2(550, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_deathzone"]
+size = Vector2(5000, 100)
+
+[node name="Level01" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Background" type="Node2D" parent="."]
+z_index = -100
+
+[node name="Sky" type="ColorRect" parent="Background"]
+offset_right = 4500.0
+offset_bottom = 1920.0
+color = Color(0.227451, 0.290196, 0.352941, 1)
+
+[node name="Mountains" type="ColorRect" parent="Background"]
+z_index = -90
+offset_left = 0.0
+offset_top = 1200.0
+offset_right = 4500.0
+offset_bottom = 1600.0
+color = Color(0.176471, 0.207843, 0.25098, 1)
+
+[node name="ForestBack" type="ColorRect" parent="Background"]
+z_index = -80
+offset_left = 0.0
+offset_top = 1400.0
+offset_right = 4500.0
+offset_bottom = 1700.0
+color = Color(0.176471, 0.313726, 0.0862745, 1)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(150, 1600)
+
+[node name="Camera" type="Camera2D" parent="."]
+position = Vector2(540, 960)
+script = ExtResource("3_camera")
+backward_limit_distance = 600.0
+forward_buffer = 300.0
+vertical_offset = -600.0
+horizontal_offset = 200.0
+
+[node name="Terrain" type="Node2D" parent="."]
+
+[node name="Section1Ground" type="StaticBody2D" parent="Terrain"]
+position = Vector2(0, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="GroundSprite" type="ColorRect" parent="Terrain/Section1Ground"]
+offset_right = 1000.0
+offset_bottom = 220.0
+color = Color(0.4, 0.333333, 0.266667, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section1Ground"]
+position = Vector2(500, 110)
+shape = SubResource("RectangleShape2D_ground_s1")
+
+[node name="Section2Ground" type="StaticBody2D" parent="Terrain"]
+position = Vector2(800, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="GroundSprite" type="ColorRect" parent="Terrain/Section2Ground"]
+offset_right = 300.0
+offset_bottom = 220.0
+color = Color(0.4, 0.333333, 0.266667, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section2Ground"]
+position = Vector2(150, 110)
+shape = SubResource("RectangleShape2D_ground_s2a")
+
+[node name="Platform1" type="StaticBody2D" parent="Terrain"]
+position = Vector2(1200, 1600)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="ColorRect" parent="Terrain/Platform1"]
+offset_right = 200.0
+offset_bottom = 32.0
+color = Color(0.533333, 0.466667, 0.4, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform1"]
+position = Vector2(100, 16)
+shape = SubResource("RectangleShape2D_platform1")
+
+[node name="Platform2" type="StaticBody2D" parent="Terrain"]
+position = Vector2(1500, 1550)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="ColorRect" parent="Terrain/Platform2"]
+offset_right = 200.0
+offset_bottom = 32.0
+color = Color(0.533333, 0.466667, 0.4, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform2"]
+position = Vector2(100, 16)
+shape = SubResource("RectangleShape2D_platform2")
+
+[node name="Platform3" type="StaticBody2D" parent="Terrain"]
+position = Vector2(1800, 1650)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="ColorRect" parent="Terrain/Platform3"]
+offset_right = 250.0
+offset_bottom = 32.0
+color = Color(0.533333, 0.466667, 0.4, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform3"]
+position = Vector2(125, 16)
+shape = SubResource("RectangleShape2D_platform3")
+
+[node name="Section3Ground" type="StaticBody2D" parent="Terrain"]
+position = Vector2(2100, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="GroundSprite" type="ColorRect" parent="Terrain/Section3Ground"]
+offset_right = 600.0
+offset_bottom = 220.0
+color = Color(0.4, 0.333333, 0.266667, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section3Ground"]
+position = Vector2(300, 110)
+shape = SubResource("RectangleShape2D_ground_s3")
+
+[node name="BridgeLog" type="StaticBody2D" parent="Terrain"]
+position = Vector2(2750, 1680)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="ColorRect" parent="Terrain/BridgeLog"]
+offset_right = 300.0
+offset_bottom = 40.0
+color = Color(0.4, 0.266667, 0.133333, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/BridgeLog"]
+position = Vector2(150, 20)
+shape = SubResource("RectangleShape2D_bridge")
+
+[node name="Platform4High" type="StaticBody2D" parent="Terrain"]
+position = Vector2(2400, 1500)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="ColorRect" parent="Terrain/Platform4High"]
+offset_right = 180.0
+offset_bottom = 32.0
+color = Color(0.533333, 0.466667, 0.4, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform4High"]
+position = Vector2(90, 16)
+shape = SubResource("RectangleShape2D_platform4h")
+
+[node name="Platform4Low" type="StaticBody2D" parent="Terrain"]
+position = Vector2(2600, 1650)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="ColorRect" parent="Terrain/Platform4Low"]
+offset_right = 180.0
+offset_bottom = 32.0
+color = Color(0.533333, 0.466667, 0.4, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform4Low"]
+position = Vector2(90, 16)
+shape = SubResource("RectangleShape2D_platform4l")
+
+[node name="Section4Ground" type="StaticBody2D" parent="Terrain"]
+position = Vector2(3100, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="GroundSprite" type="ColorRect" parent="Terrain/Section4Ground"]
+offset_right = 500.0
+offset_bottom = 220.0
+color = Color(0.4, 0.333333, 0.266667, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Section4Ground"]
+position = Vector2(250, 110)
+shape = SubResource("RectangleShape2D_ground_s4a")
+
+[node name="Platform5Elevated" type="StaticBody2D" parent="Terrain"]
+position = Vector2(3650, 1550)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="ColorRect" parent="Terrain/Platform5Elevated"]
+offset_right = 250.0
+offset_bottom = 32.0
+color = Color(0.533333, 0.466667, 0.4, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/Platform5Elevated"]
+position = Vector2(125, 16)
+shape = SubResource("RectangleShape2D_platform5")
+
+[node name="FinalGround" type="StaticBody2D" parent="Terrain"]
+position = Vector2(3950, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="GroundSprite" type="ColorRect" parent="Terrain/FinalGround"]
+offset_right = 550.0
+offset_bottom = 220.0
+color = Color(0.4, 0.333333, 0.266667, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Terrain/FinalGround"]
+position = Vector2(275, 110)
+shape = SubResource("RectangleShape2D_ground_final")
+
+[node name="Decoration" type="Node2D" parent="."]
+z_index = -50
+
+[node name="Sign_YellowArrow" type="Node2D" parent="Decoration"]
+position = Vector2(250, 1600)
+
+[node name="Post" type="ColorRect" parent="Decoration/Sign_YellowArrow"]
+offset_left = -8.0
+offset_top = -100.0
+offset_right = 8.0
+color = Color(0.4, 0.266667, 0.133333, 1)
+
+[node name="Arrow" type="ColorRect" parent="Decoration/Sign_YellowArrow"]
+offset_left = -40.0
+offset_top = -120.0
+offset_right = 60.0
+offset_bottom = -90.0
+color = Color(0.8, 0.733333, 0.2, 1)
+
+[node name="ArrowTip" type="ColorRect" parent="Decoration/Sign_YellowArrow"]
+offset_left = 60.0
+offset_top = -110.0
+offset_right = 80.0
+offset_bottom = -100.0
+color = Color(0.8, 0.733333, 0.2, 1)
+
+[node name="Shell_Pilgrim" type="Node2D" parent="Decoration"]
+position = Vector2(500, 1580)
+
+[node name="ShellBody" type="ColorRect" parent="Decoration/Shell_Pilgrim"]
+offset_left = -20.0
+offset_top = -25.0
+offset_right = 20.0
+offset_bottom = -5.0
+color = Color(0.933333, 0.866667, 0.733333, 1)
+
+[node name="Rope" type="ColorRect" parent="Decoration/Shell_Pilgrim"]
+offset_left = -2.0
+offset_top = -60.0
+offset_right = 2.0
+offset_bottom = -25.0
+color = Color(0.533333, 0.4, 0.266667, 1)
+
+[node name="Cross_Santiago" type="Node2D" parent="Decoration"]
+position = Vector2(1900, 1580)
+
+[node name="Vertical" type="ColorRect" parent="Decoration/Cross_Santiago"]
+offset_left = -8.0
+offset_top = -80.0
+offset_right = 8.0
+offset_bottom = -20.0
+color = Color(0.6, 0.4, 0.266667, 1)
+
+[node name="Horizontal" type="ColorRect" parent="Decoration/Cross_Santiago"]
+offset_left = -30.0
+offset_top = -60.0
+offset_right = 30.0
+offset_bottom = -45.0
+color = Color(0.6, 0.4, 0.266667, 1)
+
+[node name="Rock_WithSymbol" type="Node2D" parent="Decoration"]
+position = Vector2(2800, 1650)
+
+[node name="Rock" type="ColorRect" parent="Decoration/Rock_WithSymbol"]
+offset_left = -40.0
+offset_top = -50.0
+offset_right = 40.0
+offset_bottom = -10.0
+color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="Symbol" type="ColorRect" parent="Decoration/Rock_WithSymbol"]
+offset_left = -15.0
+offset_top = -35.0
+offset_right = 15.0
+offset_bottom = -25.0
+color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="Trees" type="Node2D" parent="Decoration"]
+
+[node name="Tree1" type="ColorRect" parent="Decoration/Trees"]
+offset_left = 700.0
+offset_top = 1500.0
+offset_right = 720.0
+offset_bottom = 1700.0
+color = Color(0.176471, 0.313726, 0.0862745, 1)
+
+[node name="Tree2" type="ColorRect" parent="Decoration/Trees"]
+offset_left = 1400.0
+offset_top = 1550.0
+offset_right = 1420.0
+offset_bottom = 1700.0
+color = Color(0.176471, 0.313726, 0.0862745, 1)
+
+[node name="Tree3" type="ColorRect" parent="Decoration/Trees"]
+offset_left = 2200.0
+offset_top = 1520.0
+offset_right = 2220.0
+offset_bottom = 1700.0
+color = Color(0.176471, 0.313726, 0.0862745, 1)
+
+[node name="Tree4" type="ColorRect" parent="Decoration/Trees"]
+offset_left = 3200.0
+offset_top = 1480.0
+offset_right = 3220.0
+offset_bottom = 1700.0
+color = Color(0.176471, 0.313726, 0.0862745, 1)
+
+[node name="FinalLight" type="ColorRect" parent="Decoration"]
+offset_left = 4100.0
+offset_top = 1300.0
+offset_right = 4400.0
+offset_bottom = 1700.0
+color = Color(1, 0.933333, 0.733333, 0.4)
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Wolf1" parent="Enemies" instance=ExtResource("4_wolf")]
+position = Vector2(650, 1600)
+
+[node name="Wolf2" parent="Enemies" instance=ExtResource("4_wolf")]
+position = Vector2(1600, 1480)
+
+[node name="Wolf3A" parent="Enemies" instance=ExtResource("4_wolf")]
+position = Vector2(2450, 1430)
+
+[node name="Wolf3B" parent="Enemies" instance=ExtResource("4_wolf")]
+position = Vector2(2650, 1580)
+
+[node name="Wolf4A" parent="Enemies" instance=ExtResource("4_wolf")]
+position = Vector2(3300, 1600)
+
+[node name="Wolf4B" parent="Enemies" instance=ExtResource("4_wolf")]
+position = Vector2(3850, 1600)
+
+[node name="Triggers" type="Node2D" parent="."]
+
+[node name="TriggerWolf1" type="Area2D" parent="Triggers"]
+position = Vector2(500, 1600)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerWolf1"]
+shape = SubResource("trigger_shape")
+
+[node name="TriggerWolf2" type="Area2D" parent="Triggers"]
+position = Vector2(1300, 1600)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerWolf2"]
+shape = SubResource("trigger_shape")
+
+[node name="TriggerSection3" type="Area2D" parent="Triggers"]
+position = Vector2(2300, 1600)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerSection3"]
+shape = SubResource("trigger_shape")
+
+[node name="TriggerSection4" type="Area2D" parent="Triggers"]
+position = Vector2(3150, 1600)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerSection4"]
+shape = SubResource("trigger_shape")
+
+[node name="TriggerEnd" type="Area2D" parent="Triggers"]
+position = Vector2(4250, 1600)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/TriggerEnd"]
+shape = SubResource("trigger_shape")
+
+[node name="DeathZone" type="Area2D" parent="."]
+position = Vector2(0, 2100)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone"]
+position = Vector2(2500, 0)
+shape = SubResource("RectangleShape2D_deathzone")

@@ -65,6 +65,7 @@ var attack_timer: float = 0.0
 
 
 func _ready() -> void:
+	add_to_group("enemies")  # Add to enemies group for level management
 	spawn_position = global_position
 	current_health = max_health
 	_setup_detection_area()
@@ -369,6 +370,23 @@ func _death_animation() -> void:
 		await tween.finished
 
 	queue_free()
+
+
+## Set enemy active/inactive state
+func set_active(active: bool) -> void:
+	"""Enable or disable enemy AI and visibility"""
+	set_physics_process(active)
+	visible = active
+
+	if not active:
+		# Deactivate enemy - set to idle and stop movement
+		change_state(State.IDLE)
+		velocity = Vector2.ZERO
+		player = null
+	else:
+		# Activate enemy - start patrolling
+		change_state(State.PATROL)
+		print("%s activated!" % name)
 
 
 ## Change state

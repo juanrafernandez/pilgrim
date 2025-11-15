@@ -78,6 +78,7 @@ const CHECKPOINT_INTERVAL: float = 0.5  # Update checkpoint every 0.5 seconds wh
 
 
 func _ready() -> void:
+	add_to_group("player")  # Add to player group for detection/triggers
 	_setup_phase(current_phase)
 	current_health = max_health
 	last_safe_position = global_position  # Initialize checkpoint
