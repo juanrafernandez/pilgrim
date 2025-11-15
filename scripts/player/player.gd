@@ -55,7 +55,7 @@ var can_throw_projectile: bool = true
 var projectile_cooldown_timer: float = 0.0
 
 # References
-@onready var sprite: Sprite2D = $Sprite
+@onready var sprite: AnimatedSprite2D = $Sprite
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var state_machine: PlayerStateMachine = $StateMachine
 
