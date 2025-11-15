@@ -40,26 +40,59 @@ def draw_pilgrim_base(draw, x_offset=0):
     # Belt
     draw.rectangle([20+x_offset, 40, 43+x_offset, 44], fill=STAFF_DARK, outline=BLACK)
 
+def draw_staff(draw, x1, y1, x2, y2, width=6):
+    """Draw a visible staff/weapon as a thick object with volume"""
+    import math
+
+    # Calculate perpendicular offset for width
+    dx = x2 - x1
+    dy = y2 - y1
+    length = math.sqrt(dx*dx + dy*dy)
+    if length == 0:
+        return
+
+    # Perpendicular unit vector
+    px = -dy / length * (width / 2)
+    py = dx / length * (width / 2)
+
+    # Four corners of the staff rectangle
+    corners = [
+        (int(x1 + px), int(y1 + py)),
+        (int(x2 + px), int(y2 + py)),
+        (int(x2 - px), int(y2 - py)),
+        (int(x1 - px), int(y1 - py))
+    ]
+
+    # Draw staff body
+    draw.polygon(corners, fill=STAFF_DARK, outline=BLACK)
+
+    # Add highlight on one side
+    highlight_corners = [
+        (int(x1 + px*0.5), int(y1 + py*0.5)),
+        (int(x2 + px*0.5), int(y2 + py*0.5)),
+        (int(x2 + px*0.2), int(y2 + py*0.2)),
+        (int(x1 + px*0.2), int(y1 + py*0.2))
+    ]
+    draw.polygon(highlight_corners, fill=STAFF_LIGHT, outline=None)
+
 def create_attack_frame_1():
-    """Frame 1: Anticipation - pulling staff back"""
+    """Frame 1: Anticipation - staff raised high and back"""
     img = Image.new('RGBA', (64, 96), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     draw_pilgrim_base(draw)
 
-    # Right arm (pulling back)
-    draw.rectangle([44, 28, 50, 42], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([47, 23, 53, 29], fill=SKIN, outline=BLACK)  # Hand
+    # STAFF FIRST (behind character) - raised diagonally back-high
+    # From lower-right to upper-right, angled back
+    draw_staff(draw, 46, 32, 58, 8, width=7)
 
-    # Left arm (forward)
-    draw.rectangle([13, 32, 19, 46], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([10, 30, 16, 36], fill=SKIN, outline=BLACK)  # Hand
+    # Right arm (holding staff high)
+    draw.rectangle([42, 26, 48, 40], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([43, 28, 51, 36], fill=SKIN, outline=BLACK)  # Hand gripping
 
-    # Staff (angled back, held high)
-    # Staff from hand position to high-right
-    draw.line([50, 26, 56, 14], fill=STAFF_DARK, width=3)
-    draw.line([50, 26, 56, 14], fill=STAFF_LIGHT, width=2)
-    draw.point((56, 14), fill=STAFF_HIGHLIGHT)
+    # Left arm (supporting low on staff)
+    draw.rectangle([15, 30, 21, 44], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([12, 32, 20, 40], fill=SKIN, outline=BLACK)  # Hand
 
     # Legs
     draw.rectangle([24, 61, 30, 87], fill=ROBE_DARK, outline=BLACK)
@@ -72,24 +105,23 @@ def create_attack_frame_1():
     print(f"Created {OUTPUT_DIR}/pilgrim_attack_1.png")
 
 def create_attack_frame_2():
-    """Frame 2: Swing start - staff moving forward"""
+    """Frame 2: Swing start - staff rotating downward"""
     img = Image.new('RGBA', (64, 96), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     draw_pilgrim_base(draw)
 
-    # Right arm (extending forward-up)
-    draw.rectangle([40, 20, 46, 34], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([43, 16, 49, 22], fill=SKIN, outline=BLACK)  # Hand
+    # STAFF - rotating down from high to diagonal
+    # Now at 45-degree angle, swinging forward
+    draw_staff(draw, 38, 22, 55, 12, width=7)
 
-    # Left arm (supporting)
-    draw.rectangle([17, 26, 23, 40], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([14, 24, 20, 30], fill=SKIN, outline=BLACK)  # Hand
+    # Right arm (pushing staff forward)
+    draw.rectangle([36, 18, 42, 32], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([35, 20, 43, 28], fill=SKIN, outline=BLACK)  # Hand
 
-    # Staff (diagonal, moving forward)
-    draw.line([46, 19, 52, 8], fill=STAFF_DARK, width=3)
-    draw.line([46, 19, 52, 8], fill=STAFF_LIGHT, width=2)
-    draw.point((52, 8), fill=STAFF_HIGHLIGHT)
+    # Left arm (guiding staff)
+    draw.rectangle([20, 24, 26, 38], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([17, 22, 25, 30], fill=SKIN, outline=BLACK)  # Hand
 
     # Legs (wider stance)
     draw.rectangle([22, 61, 28, 87], fill=ROBE_DARK, outline=BLACK)
@@ -102,66 +134,72 @@ def create_attack_frame_2():
     print(f"Created {OUTPUT_DIR}/pilgrim_attack_2.png")
 
 def create_attack_frame_3():
-    """Frame 3: Impact - full swing with motion blur (smear effect)"""
+    """Frame 3: Impact - full horizontal swing with motion smear on WEAPON"""
     img = Image.new('RGBA', (64, 96), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     draw_pilgrim_base(draw, x_offset=-2)  # Body leans forward
 
+    # MOTION BLUR STAFFS (behind) - the smear effect on the WEAPON itself
+    # Multiple semi-transparent copies showing the arc of movement
+    for i, offset in enumerate([(-3, -4), (-2, -2), (-1, -1)]):
+        alpha = 40 + i * 20  # Increasing opacity
+        blur_img = Image.new('RGBA', (64, 96), (0, 0, 0, 0))
+        blur_draw = ImageDraw.Draw(blur_img)
+
+        # Draw semi-transparent staff at different positions
+        x_off, y_off = offset
+        draw_staff(blur_draw, 28+x_off, 28+y_off, 60+x_off, 28+y_off, width=6)
+
+        # Apply transparency
+        blur_img.putalpha(alpha)
+        img.paste(blur_img, (0, 0), blur_img)
+
+    # MAIN STAFF (horizontal - the actual impact position)
+    draw_staff(draw, 28, 28, 62, 28, width=7)
+
+    # Impact flash at the tip
+    draw.ellipse([59, 24, 64, 32], fill=(255, 255, 200, 180), outline=None)
+    draw.ellipse([60, 25, 63, 31], fill=(255, 255, 255, 220), outline=None)
+
     # Right arm (fully extended)
-    draw.rectangle([42, 28, 48, 42], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([45, 26, 51, 32], fill=SKIN, outline=BLACK)  # Hand
+    draw.rectangle([20, 24, 26, 38], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([17, 26, 25, 34], fill=SKIN, outline=BLACK)  # Hand gripping
 
-    # Left arm (raised for balance)
-    draw.rectangle([12, 22, 18, 36], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([9, 20, 15, 26], fill=SKIN, outline=BLACK)  # Hand
+    # Left arm (pulled back after release)
+    draw.rectangle([8, 20, 14, 34], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([5, 18, 13, 26], fill=SKIN, outline=BLACK)  # Hand
 
-    # Staff (horizontal with SMEAR EFFECT)
-    # Main staff
-    draw.line([48, 29, 60, 29], fill=STAFF_DARK, width=3)
-    draw.line([48, 29, 60, 29], fill=STAFF_LIGHT, width=2)
-
-    # Motion blur trails (key to retro attack feel!)
-    blur_alpha = 80
-    for offset in [-2, -1, 1, 2]:
-        blur_color = (*MOTION_BLUR[:3], blur_alpha)
-        draw.line([48, 29+offset, 60, 29+offset], fill=blur_color, width=1)
-
-    # Impact point indicator
-    draw.ellipse([58, 26, 63, 31], fill=(255, 255, 200, 180), outline=None)
-    draw.point((60, 29), fill=STAFF_HIGHLIGHT)
-
-    # Legs (forward stance)
-    draw.rectangle([20, 61, 26, 87], fill=ROBE_DARK, outline=BLACK)
-    draw.rectangle([37, 61, 43, 87], fill=ROBE_DARK, outline=BLACK)
+    # Legs (forward lunge stance)
+    draw.rectangle([18, 61, 24, 87], fill=ROBE_DARK, outline=BLACK)
+    draw.rectangle([39, 61, 45, 87], fill=ROBE_DARK, outline=BLACK)
     # Feet
-    draw.rectangle([19, 88, 27, 95], fill=STAFF_DARK, outline=BLACK)
-    draw.rectangle([36, 88, 44, 95], fill=STAFF_DARK, outline=BLACK)
+    draw.rectangle([17, 88, 25, 95], fill=STAFF_DARK, outline=BLACK)
+    draw.rectangle([38, 88, 46, 95], fill=STAFF_DARK, outline=BLACK)
 
     img.save(f"{OUTPUT_DIR}/pilgrim_attack_3.png")
-    print(f"Created {OUTPUT_DIR}/pilgrim_attack_3.png (with smear effect)")
+    print(f"Created {OUTPUT_DIR}/pilgrim_attack_3.png (with weapon smear effect)")
 
 def create_attack_frame_4():
-    """Frame 4: Recovery - returning to ready position"""
+    """Frame 4: Recovery - staff lowering, returning to guard"""
     img = Image.new('RGBA', (64, 96), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     draw_pilgrim_base(draw)
 
-    # Right arm (pulling back to neutral)
-    draw.rectangle([38, 32, 44, 46], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([41, 30, 47, 36], fill=SKIN, outline=BLACK)  # Hand
+    # STAFF - angled down after follow-through
+    # From mid-left to lower-right, recovering
+    draw_staff(draw, 22, 38, 46, 52, width=7)
 
-    # Left arm (lowering)
-    draw.rectangle([15, 30, 21, 44], fill=ROBE_MID, outline=BLACK)
-    draw.ellipse([12, 28, 18, 34], fill=SKIN, outline=BLACK)  # Hand
+    # Right arm (lowering after swing)
+    draw.rectangle([30, 36, 36, 50], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([28, 34, 36, 42], fill=SKIN, outline=BLACK)  # Hand
 
-    # Staff (angled down, recovering)
-    draw.line([44, 33, 48, 45], fill=STAFF_DARK, width=3)
-    draw.line([44, 33, 48, 45], fill=STAFF_LIGHT, width=2)
-    draw.point((48, 45), fill=STAFF_HIGHLIGHT)
+    # Left arm (relaxing)
+    draw.rectangle([16, 34, 22, 48], fill=ROBE_MID, outline=BLACK)
+    draw.ellipse([13, 36, 21, 44], fill=SKIN, outline=BLACK)  # Hand
 
-    # Legs (returning to normal)
+    # Legs (returning to normal stance)
     draw.rectangle([25, 61, 31, 87], fill=ROBE_DARK, outline=BLACK)
     draw.rectangle([32, 61, 38, 87], fill=ROBE_DARK, outline=BLACK)
     # Feet
@@ -173,7 +211,8 @@ def create_attack_frame_4():
 
 if __name__ == "__main__":
     print("Creating pilgrim attack animation (4 frames)...")
-    print("Based on retro game attack patterns with motion smear effect")
+    print("Based on retro game attack patterns with VISIBLE WEAPON SWING")
+    print("Staff is drawn as a thick, rotating object throughout the attack")
     print()
 
     create_attack_frame_1()  # Anticipation
@@ -184,7 +223,11 @@ if __name__ == "__main__":
     print()
     print("Attack animation complete!")
     print("Frame breakdown:")
-    print("  1. Anticipation - pulling staff back")
-    print("  2. Swing - staff moving forward")
-    print("  3. Impact - full swing with motion blur/smear")
-    print("  4. Recovery - returning to ready")
+    print("  1. Anticipation - staff raised high and back (visible weapon)")
+    print("  2. Swing - staff rotating downward at 45° (visible weapon)")
+    print("  3. Impact - staff horizontal with motion smear ON THE WEAPON")
+    print("  4. Recovery - staff lowering after follow-through (visible weapon)")
+    print()
+    print("Key improvement: Staff drawn as thick 7px object with volume,")
+    print("                 not thin lines. Motion blur shows multiple weapon")
+    print("                 positions during impact frame.")
