@@ -1,6 +1,7 @@
-[gd_scene load_steps=13 format=3 uid="uid://c8q7x5r2m3v1p"]
+[gd_scene load_steps=14 format=3 uid="uid://c8q7x5r2m3v1p"]
 
 [ext_resource type="Script" path="res://scripts/ui/arcade_hud.gd" id="1_arcade_hud"]
+[ext_resource type="PackedScene" uid="uid://bp8k3m5n9qw2r" path="res://scenes/ui/shield_bar.tscn" id="2_shield_bar"]
 [ext_resource type="PackedScene" uid="uid://bvk7y3p4m8x2q" path="res://scenes/ui/virtue_display.tscn" id="2_virtue_display"]
 [ext_resource type="PackedScene" uid="uid://c4h9k2x7n1m3b" path="res://scenes/ui/boss_health_bar.tscn" id="3_boss_health"]
 [ext_resource type="PackedScene" uid="uid://d3j8m5k2p9q1r" path="res://scenes/ui/stage_indicator.tscn" id="4_stage"]
@@ -88,6 +89,16 @@ label_settings = SubResource("LabelSettings_normal")
 
 [node name="HealthBar" type="ProgressBar" parent="HUDContainer/VBox"]
 custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="ShieldBar" parent="HUDContainer/VBox" instance=ExtResource("2_shield_bar")]
+layout_mode = 2
+
+[node name="WeaponDurabilityBar" type="ProgressBar" parent="HUDContainer/VBox"]
+custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 max_value = 100.0
 value = 100.0

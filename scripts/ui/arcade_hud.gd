@@ -11,6 +11,7 @@ class_name ArcadeHUD
 @onready var lives_container: HBoxContainer = $HUDContainer/VBox/MiddleRow/LivesContainer
 @onready var weapon_label: Label = $HUDContainer/VBox/MiddleRow/WeaponLabel
 @onready var health_bar: ProgressBar = $HUDContainer/VBox/HealthBar
+@onready var shield_bar: ProgressBar = $HUDContainer/VBox/ShieldBar
 @onready var weapon_durability_bar: ProgressBar = $HUDContainer/VBox/WeaponDurabilityBar
 @onready var combo_label: Label = $HUDContainer/VBox/ComboLabel
 @onready var virtue_display: VirtueDisplay = $HUDContainer/VBox/VirtueDisplay
@@ -103,6 +104,22 @@ func set_health(current: int, maximum: int) -> void:
 	# Update low health warning
 	if low_health_warning:
 		low_health_warning.update_health_status(current, maximum)
+
+
+func set_shield_energy(current: int, maximum: int) -> void:
+	"""Update shield energy bar"""
+	if shield_bar:
+		shield_bar.max_value = maximum
+		shield_bar.value = current
+
+		# Color code based on shield percentage
+		var percentage = float(current) / float(maximum)
+		if percentage <= 0.25:
+			shield_bar.modulate = Color(1.0, 0.2, 0.2)  # Red (almost depleted)
+		elif percentage <= 0.5:
+			shield_bar.modulate = Color(1.0, 0.6, 0.0)  # Orange (low)
+		else:
+			shield_bar.modulate = Color(0.4, 0.8, 1.0)  # Cyan (good)
 
 
 func set_weapon_durability(current: int, maximum: int) -> void:
