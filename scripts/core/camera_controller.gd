@@ -11,8 +11,16 @@ class_name CameraController
 @export var vertical_offset: float = -650.0  # How far from player to position camera (negative = above player)
 @export var horizontal_offset: float = 240.0  # Horizontal offset to show more ahead (player on left third)
 
+# Screenshake parameters
+@export var max_shake_offset: float = 30.0  # Maximum shake displacement
+@export var shake_decay: float = 3.0  # How fast shake decays (higher = faster)
+
 var max_x_reached: float = 0.0  # Furthest right position reached
 var min_allowed_x: float = 0.0  # Left boundary (can't go further left)
+
+# Screenshake state
+var trauma: float = 0.0  # Shake intensity (0-1)
+var trauma_power: int = 2  # Exponent for shake calculations (higher = smoother)
 
 
 func _ready() -> void:
@@ -49,6 +57,29 @@ func _physics_process(delta: float) -> void:
 
 	# Y follows player with offset (shows more ground below)
 	global_position.y = target.global_position.y + vertical_offset
+
+	# Apply screenshake
+	if trauma > 0:
+		trauma = max(trauma - shake_decay * delta, 0)
+		_apply_shake()
+
+
+func _apply_shake() -> void:
+	"""Apply screen shake effect based on trauma"""
+	var shake_amount = pow(trauma, trauma_power)
+
+	# Random offset based on shake amount
+	var shake_offset = Vector2(
+		max_shake_offset * shake_amount * randf_range(-1, 1),
+		max_shake_offset * shake_amount * randf_range(-1, 1)
+	)
+
+	offset = shake_offset
+
+
+func add_trauma(amount: float) -> void:
+	"""Add trauma to trigger screen shake (0-1)"""
+	trauma = min(trauma + amount, 1.0)
 
 
 func get_left_boundary() -> float:

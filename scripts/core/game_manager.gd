@@ -54,6 +54,9 @@ var master_volume: float = 1.0
 var music_volume: float = 0.8
 var sfx_volume: float = 1.0
 
+# Hitstop/Freeze frames
+var is_hitstop_active: bool = false
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS  # Continue running when paused
@@ -242,3 +245,19 @@ func is_level_unlocked(level_id: int) -> bool:
 ## Get progress percentage
 func get_completion_percentage() -> float:
 	return (float(levels_completed.size()) / float(TOTAL_LEVELS)) * 100.0
+
+
+## Apply hitstop/freeze frame effect
+func apply_hitstop(duration: float = 0.08) -> void:
+	"""Freeze the game briefly for impact feedback (duration in seconds)"""
+	if is_hitstop_active:
+		return  # Don't stack hitstops
+
+	is_hitstop_active = true
+	Engine.time_scale = 0.0  # Freeze time
+
+	# Wait for duration (uses unscaled time so it works even when frozen)
+	await get_tree().create_timer(duration, true, false, true).timeout
+
+	Engine.time_scale = 1.0  # Resume normal time
+	is_hitstop_active = false

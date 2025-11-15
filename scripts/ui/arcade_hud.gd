@@ -11,6 +11,7 @@ class_name ArcadeHUD
 @onready var lives_container: HBoxContainer = $HUDContainer/VBox/MiddleRow/LivesContainer
 @onready var weapon_label: Label = $HUDContainer/VBox/MiddleRow/WeaponLabel
 @onready var health_bar: ProgressBar = $HUDContainer/VBox/HealthBar
+@onready var weapon_durability_bar: ProgressBar = $HUDContainer/VBox/WeaponDurabilityBar
 
 # Data
 var current_score: int = 0
@@ -76,6 +77,22 @@ func set_health(current: int, maximum: int) -> void:
 			health_bar.modulate = Color(1.0, 0.6, 0.0)  # Orange
 		else:
 			health_bar.modulate = Color(0.2, 1.0, 0.2)  # Green (neon)
+
+
+func set_weapon_durability(current: int, maximum: int) -> void:
+	"""Update weapon durability bar"""
+	if weapon_durability_bar:
+		weapon_durability_bar.max_value = maximum
+		weapon_durability_bar.value = current
+
+		# Color code based on durability percentage
+		var percentage = float(current) / float(maximum)
+		if percentage <= 0.25:
+			weapon_durability_bar.modulate = Color(1.0, 0.2, 0.2)  # Red (almost broken)
+		elif percentage <= 0.5:
+			weapon_durability_bar.modulate = Color(1.0, 0.6, 0.0)  # Orange (damaged)
+		else:
+			weapon_durability_bar.modulate = Color(0.4, 0.8, 1.0)  # Cyan (good condition)
 
 
 func _update_display() -> void:
