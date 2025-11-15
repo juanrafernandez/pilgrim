@@ -15,19 +15,22 @@ signal block_ended()
 signal parry_window_started()
 signal parry_window_ended()
 
-# Constants
+# Constants (defaults for ADOLESCENT phase)
 const DEFAULT_MAX_ENERGY: int = 100
 const DEFAULT_CONSUMPTION_RATE: float = 10.0  # Energy per second while blocking
-const DEFAULT_REGEN_RATE: float = 5.0  # Energy per second when not blocking
-const DEFAULT_DAMAGE_REDUCTION: float = 0.75  # 75% damage reduction
+const DEFAULT_REGEN_RATE: float = 10.0  # Energy per second when not blocking (IMPROVED from 5.0)
+const DEFAULT_DAMAGE_REDUCTION: float = 0.80  # 80% damage reduction (BALANCED)
 const PERFECT_PARRY_WINDOW: float = 0.2  # 200ms window for perfect parry
+const PERFECT_PARRY_ENERGY_REFUND: int = 30  # Energy restored on perfect parry
 const MIN_ENERGY_TO_BLOCK: int = 1  # Minimum energy needed to start blocking
 
-# Shield stats
+# Shield stats (configurable per phase)
 @export var max_energy: int = DEFAULT_MAX_ENERGY
 @export var energy_consumption_rate: float = DEFAULT_CONSUMPTION_RATE
 @export var energy_regen_rate: float = DEFAULT_REGEN_RATE
 @export var damage_reduction: float = DEFAULT_DAMAGE_REDUCTION
+@export var parry_window_duration: float = PERFECT_PARRY_WINDOW
+@export var parry_energy_refund: int = PERFECT_PARRY_ENERGY_REFUND
 
 # State
 var current_energy: int = DEFAULT_MAX_ENERGY
@@ -51,7 +54,7 @@ func update(delta: float) -> void:
 	# Update parry window timer
 	if parry_window_active:
 		parry_timer += delta
-		if parry_timer >= PERFECT_PARRY_WINDOW:
+		if parry_timer >= parry_window_duration:
 			parry_window_active = false
 			parry_timer = 0.0
 			parry_window_ended.emit()
@@ -104,7 +107,7 @@ func stop_block() -> void:
 ## Check if can parry
 func is_in_parry_window() -> bool:
 	"""Returns true if currently in perfect parry window"""
-	return parry_window_active and parry_timer <= PERFECT_PARRY_WINDOW
+	return parry_window_active and parry_timer <= parry_window_duration
 
 
 ## Reduce incoming damage
@@ -118,8 +121,12 @@ func reduce_damage(incoming_damage: int) -> int:
 	# Perfect parry - return all damage to attacker
 	if is_in_parry_window():
 		last_parry_damage = incoming_damage
+
+		# Restore energy on perfect parry (reward skillful play)
+		_regenerate_energy(float(parry_energy_refund))
+
 		perfect_parry_triggered.emit(incoming_damage)
-		print("Shield: PERFECT PARRY! Returning %d damage to attacker!" % incoming_damage)
+		print("Shield: PERFECT PARRY! Returning %d damage + restored %d energy!" % [incoming_damage, parry_energy_refund])
 		return 0  # Player takes no damage
 
 	# Normal block - reduce damage

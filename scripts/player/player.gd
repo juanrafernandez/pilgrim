@@ -467,6 +467,7 @@ func change_phase(new_phase: GameManager.PlayerPhase) -> void:
 	current_phase = new_phase
 	_setup_phase(new_phase)
 	_equip_weapon_for_phase(new_phase)  # Equip appropriate weapon for new phase
+	_configure_shield_for_phase(new_phase)  # Configure shield for new phase
 	phase_changed.emit(new_phase)
 
 	print("Player phase changed to: %s" % GameManager.PlayerPhase.keys()[new_phase])
@@ -543,7 +544,10 @@ func _initialize_shield() -> void:
 	shield.parry_window_started.connect(_on_parry_window_started)
 	shield.parry_window_ended.connect(_on_parry_window_ended)
 
-	print("Player: Shield initialized (Energy: %d/%d)" % [shield.current_energy, shield.max_energy])
+	# Configure shield for current phase
+	_configure_shield_for_phase(current_phase)
+
+	print("Player: Shield initialized (Energy: %d/%d, Reduction: %.0f%%)" % [shield.current_energy, shield.max_energy, shield.damage_reduction * 100])
 
 
 ## Shield signal handlers
@@ -589,3 +593,53 @@ func can_block() -> bool:
 	if shield:
 		return shield.can_block()
 	return false
+
+
+func _configure_shield_for_phase(phase: GameManager.PlayerPhase) -> void:
+	"""Configure shield stats based on player phase (BALANCED SYSTEM)"""
+	if not shield:
+		return
+
+	match phase:
+		GameManager.PlayerPhase.CHILD:
+			# Child: Forgiving shield for beginners
+			shield.max_energy = 80
+			shield.energy_consumption_rate = 12.0  # 6.6 seconds max block
+			shield.energy_regen_rate = 10.0  # 8 seconds to recharge
+			shield.damage_reduction = 0.85  # 85% reduction (forgiving)
+			shield.parry_window_duration = 0.25  # 250ms window (easier)
+			shield.parry_energy_refund = 30  # +30 energy on parry
+
+		GameManager.PlayerPhase.ADOLESCENT:
+			# Adolescent: Balanced, standard gameplay
+			shield.max_energy = 100
+			shield.energy_consumption_rate = 10.0  # 10 seconds max block
+			shield.energy_regen_rate = 10.0  # 10 seconds to recharge (1:1 ratio)
+			shield.damage_reduction = 0.80  # 80% reduction (balanced)
+			shield.parry_window_duration = 0.20  # 200ms window (standard)
+			shield.parry_energy_refund = 30  # +30 energy on parry
+
+		GameManager.PlayerPhase.KNIGHT:
+			# Knight: Skill-based, aggressive play rewarded
+			shield.max_energy = 120
+			shield.energy_consumption_rate = 8.0  # 15 seconds max block
+			shield.energy_regen_rate = 12.0  # 10 seconds to recharge (better regen)
+			shield.damage_reduction = 0.70  # 70% reduction (encourages parry over tank)
+			shield.parry_window_duration = 0.15  # 150ms window (harder, rewards skill)
+			shield.parry_energy_refund = 40  # +40 energy on parry (bigger reward)
+
+		GameManager.PlayerPhase.ELDER:
+			# Elder: Wisdom = perfect timing, compensates for lower HP
+			shield.max_energy = 100
+			shield.energy_consumption_rate = 10.0  # 10 seconds max block
+			shield.energy_regen_rate = 12.0  # 8.3 seconds to recharge
+			shield.damage_reduction = 0.75  # 75% reduction (balanced)
+			shield.parry_window_duration = 0.30  # 300ms window (wisdom = easier timing)
+			shield.parry_energy_refund = 50  # +50 energy on parry (mastery reward)
+
+	# Restore to full energy after reconfiguration
+	shield.current_energy = shield.max_energy
+	shield.is_depleted = false
+
+	print("Shield configured for %s: Energy=%d, Reduction=%.0f%%, Parry=%.2fs" %
+		[GameManager.PlayerPhase.keys()[phase], shield.max_energy, shield.damage_reduction * 100, shield.parry_window_duration])
