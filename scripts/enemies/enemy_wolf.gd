@@ -52,6 +52,12 @@ func _ai_chase(delta: float) -> void:
 		if can_jump and _can_jump_gap():
 			velocity.y = jump_velocity
 			print("%s jumping to chase target" % name)
+		else:
+			# Can't jump the gap - stop chasing and return to idle
+			print("%s can't jump gap, stopping chase" % name)
+			target = null
+			change_state(State.IDLE)
+			return
 
 	# Chase with increased speed when close
 	var distance_to_target = global_position.distance_to(target.global_position)
