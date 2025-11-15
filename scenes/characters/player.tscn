@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bpf5qr1j0mjf8"]
+[gd_scene load_steps=18 format=3 uid="uid://bpf5qr1j0mjf8"]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/player/player_state_machine.gd" id="2_sm"]
@@ -15,6 +15,10 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/animations/pilgrim_walk_2.png" id="13_walk2"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/animations/pilgrim_walk_3.png" id="14_walk3"]
 [ext_resource type="Texture2D" path="res://assets/sprites/characters/animations/pilgrim_walk_4.png" id="15_walk4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/animations/pilgrim_attack_1.png" id="16_attack1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/animations/pilgrim_attack_2.png" id="17_attack2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/animations/pilgrim_attack_3.png" id="18_attack3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/animations/pilgrim_attack_4.png" id="19_attack4"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
@@ -42,6 +46,23 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("16_attack1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_attack2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_attack3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_attack4")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 12.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
