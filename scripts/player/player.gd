@@ -11,7 +11,7 @@ signal died()
 signal phase_changed(new_phase: GameManager.PlayerPhase)
 signal took_damage(amount: int)
 signal landed()
-signal weapon_changed(new_weapon: Weapon)
+signal weapon_changed(new_weapon)  # Weapon type (no type hint to avoid circular dependency)
 signal weapon_durability_changed(current: int, max: int)
 signal projectile_thrown(projectile: Projectile)
 
@@ -47,7 +47,7 @@ var is_dead: bool = false
 
 # Weapon state
 var current_weapon_type: WeaponType = WeaponType.DAGGER  # For projectiles
-var equipped_weapon: Weapon = null  # Current melee weapon (NEW SYSTEM)
+var equipped_weapon = null  # Weapon type - Current melee weapon (NEW SYSTEM)
 var can_throw_projectile: bool = true
 var projectile_cooldown_timer: float = 0.0
 
@@ -372,7 +372,7 @@ func set_projectile_weapon(weapon: WeaponType) -> void:
 	print("Projectile weapon changed to: %s" % WeaponType.keys()[weapon])
 
 
-func equip_weapon(weapon: Weapon) -> void:
+func equip_weapon(weapon) -> void:  # Weapon type (untyped to avoid dependency issues)
 	"""Equip a melee weapon"""
 	if equipped_weapon == weapon:
 		return

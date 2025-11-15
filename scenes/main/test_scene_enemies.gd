@@ -131,7 +131,7 @@ func _on_player_died() -> void:
 	print("Player died in enemy test scene")
 
 
-func _on_player_weapon_changed(new_weapon: Weapon) -> void:
+func _on_player_weapon_changed(new_weapon) -> void:  # Weapon type (untyped to avoid dependency issues)
 	"""Handle weapon changed from player"""
 	arcade_hud.set_weapon(player.get_weapon_name())
 	if new_weapon:
