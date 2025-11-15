@@ -42,7 +42,7 @@ var player_in_range: bool = false
 var player_ref: Player = null
 
 # Nodes
-@onready var sprite: ColorRect = $Sprite if has_node("Sprite") else null
+@onready var sprite: Sprite2D = $Sprite if has_node("Sprite") else null
 @onready var interaction_area: Area2D = $InteractionArea if has_node("InteractionArea") else null
 @onready var prompt_label: Label = $InteractionPrompt if has_node("InteractionPrompt") else null
 
@@ -73,13 +73,13 @@ func _setup_visual() -> void:
 
 	match npc_type:
 		NPCType.MONK:
-			sprite.color = Color(0.4, 0.2, 0.1)  # Brown robes
+			sprite.modulate = Color(0.4, 0.2, 0.1)  # Brown robes
 		NPCType.PILGRIM:
-			sprite.color = Color(0.6, 0.6, 0.4)  # Tan clothes
+			sprite.modulate = Color(0.6, 0.6, 0.4)  # Tan clothes
 		NPCType.MERCHANT:
-			sprite.color = Color(0.8, 0.6, 0.2)  # Gold/yellow
+			sprite.modulate = Color(0.8, 0.6, 0.2)  # Gold/yellow
 		NPCType.ELDER:
-			sprite.color = Color(0.5, 0.5, 0.5)  # Gray robes
+			sprite.modulate = Color(0.5, 0.5, 0.5)  # Gray robes
 
 	# Hide interaction prompt initially
 	if prompt_label:
