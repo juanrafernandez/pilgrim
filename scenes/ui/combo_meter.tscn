@@ -1,0 +1,43 @@
+[gd_scene load_steps=3 format=3 uid="uid://b3m7k9p5n2x4q"]
+
+[ext_resource type="Script" path="res://scripts/ui/combo_meter.gd" id="1_combo"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_combo"]
+font_size = 32
+font_color = Color(1, 1, 1, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="ComboMeter" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 300.0
+offset_bottom = 80.0
+script = ExtResource("1_combo")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="ComboLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "COMBO x0"
+label_settings = SubResource("LabelSettings_combo")
+horizontal_alignment = 1
+
+[node name="ComboBar" type="ProgressBar" parent="VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="MilestoneContainer" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1

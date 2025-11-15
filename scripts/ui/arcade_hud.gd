@@ -15,11 +15,16 @@ class_name ArcadeHUD
 @onready var combo_label: Label = $HUDContainer/VBox/ComboLabel
 @onready var virtue_display: VirtueDisplay = $HUDContainer/VBox/VirtueDisplay
 
-# UI Elements - Enhanced Components
+# UI Elements - Enhanced Components (High Priority)
 @onready var boss_health_bar: BossHealthBar = $BossHealthBar
 @onready var stage_indicator: StageIndicator = $HUDContainer/VBox/TopRow/StageIndicator
 @onready var level_timer: LevelTimer = $HUDContainer/VBox/TopRow/LevelTimer
 @onready var low_health_warning: LowHealthWarning = $LowHealthWarning
+
+# UI Elements - Enhanced Components (Medium Priority)
+@onready var buff_indicator_panel: BuffIndicatorPanel = $HUDContainer/VBox/BuffIndicatorPanel
+@onready var combo_meter: ComboMeter = $HUDContainer/VBox/ComboMeter
+@onready var pause_menu: PauseMenu = $PauseMenu
 
 # Data
 var current_score: int = 0
@@ -150,7 +155,7 @@ func _update_weapon_display() -> void:
 
 
 func set_combo(combo_count: int, multiplier: float) -> void:
-	"""Update combo display"""
+	"""Update combo display (legacy - consider using combo_meter)"""
 	if not combo_label:
 		return
 
@@ -167,6 +172,10 @@ func set_combo(combo_count: int, multiplier: float) -> void:
 			combo_label.add_theme_color_override("font_color", Color(0.2, 1.0, 1.0))  # Cyan (good)
 	else:
 		combo_label.visible = false
+
+	# Also update combo meter if available
+	if combo_meter:
+		combo_meter.increment_combo(combo_count, multiplier)
 
 
 ## Enhanced HUD Component Methods
@@ -218,3 +227,56 @@ func get_elapsed_time() -> float:
 	if level_timer:
 		return level_timer.get_elapsed_time()
 	return 0.0
+
+
+## Medium Priority Component Methods
+
+func add_buff(buff_name: String, icon: String, duration: float, color: Color = Color(1.0, 1.0, 1.0)) -> void:
+	"""Add a buff/power-up indicator"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_buff(buff_name, icon, duration, color)
+
+
+func remove_buff(buff_name: String) -> void:
+	"""Remove a buff indicator"""
+	if buff_indicator_panel:
+		buff_indicator_panel.remove_buff(buff_name)
+
+
+func add_shield_buff(duration: float = 30.0) -> void:
+	"""Quick method: Add shield buff"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_shield_buff(duration)
+
+
+func add_damage_buff(duration: float = 20.0) -> void:
+	"""Quick method: Add damage buff"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_damage_buff(duration)
+
+
+func add_speed_buff(duration: float = 15.0) -> void:
+	"""Quick method: Add speed buff"""
+	if buff_indicator_panel:
+		buff_indicator_panel.add_speed_buff(duration)
+
+
+func toggle_pause() -> void:
+	"""Toggle pause menu"""
+	if pause_menu:
+		if pause_menu.is_paused:
+			pause_menu.hide_pause_menu()
+		else:
+			pause_menu.show_pause_menu()
+
+
+func show_pause() -> void:
+	"""Show pause menu"""
+	if pause_menu:
+		pause_menu.show_pause_menu()
+
+
+func hide_pause() -> void:
+	"""Hide pause menu"""
+	if pause_menu:
+		pause_menu.hide_pause_menu()
