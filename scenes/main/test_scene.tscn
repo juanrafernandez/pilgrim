@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://cxpg4yjnau57w"]
+
+[ext_resource type="Script" path="res://scenes/main/test_scene.gd" id="1_test"]
+
+[node name="TestScene" type="Node2D"]
+script = ExtResource("1_test")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1080.0
+offset_bottom = 1920.0
+color = Color(0.2, 0.25, 0.3, 1)
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(540, 960)
+
+[node name="Sprite" type="ColorRect" parent="Player"]
+offset_left = -32.0
+offset_top = -48.0
+offset_right = 32.0
+offset_bottom = 48.0
+color = Color(0.3, 0.8, 0.3, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(0, 1700)
+
+[node name="GroundSprite" type="ColorRect" parent="Ground"]
+offset_right = 1080.0
+offset_bottom = 220.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InfoLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1060.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 32
+text = "ESCENA DE PRUEBA
+
+Controles:
+\u2190 \u2192: Mover
+A: Saltar
+ESC: Volver al men\u00fa
+
+Este es un placeholder para validar
+que Godot funciona correctamente."
+
+[node name="DebugLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 1820.0
+offset_right = 1060.0
+offset_bottom = 1900.0
+theme_override_font_sizes/font_size = 24
+text = "FPS: 60"

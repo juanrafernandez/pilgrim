@@ -1,18 +1,14 @@
 extends Node
-class_name SceneManager
 
 ## SceneManager
 ## Handles scene loading, unloading, and transitions
-## Access via: SceneManager.instance
+## Access via: SceneManager (global autoload)
 
 # Signals
 signal scene_load_started(scene_path: String)
 signal scene_load_finished(scene_path: String)
 signal transition_started()
 signal transition_finished()
-
-# Singleton instance
-static var instance: SceneManager
 
 # Scene paths constants
 const SCENES = {
@@ -34,12 +30,7 @@ var fade_color: Color = Color.BLACK
 
 
 func _ready() -> void:
-	if instance == null:
-		instance = self
-		process_mode = Node.PROCESS_MODE_ALWAYS
-	else:
-		queue_free()
-		return
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	# Get initial scene
 	var root = get_tree().root

@@ -1,0 +1,194 @@
+[gd_scene load_steps=8 format=3 uid="uid://test_enemies"]
+
+[ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://cow123456" path="res://scenes/enemies/enemy_cow.tscn" id="2_cow"]
+[ext_resource type="PackedScene" uid="uid://wolf123456" path="res://scenes/enemies/enemy_wolf.tscn" id="3_wolf"]
+[ext_resource type="PackedScene" uid="uid://boar123456" path="res://scenes/enemies/enemy_boar.tscn" id="4_boar"]
+[ext_resource type="Script" path="res://scenes/main/test_scene_enemies.gd" id="5_script"]
+[ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="6_camera"]
+[ext_resource type="PackedScene" uid="uid://c8q7x5r2m3v1p" path="res://scenes/ui/arcade_hud.tscn" id="7_hud"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_start"]
+size = Vector2(600, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform_mid"]
+size = Vector2(400, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform_small"]
+size = Vector2(200, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform_high"]
+size = Vector2(500, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_landing"]
+size = Vector2(400, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground_end"]
+size = Vector2(1500, 220)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_deathzone"]
+size = Vector2(5000, 100)
+
+[node name="TestSceneEnemies" type="Node2D"]
+script = ExtResource("5_script")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1080.0
+offset_bottom = 1920.0
+color = Color(0.15, 0.2, 0.25, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(200, 1600)
+
+[node name="Camera" type="Camera2D" parent="."]
+position = Vector2(540, 960)
+script = ExtResource("6_camera")
+backward_limit_distance = 600.0
+forward_buffer = 200.0
+vertical_offset = -650.0
+horizontal_offset = 240.0
+
+[node name="GroundStart" type="StaticBody2D" parent="."]
+position = Vector2(0, 1700)
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite" type="ColorRect" parent="GroundStart"]
+offset_right = 600.0
+offset_bottom = 220.0
+color = Color(0.35, 0.25, 0.15, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundStart"]
+position = Vector2(300, 110)
+shape = SubResource("RectangleShape2D_ground_start")
+
+[node name="PlatformMid1" type="StaticBody2D" parent="."]
+position = Vector2(700, 1500)
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite" type="ColorRect" parent="PlatformMid1"]
+offset_right = 400.0
+offset_bottom = 120.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformMid1"]
+position = Vector2(200, 60)
+shape = SubResource("RectangleShape2D_platform_mid")
+
+[node name="StepUp1" type="StaticBody2D" parent="."]
+position = Vector2(1200, 1400)
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite" type="ColorRect" parent="StepUp1"]
+offset_right = 200.0
+offset_bottom = 120.0
+color = Color(0.42, 0.32, 0.22, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepUp1"]
+position = Vector2(100, 60)
+shape = SubResource("RectangleShape2D_platform_small")
+
+[node name="StepUp2" type="StaticBody2D" parent="."]
+position = Vector2(1450, 1300)
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite" type="ColorRect" parent="StepUp2"]
+offset_right = 200.0
+offset_bottom = 120.0
+color = Color(0.42, 0.32, 0.22, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepUp2"]
+position = Vector2(100, 60)
+shape = SubResource("RectangleShape2D_platform_small")
+
+[node name="PlatformHigh" type="StaticBody2D" parent="."]
+position = Vector2(1700, 1200)
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite" type="ColorRect" parent="PlatformHigh"]
+offset_right = 500.0
+offset_bottom = 120.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformHigh"]
+position = Vector2(250, 60)
+shape = SubResource("RectangleShape2D_platform_high")
+
+[node name="GroundLanding" type="StaticBody2D" parent="."]
+position = Vector2(2600, 1500)
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite" type="ColorRect" parent="GroundLanding"]
+offset_right = 400.0
+offset_bottom = 220.0
+color = Color(0.35, 0.25, 0.15, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundLanding"]
+position = Vector2(200, 110)
+shape = SubResource("RectangleShape2D_ground_landing")
+
+[node name="GroundEnd" type="StaticBody2D" parent="."]
+position = Vector2(3100, 1700)
+collision_layer = 2
+collision_mask = 5
+
+[node name="Sprite" type="ColorRect" parent="GroundEnd"]
+offset_right = 1500.0
+offset_bottom = 220.0
+color = Color(0.35, 0.25, 0.15, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundEnd"]
+position = Vector2(750, 110)
+shape = SubResource("RectangleShape2D_ground_end")
+
+[node name="DeathZone" type="Area2D" parent="."]
+position = Vector2(0, 2300)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone"]
+position = Vector2(2500, 0)
+shape = SubResource("RectangleShape2D_deathzone")
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Cow1" parent="Enemies" instance=ExtResource("2_cow")]
+position = Vector2(400, 1650)
+
+[node name="Wolf1" parent="Enemies" instance=ExtResource("3_wolf")]
+position = Vector2(900, 1450)
+
+[node name="Boar1" parent="Enemies" instance=ExtResource("4_boar")]
+position = Vector2(1900, 1150)
+
+[node name="Cow2" parent="Enemies" instance=ExtResource("2_cow")]
+position = Vector2(2700, 1450)
+
+[node name="Wolf2" parent="Enemies" instance=ExtResource("3_wolf")]
+position = Vector2(3500, 1650)
+
+[node name="ArcadeHUD" parent="." instance=ExtResource("7_hud")]
+
+[node name="DebugUI" type="CanvasLayer" parent="."]
+layer = 101
+
+[node name="EnemyCountLabel" type="Label" parent="DebugUI"]
+offset_left = 20.0
+offset_top = 150.0
+offset_right = 420.0
+offset_bottom = 190.0
+theme_override_font_sizes/font_size = 20
+text = "Enemigos: 4"
+
+[node name="DebugLabel" type="Label" parent="DebugUI"]
+offset_left = 20.0
+offset_top = 1820.0
+offset_right = 1060.0
+offset_bottom = 1900.0
+theme_override_font_sizes/font_size = 22
+text = "FPS: 60"

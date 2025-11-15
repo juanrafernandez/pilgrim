@@ -1,0 +1,77 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8q7x5r2m3v1p"]
+
+[ext_resource type="Script" path="res://scripts/ui/arcade_hud.gd" id="1_arcade_hud"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_score"]
+font_size = 24
+font_color = Color(1, 1, 1, 1)
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_normal"]
+font_size = 20
+font_color = Color(1, 1, 1, 1)
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="ArcadeHUD" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_arcade_hud")
+
+[node name="HUDContainer" type="MarginContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 200.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="HUDContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopRow" type="HBoxContainer" parent="HUDContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="ScoreLabel" type="Label" parent="HUDContainer/VBox/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SCORE 0000000"
+label_settings = SubResource("LabelSettings_score")
+
+[node name="HighScoreLabel" type="Label" parent="HUDContainer/VBox/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "HI 0000000"
+horizontal_alignment = 2
+label_settings = SubResource("LabelSettings_score")
+
+[node name="MiddleRow" type="HBoxContainer" parent="HUDContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="LivesLabel" type="Label" parent="HUDContainer/VBox/MiddleRow"]
+layout_mode = 2
+text = "LIVES:"
+label_settings = SubResource("LabelSettings_normal")
+
+[node name="LivesContainer" type="HBoxContainer" parent="HUDContainer/VBox/MiddleRow"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeaponLabel" type="Label" parent="HUDContainer/VBox/MiddleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "WEAPON: DAGGER"
+horizontal_alignment = 2
+label_settings = SubResource("LabelSettings_normal")
+
+[node name="HealthBar" type="ProgressBar" parent="HUDContainer/VBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false

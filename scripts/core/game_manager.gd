@@ -1,15 +1,16 @@
 extends Node
-class_name GameManager
 
 ## GameManager
-## Singleton that manages global game state, progression, and systems coordination
-## Access via: GameManager.instance
+## Coordinates game flow and state - delegates specific responsibilities to specialized managers
+## Follows Single Responsibility Principle by focusing only on game state orchestration
+## Access via: GameManager (global autoload)
 
 # Signals
 signal game_state_changed(new_state: GameState)
 signal player_phase_changed(new_phase: PlayerPhase)
-signal virtue_changed(new_virtue: int)
 signal level_completed(level_id: int, virtue_earned: int)
+signal lives_changed(new_lives: int)
+signal player_respawned()
 
 # Enums
 enum GameState {
@@ -31,16 +32,11 @@ enum PlayerPhase {
 # Constants
 const LEVELS_PER_PHASE: int = 8
 const TOTAL_LEVELS: int = 32
-const MAX_VIRTUE: int = 1000
 
-# Singleton instance
-static var instance: GameManager
-
-# Game state
+# Game state (ONLY game flow, other concerns delegated)
 var current_state: GameState = GameState.MAIN_MENU
 var current_phase: PlayerPhase = PlayerPhase.CHILD
 var current_level: int = 1
-var total_virtue: int = 0
 var lives: int = 3
 
 # Player stats
@@ -49,23 +45,20 @@ var player_current_health: int = 100
 
 # Level progress tracking
 var levels_completed: Array[int] = []
-var virtue_per_level: Dictionary = {}  # level_id: virtue_earned
 
 # Settings
 var master_volume: float = 1.0
 var music_volume: float = 0.8
 var sfx_volume: float = 1.0
 
+# Hitstop/Freeze frames
+var is_hitstop_active: bool = false
+
 
 func _ready() -> void:
-	if instance == null:
-		instance = self
-		process_mode = Node.PROCESS_MODE_ALWAYS  # Continue running when paused
-	else:
-		queue_free()  # Ensure singleton
-		return
-
+	process_mode = Node.PROCESS_MODE_ALWAYS  # Continue running when paused
 	_initialize_game()
+	print("GameManager initialized")
 
 
 func _initialize_game() -> void:
@@ -73,13 +66,9 @@ func _initialize_game() -> void:
 	current_state = GameState.MAIN_MENU
 	current_phase = PlayerPhase.CHILD
 	current_level = 1
-	total_virtue = 0
 	lives = 3
 	player_current_health = player_max_health
 	levels_completed.clear()
-	virtue_per_level.clear()
-
-	print("GameManager initialized")
 
 
 ## Start a new game
@@ -131,20 +120,6 @@ func resume_game() -> void:
 		change_state(GameState.PLAYING)
 
 
-## Add virtue points
-func add_virtue(amount: int) -> void:
-	total_virtue = clampi(total_virtue + amount, 0, MAX_VIRTUE)
-	virtue_changed.emit(total_virtue)
-	print("Virtue added: +%d (Total: %d)" % [amount, total_virtue])
-
-
-## Remove virtue points
-func remove_virtue(amount: int) -> void:
-	total_virtue = maxi(0, total_virtue - amount)
-	virtue_changed.emit(total_virtue)
-	print("Virtue removed: -%d (Total: %d)" % [amount, total_virtue])
-
-
 ## Complete current level
 func complete_level(virtue_earned: int) -> void:
 	if current_level in levels_completed:
@@ -152,8 +127,10 @@ func complete_level(virtue_earned: int) -> void:
 		return
 
 	levels_completed.append(current_level)
-	virtue_per_level[current_level] = virtue_earned
-	add_virtue(virtue_earned)
+
+	# Delegate virtue management to VirtueManager
+	if has_node("/root/VirtueManager"):
+		get_node("/root/VirtueManager").add_virtue(virtue_earned, "Level %d completed" % current_level)
 
 	level_completed.emit(current_level, virtue_earned)
 	print("Level %d completed! Virtue earned: %d" % [current_level, virtue_earned])
@@ -208,16 +185,21 @@ func load_next_level() -> void:
 ## Restart current level
 func restart_level() -> void:
 	player_current_health = player_max_health
+	player_respawned.emit()
 	print("Restarting level %d" % current_level)
 
 
 ## Player died
 func player_died() -> void:
 	lives -= 1
+	lives_changed.emit(lives)
+	print("Player died! Lives remaining: %d" % lives)
 
 	if lives <= 0:
 		change_state(GameState.GAME_OVER)
 	else:
+		# Wait a moment before respawning
+		await get_tree().create_timer(1.0).timeout
 		restart_level()
 
 
@@ -227,7 +209,15 @@ func _handle_game_over() -> void:
 
 
 func _handle_victory() -> void:
-	print("VICTORY! All %d levels completed. Total Virtue: %d" % [TOTAL_LEVELS, total_virtue])
+	var final_score = 0
+	if has_node("/root/ScoreManager"):
+		final_score = get_node("/root/ScoreManager").get_score()
+
+	var final_virtue = 0
+	if has_node("/root/VirtueManager"):
+		final_virtue = get_node("/root/VirtueManager").get_virtue()
+
+	print("VICTORY! All %d levels completed. Score: %d, Virtue: %d" % [TOTAL_LEVELS, final_score, final_virtue])
 	# Will show victory screen
 
 
@@ -246,3 +236,84 @@ func is_level_unlocked(level_id: int) -> bool:
 ## Get progress percentage
 func get_completion_percentage() -> float:
 	return (float(levels_completed.size()) / float(TOTAL_LEVELS)) * 100.0
+
+
+## Apply hitstop/freeze frame effect
+func apply_hitstop(duration: float = 0.08) -> void:
+	"""Freeze the game briefly for impact feedback (duration in seconds)"""
+	if is_hitstop_active:
+		return  # Don't stack hitstops
+
+	is_hitstop_active = true
+	Engine.time_scale = 0.0  # Freeze time
+
+	# Wait for duration (uses unscaled time so it works even when frozen)
+	await get_tree().create_timer(duration, true, false, true).timeout
+
+	Engine.time_scale = 1.0  # Resume normal time
+	is_hitstop_active = false
+
+
+## Deprecated methods - kept for backward compatibility, delegate to new managers
+## These will be removed in future versions
+
+func add_virtue(amount: int) -> void:
+	push_warning("GameManager.add_virtue() is deprecated. Use VirtueManager.add_virtue() instead.")
+	if has_node("/root/VirtueManager"):
+		get_node("/root/VirtueManager").add_virtue(amount)
+
+
+func remove_virtue(amount: int) -> void:
+	push_warning("GameManager.remove_virtue() is deprecated. Use VirtueManager.remove_virtue() instead.")
+	if has_node("/root/VirtueManager"):
+		get_node("/root/VirtueManager").remove_virtue(amount)
+
+
+func add_score(points: int) -> void:
+	push_warning("GameManager.add_score() is deprecated. Use ScoreManager.add_score() instead.")
+	if has_node("/root/ScoreManager"):
+		get_node("/root/ScoreManager").add_score(points)
+
+
+func add_combo_hit() -> void:
+	push_warning("GameManager.add_combo_hit() is deprecated. Use ComboManager.add_combo_hit() instead.")
+	if has_node("/root/ComboManager"):
+		get_node("/root/ComboManager").add_combo_hit()
+
+
+func reset_score() -> void:
+	push_warning("GameManager.reset_score() is deprecated. Use ScoreManager.reset_score() instead.")
+	if has_node("/root/ScoreManager"):
+		get_node("/root/ScoreManager").reset_score()
+
+
+# Read-only access to delegated systems (for backward compatibility)
+var total_virtue: int:
+	get:
+		if has_node("/root/VirtueManager"):
+			return get_node("/root/VirtueManager").get_virtue()
+		return 0
+
+var current_score: int:
+	get:
+		if has_node("/root/ScoreManager"):
+			return get_node("/root/ScoreManager").get_score()
+		return 0
+
+var high_score: int:
+	get:
+		if has_node("/root/ScoreManager"):
+			return get_node("/root/ScoreManager").get_high_score()
+		return 0
+
+var combo_count: int:
+	get:
+		if has_node("/root/ComboManager"):
+			return get_node("/root/ComboManager").get_combo_count()
+		return 0
+
+var combo_multiplier: float:
+	get:
+		if has_node("/root/ComboManager"):
+			return get_node("/root/ComboManager").get_multiplier()
+		return 1.0
