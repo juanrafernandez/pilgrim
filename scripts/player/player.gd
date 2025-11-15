@@ -37,6 +37,9 @@ const PROJECTILE_COOLDOWN: float = 0.5
 # Projectile scenes
 const PROJECTILE_DAGGER = preload("res://scenes/projectiles/projectile_dagger.tscn")
 
+# Weapon/Shield class references
+const Shield = preload("res://scripts/weapons/shield.gd")
+
 # State
 var current_phase: GameManager.PlayerPhase = GameManager.PlayerPhase.CHILD
 var max_health: int = 100
