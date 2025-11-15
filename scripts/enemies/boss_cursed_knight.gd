@@ -40,7 +40,7 @@ func _ready() -> void:
 	move_speed = 150.0
 	patrol_speed = 100.0
 	chase_speed = 200.0
-	attack_damage = 40  # 40% base damage
+	attack_damage = 45  # REBALANCED: 45 dmg (was 40) - boss is harder, shields are stronger now
 	attack_range = 100.0
 	detection_range = 800.0  # Always aware
 	lose_player_range = 9999.0  # Never loses player
@@ -99,13 +99,13 @@ func _ai_chase(delta: float) -> void:
 func _phase_1_chase(delta: float) -> void:
 	"""Phase 1: Aggressive physical pursuit"""
 	chase_speed = 200.0
-	attack_damage = 40
+	attack_damage = 45  # REBALANCED: 45 dmg (was 40)
 
 
 func _phase_2_chase(delta: float) -> void:
 	"""Phase 2: Teleport and magic"""
 	chase_speed = 180.0
-	attack_damage = 50  # More dangerous
+	attack_damage = 55  # REBALANCED: 55 dmg (was 50) - more dangerous
 
 	# Teleport ability
 	if teleport_timer >= teleport_cooldown:
@@ -116,7 +116,7 @@ func _phase_2_chase(delta: float) -> void:
 func _phase_3_chase(delta: float) -> void:
 	"""Phase 3: Vulnerable but desperate"""
 	chase_speed = 220.0  # Faster, desperate
-	attack_damage = 60  # Maximum damage
+	attack_damage = 65  # REBALANCED: 65 dmg (was 60) - maximum damage
 
 
 func _perform_attack() -> void:

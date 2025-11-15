@@ -161,6 +161,9 @@ func take_damage(amount: int, knockback: Vector2 = Vector2.ZERO, attacker = null
 			perfect_parry.emit(parry_damage)
 			print("Player: PERFECT PARRY! Returned %d damage to %s" % [parry_damage, attacker.name])
 
+			# Slow-motion effect for perfect parry (skill expression)
+			_trigger_slowmo_effect(0.25, 0.15)  # 25% speed for 0.15 seconds
+
 			# Screenshake for successful parry
 			if camera_controller:
 				camera_controller.add_trauma(0.4)  # Medium shake for parry
@@ -266,6 +269,42 @@ func _flash_sprite() -> void:
 		await get_tree().create_timer(flash_interval).timeout
 		sprite.modulate.a = 1.0
 		await get_tree().create_timer(flash_interval).timeout
+
+
+func _flash_sprite_color(flash_color: Color) -> void:
+	"""Flash sprite with a specific color for feedback"""
+	if not sprite:
+		return
+
+	var original_modulate = sprite.modulate
+	var flash_duration = 0.15  # Quick flash
+
+	# Flash to color
+	sprite.modulate = flash_color
+	await get_tree().create_timer(flash_duration).timeout
+
+	# Return to normal
+	sprite.modulate = original_modulate
+
+
+func _trigger_slowmo_effect(time_scale: float, duration: float) -> void:
+	"""Trigger slow-motion effect for perfect parry feedback
+
+	Args:
+		time_scale: Slow-motion scale (0.0-1.0, e.g., 0.25 = 25% speed)
+		duration: Duration in real-time seconds
+	"""
+	# Slow down time
+	Engine.time_scale = time_scale
+	print("SLOWMO: Time scale set to %.2f for %.2fs" % [time_scale, duration])
+
+	# Wait for duration (using real time, not affected by time_scale)
+	# process_in_physics = false means it uses real time
+	await get_tree().create_timer(duration, true, false, true).timeout
+
+	# Restore normal time
+	Engine.time_scale = 1.0
+	print("SLOWMO: Time scale restored to normal")
 
 
 ## Attack
@@ -561,11 +600,33 @@ func _on_perfect_parry_triggered(damage: int) -> void:
 
 
 func _on_shield_depleted() -> void:
+	"""Handle shield depletion with visual/audio feedback"""
 	print("Player: Shield depleted!")
+
+	# Strong camera shake for shield break
+	if camera_controller:
+		camera_controller.add_trauma(0.6)  # Strong shake
+
+	# Visual feedback - brief flash effect
+	_flash_sprite_color(Color(1.0, 0.3, 0.0))  # Orange flash
+
+	# Audio feedback (placeholder - would play "shield_break.wav")
+	print("AUDIO: Shield break sound! [PLACEHOLDER]")
 
 
 func _on_shield_recharged() -> void:
+	"""Handle shield recharge with positive feedback"""
 	print("Player: Shield recharged!")
+
+	# Gentle camera shake for shield restore
+	if camera_controller:
+		camera_controller.add_trauma(0.15)  # Gentle pulse
+
+	# Visual feedback - brief cyan flash
+	_flash_sprite_color(Color(0.2, 0.8, 1.0))  # Cyan flash
+
+	# Audio feedback (placeholder - would play "shield_restore.wav")
+	print("AUDIO: Shield restore sound! [PLACEHOLDER]")
 
 
 func _on_parry_window_started() -> void:

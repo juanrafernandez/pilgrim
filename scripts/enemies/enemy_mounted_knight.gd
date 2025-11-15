@@ -21,7 +21,7 @@ func _ready() -> void:
 	move_speed = 250.0
 	patrol_speed = 150.0
 	chase_speed = 200.0
-	attack_damage = 40  # 40% damage while mounted
+	attack_damage = 35  # REBALANCED: 35 dmg (was 40) - balanced for late game
 	attack_range = 100.0  # Long lance reach
 	detection_range = 600.0
 	lose_player_range = 900.0
@@ -104,7 +104,7 @@ func _perform_attack() -> void:
 	"""Lance charge attack or dismounted sword attack"""
 	if is_mounted:
 		# Devastating lance charge
-		attack_damage = 45  # Even more damage during charge
+		attack_damage = 40  # REBALANCED: 40 dmg during charge (was 45)
 
 		if player and _is_player_in_range(attack_range):
 			var direction = sign(player.global_position.x - global_position.x)
@@ -114,7 +114,7 @@ func _perform_attack() -> void:
 			print("%s lance strike!" % name)
 	else:
 		# Regular sword attack when dismounted
-		attack_damage = 25
+		attack_damage = 22  # REBALANCED: 22 dmg dismounted (was 25)
 		super._perform_attack()
 
 
@@ -146,7 +146,7 @@ func _dismount() -> void:
 	# Adjust stats for foot combat
 	move_speed = 120.0
 	chase_speed = 150.0
-	attack_damage = 30
+	attack_damage = 26  # REBALANCED: 26 dmg dismounted (was 30)
 	attack_range = 80.0
 	patrol_speed = 80.0
 	can_jump = true

@@ -16,7 +16,7 @@ func _ready() -> void:
 	move_speed = 140.0
 	patrol_speed = 90.0
 	chase_speed = 220.0  # Fast when attacking
-	attack_damage = 15  # 15% damage
+	attack_damage = 12  # REBALANCED: 12 dmg (was 15) - balanced for early-mid game
 	attack_range = 60.0
 	detection_range = 350.0
 	patrol_distance = 180.0

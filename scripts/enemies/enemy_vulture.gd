@@ -16,7 +16,7 @@ var max_health: int = 20  # Fragile
 var current_health: int = 20
 var fly_speed: float = 120.0
 var dive_speed: float = 300.0
-var attack_damage: int = 10  # 10% damage
+var attack_damage: int = 8  # REBALANCED: 8 dmg (was 10) - balanced for early game
 var detection_range: float = 500.0
 var is_dead: bool = false
 

@@ -96,3 +96,61 @@ func get_energy_percentage() -> float:
 	if energy_bar and energy_bar.max_value > 0:
 		return energy_bar.value / energy_bar.max_value
 	return 0.0
+
+
+func shield_depleted() -> void:
+	"""Visual feedback when shield breaks"""
+	if not energy_bar:
+		return
+
+	# Flash red to indicate break
+	_flash_bar(Color(1.0, 0.0, 0.0), 0.2)  # Red flash
+
+	# Show DEPLETED text
+	if shield_label:
+		var original_text = shield_label.text
+		shield_label.text = "SHIELD DEPLETED!"
+		shield_label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.0))  # Orange
+
+		# Reset after 2 seconds
+		await get_tree().create_timer(2.0).timeout
+		if shield_label:
+			shield_label.text = original_text
+			shield_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+
+
+func shield_recharged() -> void:
+	"""Visual feedback when shield recharges from depleted state"""
+	if not energy_bar:
+		return
+
+	# Flash cyan to indicate restoration
+	_flash_bar(Color(0.2, 1.0, 1.0), 0.15)  # Bright cyan flash
+
+	# Brief positive message
+	if shield_label:
+		var original_text = shield_label.text
+		shield_label.text = "SHIELD READY!"
+		shield_label.add_theme_color_override("font_color", Color(0.2, 1.0, 0.5))  # Green
+
+		# Reset after 1 second
+		await get_tree().create_timer(1.0).timeout
+		if shield_label:
+			shield_label.text = original_text
+			shield_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+
+
+func _flash_bar(flash_color: Color, duration: float) -> void:
+	"""Flash the energy bar with a specific color"""
+	if not energy_bar:
+		return
+
+	var original_modulate = energy_bar.modulate
+
+	# Flash
+	energy_bar.modulate = flash_color
+	await get_tree().create_timer(duration).timeout
+
+	# Restore (will be overridden by set_energy() on next update)
+	if energy_bar:
+		energy_bar.modulate = original_modulate
