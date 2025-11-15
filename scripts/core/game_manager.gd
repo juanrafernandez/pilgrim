@@ -1,18 +1,16 @@
 extends Node
 
 ## GameManager
-## Singleton that manages global game state, progression, and systems coordination
+## Coordinates game flow and state - delegates specific responsibilities to specialized managers
+## Follows Single Responsibility Principle by focusing only on game state orchestration
 ## Access via: GameManager (global autoload)
 
 # Signals
 signal game_state_changed(new_state: GameState)
 signal player_phase_changed(new_phase: PlayerPhase)
-signal virtue_changed(new_virtue: int)
 signal level_completed(level_id: int, virtue_earned: int)
 signal lives_changed(new_lives: int)
 signal player_respawned()
-signal score_changed(new_score: int)
-signal combo_changed(combo_count: int, multiplier: float)
 
 # Enums
 enum GameState {
@@ -34,23 +32,12 @@ enum PlayerPhase {
 # Constants
 const LEVELS_PER_PHASE: int = 8
 const TOTAL_LEVELS: int = 32
-const MAX_VIRTUE: int = 1000
 
-# Game state
+# Game state (ONLY game flow, other concerns delegated)
 var current_state: GameState = GameState.MAIN_MENU
 var current_phase: PlayerPhase = PlayerPhase.CHILD
 var current_level: int = 1
-var total_virtue: int = 0
 var lives: int = 3
-
-# Score system
-var current_score: int = 0
-var high_score: int = 0
-var combo_count: int = 0
-var combo_multiplier: float = 1.0
-var combo_timer: float = 0.0
-const COMBO_TIMEOUT: float = 3.0  # Seconds before combo resets
-const COMBO_INCREMENT: float = 0.5  # Multiplier increase per combo hit
 
 # Player stats
 var player_max_health: int = 100
@@ -58,7 +45,6 @@ var player_current_health: int = 100
 
 # Level progress tracking
 var levels_completed: Array[int] = []
-var virtue_per_level: Dictionary = {}  # level_id: virtue_earned
 
 # Settings
 var master_volume: float = 1.0
@@ -75,24 +61,14 @@ func _ready() -> void:
 	print("GameManager initialized")
 
 
-func _process(delta: float) -> void:
-	# Update combo timer
-	if combo_count > 0 and combo_timer > 0:
-		combo_timer -= delta
-		if combo_timer <= 0:
-			_reset_combo()
-
-
 func _initialize_game() -> void:
 	"""Initialize or reset game state"""
 	current_state = GameState.MAIN_MENU
 	current_phase = PlayerPhase.CHILD
 	current_level = 1
-	total_virtue = 0
 	lives = 3
 	player_current_health = player_max_health
 	levels_completed.clear()
-	virtue_per_level.clear()
 
 
 ## Start a new game
@@ -144,20 +120,6 @@ func resume_game() -> void:
 		change_state(GameState.PLAYING)
 
 
-## Add virtue points
-func add_virtue(amount: int) -> void:
-	total_virtue = clampi(total_virtue + amount, 0, MAX_VIRTUE)
-	virtue_changed.emit(total_virtue)
-	print("Virtue added: +%d (Total: %d)" % [amount, total_virtue])
-
-
-## Remove virtue points
-func remove_virtue(amount: int) -> void:
-	total_virtue = maxi(0, total_virtue - amount)
-	virtue_changed.emit(total_virtue)
-	print("Virtue removed: -%d (Total: %d)" % [amount, total_virtue])
-
-
 ## Complete current level
 func complete_level(virtue_earned: int) -> void:
 	if current_level in levels_completed:
@@ -165,8 +127,10 @@ func complete_level(virtue_earned: int) -> void:
 		return
 
 	levels_completed.append(current_level)
-	virtue_per_level[current_level] = virtue_earned
-	add_virtue(virtue_earned)
+
+	# Delegate virtue management to VirtueManager
+	if has_node("/root/VirtueManager"):
+		get_node("/root/VirtueManager").add_virtue(virtue_earned, "Level %d completed" % current_level)
 
 	level_completed.emit(current_level, virtue_earned)
 	print("Level %d completed! Virtue earned: %d" % [current_level, virtue_earned])
@@ -245,7 +209,15 @@ func _handle_game_over() -> void:
 
 
 func _handle_victory() -> void:
-	print("VICTORY! All %d levels completed. Total Virtue: %d" % [TOTAL_LEVELS, total_virtue])
+	var final_score = 0
+	if has_node("/root/ScoreManager"):
+		final_score = get_node("/root/ScoreManager").get_score()
+
+	var final_virtue = 0
+	if has_node("/root/VirtueManager"):
+		final_virtue = get_node("/root/VirtueManager").get_virtue()
+
+	print("VICTORY! All %d levels completed. Score: %d, Virtue: %d" % [TOTAL_LEVELS, final_score, final_virtue])
 	# Will show victory screen
 
 
@@ -282,47 +254,66 @@ func apply_hitstop(duration: float = 0.08) -> void:
 	is_hitstop_active = false
 
 
-## Score system methods
+## Deprecated methods - kept for backward compatibility, delegate to new managers
+## These will be removed in future versions
+
+func add_virtue(amount: int) -> void:
+	push_warning("GameManager.add_virtue() is deprecated. Use VirtueManager.add_virtue() instead.")
+	if has_node("/root/VirtueManager"):
+		get_node("/root/VirtueManager").add_virtue(amount)
+
+
+func remove_virtue(amount: int) -> void:
+	push_warning("GameManager.remove_virtue() is deprecated. Use VirtueManager.remove_virtue() instead.")
+	if has_node("/root/VirtueManager"):
+		get_node("/root/VirtueManager").remove_virtue(amount)
+
+
 func add_score(points: int) -> void:
-	"""Add points to score with current combo multiplier"""
-	var final_points = int(points * combo_multiplier)
-	current_score += final_points
-
-	# Update high score
-	if current_score > high_score:
-		high_score = current_score
-
-	score_changed.emit(current_score)
-	print("Score +%d (x%.1f multiplier) = %d points" % [points, combo_multiplier, final_points])
+	push_warning("GameManager.add_score() is deprecated. Use ScoreManager.add_score() instead.")
+	if has_node("/root/ScoreManager"):
+		get_node("/root/ScoreManager").add_score(points)
 
 
 func add_combo_hit() -> void:
-	"""Increment combo counter"""
-	combo_count += 1
-	combo_timer = COMBO_TIMEOUT
-
-	# Increase multiplier (caps at 5x)
-	combo_multiplier = min(1.0 + (combo_count - 1) * COMBO_INCREMENT, 5.0)
-
-	combo_changed.emit(combo_count, combo_multiplier)
-
-	if combo_count > 1:
-		print("COMBO x%d! Multiplier: %.1fx" % [combo_count, combo_multiplier])
-
-
-func _reset_combo() -> void:
-	"""Reset combo counter"""
-	if combo_count > 1:
-		print("Combo ended at x%d" % combo_count)
-
-	combo_count = 0
-	combo_multiplier = 1.0
-	combo_timer = 0.0
-	combo_changed.emit(0, 1.0)
+	push_warning("GameManager.add_combo_hit() is deprecated. Use ComboManager.add_combo_hit() instead.")
+	if has_node("/root/ComboManager"):
+		get_node("/root/ComboManager").add_combo_hit()
 
 
 func reset_score() -> void:
-	"""Reset current score (for new game/level)"""
-	current_score = 0
-	_reset_combo()
-	score_changed.emit(current_score)
+	push_warning("GameManager.reset_score() is deprecated. Use ScoreManager.reset_score() instead.")
+	if has_node("/root/ScoreManager"):
+		get_node("/root/ScoreManager").reset_score()
+
+
+# Read-only access to delegated systems (for backward compatibility)
+var total_virtue: int:
+	get:
+		if has_node("/root/VirtueManager"):
+			return get_node("/root/VirtueManager").get_virtue()
+		return 0
+
+var current_score: int:
+	get:
+		if has_node("/root/ScoreManager"):
+			return get_node("/root/ScoreManager").get_score()
+		return 0
+
+var high_score: int:
+	get:
+		if has_node("/root/ScoreManager"):
+			return get_node("/root/ScoreManager").get_high_score()
+		return 0
+
+var combo_count: int:
+	get:
+		if has_node("/root/ComboManager"):
+			return get_node("/root/ComboManager").get_combo_count()
+		return 0
+
+var combo_multiplier: float:
+	get:
+		if has_node("/root/ComboManager"):
+			return get_node("/root/ComboManager").get_multiplier()
+		return 1.0

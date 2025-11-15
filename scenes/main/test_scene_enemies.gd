@@ -34,8 +34,13 @@ func _ready() -> void:
 	GameManager.lives_changed.connect(_on_lives_changed)
 	GameManager.player_respawned.connect(_on_player_respawned)
 	GameManager.game_state_changed.connect(_on_game_state_changed)
-	GameManager.score_changed.connect(_on_score_changed)
-	GameManager.combo_changed.connect(_on_combo_changed)
+
+	# Connect specialized manager signals (SOLID - using separate managers)
+	if has_node("/root/ScoreManager"):
+		get_node("/root/ScoreManager").score_changed.connect(_on_score_changed)
+
+	if has_node("/root/ComboManager"):
+		get_node("/root/ComboManager").combo_changed.connect(_on_combo_changed)
 
 	# Connect death zone
 	death_zone.body_entered.connect(_on_death_zone_entered)
@@ -85,7 +90,13 @@ func _update_enemy_count() -> void:
 func _update_ui() -> void:
 	"""Update UI elements"""
 	arcade_hud.set_health(player.current_health, player.max_health)
-	arcade_hud.set_score(GameManager.current_score)
+
+	# Get score from ScoreManager (SOLID - accessing specialized manager)
+	var current_score = 0
+	if has_node("/root/ScoreManager"):
+		current_score = get_node("/root/ScoreManager").get_score()
+	arcade_hud.set_score(current_score)
+
 	arcade_hud.set_lives(GameManager.lives)
 	arcade_hud.set_weapon(player.get_weapon_name())
 

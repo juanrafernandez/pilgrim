@@ -350,9 +350,12 @@ func die() -> void:
 
 	print("%s died" % name)
 
-	# Award score to player
-	GameManager.add_score(score_value)
-	GameManager.add_combo_hit()
+	# Award score to player using new managers (SOLID principle - dependency on abstraction)
+	if has_node("/root/ScoreManager"):
+		get_node("/root/ScoreManager").add_score(score_value)
+
+	if has_node("/root/ComboManager"):
+		get_node("/root/ComboManager").add_combo_hit()
 
 	# Fade out and remove
 	_death_animation()
