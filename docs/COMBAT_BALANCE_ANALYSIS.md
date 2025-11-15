@@ -470,10 +470,11 @@ Difficulty Curve (expected):
 3. ✅ Perfect parry energy refund
 4. ✅ Wood weapon durability buff
 
-### Phase 2 (HIGH - Next Week):
-5. ⏳ Enemy damage rebalance
-6. ⏳ Shield break visual/audio
-7. ⏳ Perfect parry enhanced feedback
+### Phase 2 (HIGH - COMPLETED ✅):
+5. ✅ Enemy damage rebalance
+6. ✅ Shield break visual/audio
+7. ✅ Perfect parry enhanced feedback (slow-motion)
+8. ✅ Contact damage balance (Phase 2.5)
 
 ### Phase 3 (MEDIUM - Nice to Have):
 8. ⏳ Chip damage system
@@ -520,6 +521,130 @@ When testing balance, measure:
 
 ---
 
-**Document Status:** DRAFT - Ready for Implementation
+## 🆕 PHASE 2.5 UPDATE: CONTACT DAMAGE SYSTEM (2025-11-15)
+
+### Overview
+A contact damage system was integrated by another developer, allowing enemies to deal damage on collision (not just attacks). This required immediate balance adjustments to maintain difficulty curve.
+
+### Contact Damage Specifications
+
+**Before Phase 2.5:**
+- Contact damage = Attack damage (same value)
+- Cooldown = 0.5s for all enemies
+- Knockback = Vector2(350, -450) - very strong
+- **Problem:** Too punishing for early game players
+
+**After Phase 2.5 (BALANCED):**
+```gdscript
+contact_damage = attack_damage * 0.7  // 70% of attack damage
+contact_damage_cooldown:
+  - Early game (≤12 dmg): 0.75s  // More forgiving
+  - Mid game (12-22 dmg): 0.5-0.75s (interpolated)
+  - Late game (≥22 dmg): 0.5s  // Punishing
+knockback = Vector2(250, -350)  // Softer than attacks
+screenshake = 0.2 trauma  // Lighter feedback
+```
+
+### Enemy Contact Damage Values
+
+| Enemy | Attack Dmg | Contact Dmg | Cooldown | Notes |
+|-------|-----------|-------------|----------|-------|
+| Cow | 3 | 2 | 0.75s | Very forgiving |
+| Wolf | 12 | 8 | 0.75s | Balanced early game |
+| Goat | 12 | 8 | 0.75s | Balanced early game |
+| Vulture | 8 | 5 | 0.75s | Flying contact minimal |
+| Specter | 22 | 15 | 0.5s | Starts being punishing |
+| Knight | 28 | 19 | 0.5s | Late game pressure |
+| Mounted Knight | 35 | 24 | 0.5s | Very dangerous |
+| Boss (Phase 3) | 65 | 45 | 0.5s | Extreme danger |
+
+### Impact on Shield Balance
+
+**Shield is now MORE important:**
+- Without shield: Player takes both attack + contact damage
+- With shield: Contact damage reduced by 70-85% (phase-dependent)
+- Perfect parry: Works on contact damage too!
+
+**Example Scenarios:**
+
+**Child Phase vs Wolf (no contact damage system):**
+- Attack only: 12 dmg → 1.8 dmg blocked (85% reduction)
+- Hits to die: ~56 hits (100 HP / 1.8)
+
+**Child Phase vs Wolf (with contact damage):**
+- Attack: 12 dmg → 1.8 dmg blocked
+- Contact: 8 dmg → 1.2 dmg blocked
+- **Total if hit**: 3 dmg (1.8 + 1.2)
+- **Effective hits to die**: ~33 hits (100 HP / 3)
+- **40% more deadly!** ⚠️
+
+**Shield Energy Management Critical:**
+- Must time blocks carefully (can't spam block anymore)
+- Perfect parry now has dual benefit (damage return + energy refund)
+- Shield break = exposed to full contact damage
+
+### Adjusted Difficulty Curve
+
+**Updated Phase 2 Goals:**
+```
+Without Shield:
+  Early game: 8-12 hits to die ⚠️ Very punishing
+  Late game: 2-3 hits to die ⚠️ Extreme
+
+With Shield (Blocking):
+  Early game: 40-50 hits to die ✅ Forgiving
+  Late game: 12-15 hits to die ✅ Skill-based
+
+With Perfect Parry:
+  All phases: Indefinite survival ✅ Mastery rewarded
+```
+
+### Visual Feedback Differences
+
+| Damage Type | Knockback | Screenshake | Feel |
+|-------------|-----------|-------------|------|
+| Attack Hit | Vector2(350, -450) | 0.5 trauma | "WHACK!" |
+| Attack Blocked | Vector2(60, -120) | 0.3 trauma | "Blocked!" |
+| Contact Damage | Vector2(250, -350) | 0.2 trauma | "Bumped!" |
+| Perfect Parry | None | 0.4 trauma + slowmo | "AMAZING!" |
+
+### Balance Philosophy
+
+**Contact damage as "space control":**
+- Punishes players who get cornered or surrounded
+- Rewards spacing and movement skill
+- Makes blocking more strategic (can't face-tank forever)
+- Encourages using attacks to create space
+
+**70% Ratio Reasoning:**
+- Contact should hurt, but not as much as deliberate attacks
+- Allows skilled players to minimize contact via movement
+- Early game remains approachable with 0.75s cooldown
+- Late game becomes intense with 0.5s cooldown
+
+### Implementation Notes
+
+**Files Modified:**
+- `scripts/enemies/enemy.gd`:
+  - Added `contact_damage` variable (auto-calculated as 70% of attack_damage)
+  - Added `_adjust_contact_cooldown()` for phase-based tuning
+  - Modified `_on_body_entered_contact()` for balanced damage/feedback
+
+**No Changes Needed:**
+- Player shield system works perfectly with contact damage
+- Perfect parry system reflects contact damage too
+- All Phase 2 balance improvements remain valid
+
+### Playtesting Focus
+
+When testing with contact damage:
+1. **Is early game still approachable?** (0.75s cooldown sufficient?)
+2. **Does shield feel essential?** (should be critical, not optional)
+3. **Is contact damage distinct from attacks?** (lighter feel?)
+4. **Do players learn spacing?** (should punish face-tanking)
+
+---
+
+**Document Status:** UPDATED - Contact Damage Phase 2.5 Complete
 **Reviewed By:** Weapon & Defense Specialist (Claude)
 **Approved By:** [Pending Game Director Approval]
