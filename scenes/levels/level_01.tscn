@@ -1,9 +1,12 @@
-[gd_scene load_steps=20 format=3 uid="uid://b8xm3k9p2vwq1"]
+[gd_scene load_steps=23 format=3 uid="uid://b8xm3k9p2vwq1"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_01.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="3_camera"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy_wolf.tscn" id="4_wolf"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/arrow.png" id="5_arrow"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/shell.png" id="6_shell"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/cross.png" id="7_cross"]
 
 [sub_resource type="RectangleShape2D" id="trigger_shape"]
 size = Vector2(100, 300)
@@ -377,62 +380,20 @@ shape = SubResource("RectangleShape2D_ground_s7")
 [node name="Decoration" type="Node2D" parent="."]
 z_index = -50
 
-[node name="Sign_YellowArrow" type="Node2D" parent="Decoration"]
-position = Vector2(250, 1600)
+[node name="Sign_YellowArrow" type="Sprite2D" parent="Decoration"]
+position = Vector2(250, 1550)
+texture = ExtResource("5_arrow")
+scale = Vector2(2, 2)
 
-[node name="Post" type="ColorRect" parent="Decoration/Sign_YellowArrow"]
-offset_left = -8.0
-offset_top = -100.0
-offset_right = 8.0
-color = Color(0.4, 0.266667, 0.133333, 1)
+[node name="Shell_Pilgrim" type="Sprite2D" parent="Decoration"]
+position = Vector2(500, 1560)
+texture = ExtResource("6_shell")
+scale = Vector2(2, 2)
 
-[node name="Arrow" type="ColorRect" parent="Decoration/Sign_YellowArrow"]
-offset_left = -40.0
-offset_top = -120.0
-offset_right = 60.0
-offset_bottom = -90.0
-color = Color(0.8, 0.733333, 0.2, 1)
-
-[node name="ArrowTip" type="ColorRect" parent="Decoration/Sign_YellowArrow"]
-offset_left = 60.0
-offset_top = -110.0
-offset_right = 80.0
-offset_bottom = -100.0
-color = Color(0.8, 0.733333, 0.2, 1)
-
-[node name="Shell_Pilgrim" type="Node2D" parent="Decoration"]
-position = Vector2(500, 1580)
-
-[node name="ShellBody" type="ColorRect" parent="Decoration/Shell_Pilgrim"]
-offset_left = -20.0
-offset_top = -25.0
-offset_right = 20.0
-offset_bottom = -5.0
-color = Color(0.933333, 0.866667, 0.733333, 1)
-
-[node name="Rope" type="ColorRect" parent="Decoration/Shell_Pilgrim"]
-offset_left = -2.0
-offset_top = -60.0
-offset_right = 2.0
-offset_bottom = -25.0
-color = Color(0.533333, 0.4, 0.266667, 1)
-
-[node name="Cross_Santiago" type="Node2D" parent="Decoration"]
-position = Vector2(1900, 1580)
-
-[node name="Vertical" type="ColorRect" parent="Decoration/Cross_Santiago"]
-offset_left = -8.0
-offset_top = -80.0
-offset_right = 8.0
-offset_bottom = -20.0
-color = Color(0.6, 0.4, 0.266667, 1)
-
-[node name="Horizontal" type="ColorRect" parent="Decoration/Cross_Santiago"]
-offset_left = -30.0
-offset_top = -60.0
-offset_right = 30.0
-offset_bottom = -45.0
-color = Color(0.6, 0.4, 0.266667, 1)
+[node name="Cross_Santiago" type="Sprite2D" parent="Decoration"]
+position = Vector2(1900, 1540)
+texture = ExtResource("7_cross")
+scale = Vector2(2, 2)
 
 [node name="Rock_WithSymbol" type="Node2D" parent="Decoration"]
 position = Vector2(2800, 1650)
