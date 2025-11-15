@@ -12,6 +12,7 @@ class_name ArcadeHUD
 @onready var weapon_label: Label = $HUDContainer/VBox/MiddleRow/WeaponLabel
 @onready var health_bar: ProgressBar = $HUDContainer/VBox/HealthBar
 @onready var weapon_durability_bar: ProgressBar = $HUDContainer/VBox/WeaponDurabilityBar
+@onready var combo_label: Label = $HUDContainer/VBox/ComboLabel
 
 # Data
 var current_score: int = 0
@@ -31,11 +32,15 @@ func _ready() -> void:
 func _setup_hud_style() -> void:
 	"""Setup arcade-style visual appearance"""
 	# Apply neon/fluorescent colors and outlines to all labels
-	for label in [score_label, high_score_label, weapon_label]:
+	for label in [score_label, high_score_label, weapon_label, combo_label]:
 		if label:
 			label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))  # White
 			label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 			label.add_theme_constant_override("outline_size", 2)
+
+	# Combo label starts hidden
+	if combo_label:
+		combo_label.visible = false
 
 
 func set_score(score: int) -> void:
@@ -131,3 +136,23 @@ func _update_weapon_display() -> void:
 	"""Update weapon display"""
 	if weapon_label:
 		weapon_label.text = "WEAPON: %s" % current_weapon
+
+
+func set_combo(combo_count: int, multiplier: float) -> void:
+	"""Update combo display"""
+	if not combo_label:
+		return
+
+	if combo_count > 1:
+		combo_label.visible = true
+		combo_label.text = "COMBO x%d  (%.1fx)" % [combo_count, multiplier]
+
+		# Color based on combo level
+		if combo_count >= 10:
+			combo_label.add_theme_color_override("font_color", Color(1.0, 0.2, 1.0))  # Magenta (epic)
+		elif combo_count >= 5:
+			combo_label.add_theme_color_override("font_color", Color(1.0, 0.8, 0.0))  # Gold (great)
+		else:
+			combo_label.add_theme_color_override("font_color", Color(0.2, 1.0, 1.0))  # Cyan (good)
+	else:
+		combo_label.visible = false

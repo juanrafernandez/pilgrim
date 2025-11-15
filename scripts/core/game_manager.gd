@@ -11,6 +11,8 @@ signal virtue_changed(new_virtue: int)
 signal level_completed(level_id: int, virtue_earned: int)
 signal lives_changed(new_lives: int)
 signal player_respawned()
+signal score_changed(new_score: int)
+signal combo_changed(combo_count: int, multiplier: float)
 
 # Enums
 enum GameState {
@@ -41,6 +43,15 @@ var current_level: int = 1
 var total_virtue: int = 0
 var lives: int = 3
 
+# Score system
+var current_score: int = 0
+var high_score: int = 0
+var combo_count: int = 0
+var combo_multiplier: float = 1.0
+var combo_timer: float = 0.0
+const COMBO_TIMEOUT: float = 3.0  # Seconds before combo resets
+const COMBO_INCREMENT: float = 0.5  # Multiplier increase per combo hit
+
 # Player stats
 var player_max_health: int = 100
 var player_current_health: int = 100
@@ -62,6 +73,14 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS  # Continue running when paused
 	_initialize_game()
 	print("GameManager initialized")
+
+
+func _process(delta: float) -> void:
+	# Update combo timer
+	if combo_count > 0 and combo_timer > 0:
+		combo_timer -= delta
+		if combo_timer <= 0:
+			_reset_combo()
 
 
 func _initialize_game() -> void:
@@ -261,3 +280,49 @@ func apply_hitstop(duration: float = 0.08) -> void:
 
 	Engine.time_scale = 1.0  # Resume normal time
 	is_hitstop_active = false
+
+
+## Score system methods
+func add_score(points: int) -> void:
+	"""Add points to score with current combo multiplier"""
+	var final_points = int(points * combo_multiplier)
+	current_score += final_points
+
+	# Update high score
+	if current_score > high_score:
+		high_score = current_score
+
+	score_changed.emit(current_score)
+	print("Score +%d (x%.1f multiplier) = %d points" % [points, combo_multiplier, final_points])
+
+
+func add_combo_hit() -> void:
+	"""Increment combo counter"""
+	combo_count += 1
+	combo_timer = COMBO_TIMEOUT
+
+	# Increase multiplier (caps at 5x)
+	combo_multiplier = min(1.0 + (combo_count - 1) * COMBO_INCREMENT, 5.0)
+
+	combo_changed.emit(combo_count, combo_multiplier)
+
+	if combo_count > 1:
+		print("COMBO x%d! Multiplier: %.1fx" % [combo_count, combo_multiplier])
+
+
+func _reset_combo() -> void:
+	"""Reset combo counter"""
+	if combo_count > 1:
+		print("Combo ended at x%d" % combo_count)
+
+	combo_count = 0
+	combo_multiplier = 1.0
+	combo_timer = 0.0
+	combo_changed.emit(0, 1.0)
+
+
+func reset_score() -> void:
+	"""Reset current score (for new game/level)"""
+	current_score = 0
+	_reset_combo()
+	score_changed.emit(current_score)

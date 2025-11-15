@@ -28,11 +28,14 @@ func _ready() -> void:
 	player.health_changed.connect(_on_player_health_changed)
 	player.died.connect(_on_player_died)
 	player.weapon_changed.connect(_on_player_weapon_changed)
+	player.weapon_durability_changed.connect(_on_weapon_durability_changed)
 
 	# Connect GameManager signals
 	GameManager.lives_changed.connect(_on_lives_changed)
 	GameManager.player_respawned.connect(_on_player_respawned)
 	GameManager.game_state_changed.connect(_on_game_state_changed)
+	GameManager.score_changed.connect(_on_score_changed)
+	GameManager.combo_changed.connect(_on_combo_changed)
 
 	# Connect death zone
 	death_zone.body_entered.connect(_on_death_zone_entered)
@@ -82,9 +85,13 @@ func _update_enemy_count() -> void:
 func _update_ui() -> void:
 	"""Update UI elements"""
 	arcade_hud.set_health(player.current_health, player.max_health)
-	arcade_hud.set_score(0)  # TODO: Implement score system
+	arcade_hud.set_score(GameManager.current_score)
 	arcade_hud.set_lives(GameManager.lives)
 	arcade_hud.set_weapon(player.get_weapon_name())
+
+	# Update weapon durability if weapon is equipped
+	if player.equipped_weapon:
+		arcade_hud.set_weapon_durability(player.equipped_weapon.current_durability, player.equipped_weapon.max_durability)
 
 
 func _update_debug_info() -> void:
@@ -124,10 +131,17 @@ func _on_player_died() -> void:
 	print("Player died in enemy test scene")
 
 
-func _on_player_weapon_changed(new_weapon: Player.WeaponType) -> void:
+func _on_player_weapon_changed(new_weapon: Weapon) -> void:
 	"""Handle weapon changed from player"""
 	arcade_hud.set_weapon(player.get_weapon_name())
+	if new_weapon:
+		arcade_hud.set_weapon_durability(new_weapon.current_durability, new_weapon.max_durability)
 	print("Weapon changed to: %s" % player.get_weapon_name())
+
+
+func _on_weapon_durability_changed(current: int, maximum: int) -> void:
+	"""Handle weapon durability changed"""
+	arcade_hud.set_weapon_durability(current, maximum)
 
 
 func _on_death_zone_entered(body: Node2D) -> void:
@@ -225,3 +239,13 @@ func _show_game_over_screen() -> void:
 	await get_tree().create_timer(3.0).timeout
 	print("Returning to main menu (or reload scene)")
 	# TODO: SceneManager.load_scene("res://scenes/main/main_menu.tscn")
+
+
+func _on_score_changed(new_score: int) -> void:
+	"""Handle score changed from GameManager"""
+	arcade_hud.set_score(new_score)
+
+
+func _on_combo_changed(combo_count: int, multiplier: float) -> void:
+	"""Handle combo changed from GameManager"""
+	arcade_hud.set_combo(combo_count, multiplier)

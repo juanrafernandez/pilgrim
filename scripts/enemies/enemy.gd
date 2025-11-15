@@ -32,6 +32,7 @@ var attack_damage: int = 10
 var attack_range: float = 60.0
 var detection_range: float = 400.0
 var lose_player_range: float = 600.0
+var score_value: int = 100  # Points awarded when killed
 
 # Movement capabilities
 var can_jump: bool = false  # Can this enemy jump?
@@ -348,6 +349,10 @@ func die() -> void:
 	died.emit()
 
 	print("%s died" % name)
+
+	# Award score to player
+	GameManager.add_score(score_value)
+	GameManager.add_combo_hit()
 
 	# Fade out and remove
 	_death_animation()
