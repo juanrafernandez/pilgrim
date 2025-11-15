@@ -40,6 +40,9 @@ const PROJECTILE_COOLDOWN: float = 0.5
 # Projectile scenes
 const PROJECTILE_DAGGER = preload("res://scenes/projectiles/projectile_dagger.tscn")
 
+# Weapon/Shield class references
+const Shield = preload("res://scripts/weapons/shield.gd")
+
 # State
 var current_phase: GameManager.PlayerPhase = GameManager.PlayerPhase.CHILD
 var max_health: int = 100
@@ -58,7 +61,7 @@ var projectile_cooldown_timer: float = 0.0
 var shield: Shield = null  # Shield for blocking and parrying
 
 # References
-@onready var sprite: ColorRect = $Sprite
+@onready var sprite: AnimatedSprite2D = $Sprite
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var state_machine: PlayerStateMachine = $StateMachine
 
@@ -519,22 +522,22 @@ func _setup_phase(phase: GameManager.PlayerPhase) -> void:
 		GameManager.PlayerPhase.CHILD:
 			max_health = 80
 			attack_damage = 8
-			sprite.color = Color(0.3, 0.8, 0.3)  # Green
+			sprite.modulate = Color(0.3, 0.8, 0.3)  # Green
 
 		GameManager.PlayerPhase.ADOLESCENT:
 			max_health = 100
 			attack_damage = 12
-			sprite.color = Color(0.2, 0.5, 0.9)  # Blue
+			sprite.modulate = Color(0.2, 0.5, 0.9)  # Blue
 
 		GameManager.PlayerPhase.KNIGHT:
 			max_health = 150
 			attack_damage = 20
-			sprite.color = Color(0.95, 0.95, 0.95)  # White (templar)
+			sprite.modulate = Color(0.95, 0.95, 0.95)  # White (templar)
 
 		GameManager.PlayerPhase.ELDER:
 			max_health = 120
 			attack_damage = 15
-			sprite.color = Color(0.7, 0.7, 0.7)  # Gray
+			sprite.modulate = Color(0.7, 0.7, 0.7)  # Gray
 
 	# Restore health to new max
 	current_health = max_health

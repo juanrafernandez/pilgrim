@@ -68,7 +68,7 @@ var patrol_timer: float = 0.0
 var attack_timer: float = 0.0
 
 # Nodes (to be set by child classes or scene)
-@onready var sprite: ColorRect = $Sprite if has_node("Sprite") else null
+@onready var sprite: AnimatedSprite2D = $Sprite if has_node("Sprite") else null
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var detection_area: Area2D = $DetectionArea if has_node("DetectionArea") else null
 @onready var contact_area: Area2D = $ContactArea if has_node("ContactArea") else null

@@ -6,6 +6,9 @@ extends PlayerState
 
 func _state_enter() -> void:
 	player.velocity.x = 0
+	# Play idle animation
+	if player.sprite:
+		player.sprite.play("idle")
 
 
 func _state_physics_update(delta: float) -> void:

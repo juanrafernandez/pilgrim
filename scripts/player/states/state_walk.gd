@@ -4,6 +4,12 @@ extends PlayerState
 ## Player is moving horizontally on the ground
 
 
+func _state_enter() -> void:
+	# Play walk animation
+	if player.sprite:
+		player.sprite.play("walk")
+
+
 func _state_physics_update(delta: float) -> void:
 	# Apply gravity
 	apply_gravity(delta)

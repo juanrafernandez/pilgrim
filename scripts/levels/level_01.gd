@@ -17,12 +17,21 @@ const LEVEL_NAME = "El Inicio del Camino"
 @onready var wolf_3b = $Enemies/Wolf3B
 @onready var wolf_4a = $Enemies/Wolf4A
 @onready var wolf_4b = $Enemies/Wolf4B
+@onready var wolf_5a = $Enemies/Wolf5A
+@onready var wolf_5b = $Enemies/Wolf5B
+@onready var wolf_6 = $Enemies/Wolf6
+@onready var wolf_7a = $Enemies/Wolf7A
+@onready var wolf_7b = $Enemies/Wolf7B
+@onready var wolf_8 = $Enemies/Wolf8
 
 # Trigger references
 @onready var trigger_wolf1 = $Triggers/TriggerWolf1
 @onready var trigger_wolf2 = $Triggers/TriggerWolf2
 @onready var trigger_section3 = $Triggers/TriggerSection3
 @onready var trigger_section4 = $Triggers/TriggerSection4
+@onready var trigger_section5 = $Triggers/TriggerSection5
+@onready var trigger_section6 = $Triggers/TriggerSection6
+@onready var trigger_section7 = $Triggers/TriggerSection7
 @onready var trigger_end = $Triggers/TriggerEnd
 
 func _ready() -> void:
@@ -45,6 +54,9 @@ func _connect_triggers() -> void:
 	trigger_wolf2.body_entered.connect(_on_trigger_wolf2_entered)
 	trigger_section3.body_entered.connect(_on_trigger_section3_entered)
 	trigger_section4.body_entered.connect(_on_trigger_section4_entered)
+	trigger_section5.body_entered.connect(_on_trigger_section5_entered)
+	trigger_section6.body_entered.connect(_on_trigger_section6_entered)
+	trigger_section7.body_entered.connect(_on_trigger_section7_entered)
 	trigger_end.body_entered.connect(_on_trigger_end_entered)
 
 func _deactivate_all_enemies() -> void:
@@ -82,15 +94,40 @@ func _on_trigger_section3_entered(body: Node2D) -> void:
 		trigger_section3.queue_free()
 
 func _on_trigger_section4_entered(body: Node2D) -> void:
-	"""Section 4: Final challenge - two simultaneous wolves"""
+	"""Section 4: Two simultaneous wolves"""
 	if body.is_in_group("player"):
 		_activate_enemy(wolf_4a)
 		_activate_enemy(wolf_4b)
 		trigger_section4.queue_free()
 
+func _on_trigger_section5_entered(body: Node2D) -> void:
+	"""Section 5: Two wolves with delay"""
+	if body.is_in_group("player"):
+		_activate_enemy(wolf_5a)
+		await get_tree().create_timer(1.0).timeout
+		_activate_enemy(wolf_5b)
+		trigger_section5.queue_free()
+
+func _on_trigger_section6_entered(body: Node2D) -> void:
+	"""Section 6: Single wolf"""
+	if body.is_in_group("player"):
+		_activate_enemy(wolf_6)
+		trigger_section6.queue_free()
+
+func _on_trigger_section7_entered(body: Node2D) -> void:
+	"""Section 7: Final two wolves before end"""
+	if body.is_in_group("player"):
+		_activate_enemy(wolf_7a)
+		await get_tree().create_timer(0.8).timeout
+		_activate_enemy(wolf_7b)
+		trigger_section7.queue_free()
+
 func _on_trigger_end_entered(body: Node2D) -> void:
 	"""Level complete trigger"""
 	if body.is_in_group("player"):
+		# Activate final wolf for dramatic finish
+		_activate_enemy(wolf_8)
+		await get_tree().create_timer(2.0).timeout
 		_complete_level()
 
 func _complete_level() -> void:

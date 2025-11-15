@@ -10,6 +10,10 @@ func _state_enter() -> void:
 	attack_timer = 0.0
 	player.attack()  # Trigger attack
 
+	# Play attack animation
+	if player.sprite:
+		player.sprite.play("attack")
+
 
 func _state_physics_update(delta: float) -> void:
 	attack_timer += delta
