@@ -85,11 +85,7 @@ var last_contact_damage_time: float = 0.0
 var is_recoiling: bool = false  # Flag to prevent AI from overriding recoil
 var recoil_timer: float = 0.0  # Time remaining in recoil
 var recoil_duration: float = 0.15  # How long recoil lasts (short bounce)
-
-# Direction change cooldown (FIX for enemies flipping while player in air)
-var direction_change_cooldown: float = 0.3  # Minimum time between direction changes
-var last_direction_change_time: float = 0.0  # Time of last direction change
-var current_chase_direction: int = 1  # Current chase direction (1 or -1)
+var return_to_patrol_after_recoil: bool = false  # After recoil, return to patrol mode
 
 
 func _ready() -> void:
@@ -128,6 +124,13 @@ func _physics_process(delta: float) -> void:
 		recoil_timer -= delta
 		if recoil_timer <= 0:
 			is_recoiling = false  # Recoil finished, AI can control movement again
+
+			# After recoil from contact, return to patrol (vaca vuelve a caminar normal)
+			if return_to_patrol_after_recoil:
+				return_to_patrol_after_recoil = false
+				target = null  # Stop tracking target
+				change_state(State.PATROL)
+				print("%s: Recoil finished, returning to patrol" % name)
 
 	# AI behavior based on state (but skip if recoiling)
 	if not is_recoiling:
@@ -236,7 +239,7 @@ func _ai_patrol(delta: float) -> void:
 
 
 func _ai_chase(delta: float) -> void:
-	"""Chase target behavior (DECOUPLED - works with any damageable entity)"""
+	"""Chase target behavior - only chase if target is IN FRONT"""
 	# Check if target is still valid and alive
 	if not target or (target.has_method("is_dead") and target.is_dead):
 		change_state(State.IDLE)
@@ -245,6 +248,18 @@ func _ai_chase(delta: float) -> void:
 	# Check if target is too far
 	if not _is_target_in_range(lose_player_range):
 		target_lost.emit()
+		target = null
+		change_state(State.PATROL)
+		return
+
+	# FIX: Check if target is BEHIND the enemy (player jumped over enemy)
+	# Enemy should only chase if target is in front
+	var direction_to_target = sign(target.global_position.x - global_position.x)
+	var facing_direction = 1 if facing_right else -1
+
+	if direction_to_target != facing_direction:
+		# Target is behind us - stop chasing, return to normal patrol
+		print("%s: Target is behind me, returning to patrol" % name)
 		target = null
 		change_state(State.PATROL)
 		return
@@ -266,26 +281,9 @@ func _ai_chase(delta: float) -> void:
 			change_state(State.IDLE)
 			return
 
-	# Move towards target (FIX: use direction cooldown to prevent constant flipping)
-	var current_time = Time.get_ticks_msec() / 1000.0
-
-	# Calculate ideal direction
-	var ideal_direction = sign(target.global_position.x - global_position.x)
-
-	# Only update direction if enough time has passed OR direction is same
-	if ideal_direction != current_chase_direction:
-		# Direction would change - check cooldown
-		if current_time - last_direction_change_time >= direction_change_cooldown:
-			# Cooldown elapsed, can change direction
-			current_chase_direction = ideal_direction
-			last_direction_change_time = current_time
-			print("%s changed chase direction" % name)
-	else:
-		# Direction is same, just update it
-		current_chase_direction = ideal_direction
-
-	# Apply movement in current direction
-	velocity.x = current_chase_direction * chase_speed
+	# Move towards target (simple, no cooldown - target is in front)
+	var direction = sign(target.global_position.x - global_position.x)
+	velocity.x = direction * chase_speed
 	_update_sprite_direction()
 
 
@@ -511,12 +509,6 @@ func change_state(new_state: State) -> void:
 		return
 
 	current_state = new_state
-
-	# Initialize chase direction when entering CHASE state
-	if new_state == State.CHASE and target:
-		current_chase_direction = sign(target.global_position.x - global_position.x)
-		last_direction_change_time = Time.get_ticks_msec() / 1000.0
-
 	# print("%s: State changed to %s" % [name, State.keys()[new_state]])
 
 
@@ -572,12 +564,13 @@ func _on_body_entered_contact(body: Node2D) -> void:
 		velocity.x = enemy_recoil_velocity
 		is_recoiling = true
 		recoil_timer = recoil_duration  # Lock AI for 0.15 seconds
+		return_to_patrol_after_recoil = true  # FIX: After recoil, return to patrol
 
 		# Lighter screenshake for contact damage (duck typing check for camera)
 		if body.has_method("get") and body.get("camera_controller"):
 			body.camera_controller.add_trauma(0.2)  # Lighter shake than normal hits
 
-		print("%s dealt %d contact damage and recoiled (%.1fs)" % [name, contact_damage, recoil_duration])
+		print("%s dealt %d contact damage and recoiled - will return to patrol" % [name, contact_damage])
 
 
 func _on_body_exited_contact(body: Node2D) -> void:
