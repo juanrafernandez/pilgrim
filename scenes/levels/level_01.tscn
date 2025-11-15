@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://b8xm3k9p2vwq1"]
+[gd_scene load_steps=49 format=3 uid="uid://b8xm3k9p2vwq1"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_01.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="2_player"]
@@ -24,6 +24,12 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/tiled/platform_250x32.png" id="22_plat250"]
 [ext_resource type="Texture2D" path="res://assets/tiles/tiled/platform_180x32.png" id="23_plat180"]
 [ext_resource type="Texture2D" path="res://assets/tiles/tiled/bridge_300x40.png" id="24_bridge"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/natural/rock_small.png" id="25_rock_small"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/natural/rock_medium.png" id="26_rock_med"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/natural/rock_large.png" id="27_rock_large"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/natural/bush.png" id="28_bush"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/natural/grass_tuft.png" id="29_grass"]
+[ext_resource type="Texture2D" path="res://assets/sprites/decorations/natural/stone_marker.png" id="30_marker"]
 
 [sub_resource type="RectangleShape2D" id="trigger_shape"]
 size = Vector2(100, 300)
@@ -87,6 +93,12 @@ size = Vector2(1400, 220)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_deathzone"]
 size = Vector2(10000, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rock_small"]
+size = Vector2(28, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rock_medium"]
+size = Vector2(44, 28)
 
 [node name="Level01" type="Node2D"]
 script = ExtResource("1_script")
@@ -424,44 +436,153 @@ color = Color(0.8, 0.2, 0.2, 1)
 [node name="Trees" type="Node2D" parent="Decoration"]
 
 [node name="Tree1" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(700, 1640)
+position = Vector2(700, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
 
 [node name="Tree2" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(1400, 1640)
+position = Vector2(1400, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
 
 [node name="Tree3" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(2200, 1640)
+position = Vector2(2200, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
 
 [node name="Tree4" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(3200, 1640)
+position = Vector2(3200, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
 
 [node name="Tree5" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(4800, 1640)
+position = Vector2(4800, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
 
 [node name="Tree6" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(5900, 1640)
+position = Vector2(5900, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
 
 [node name="Tree7" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(7100, 1640)
+position = Vector2(7100, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
 
 [node name="Tree8" type="Sprite2D" parent="Decoration/Trees"]
-position = Vector2(8000, 1640)
+position = Vector2(8000, 1580)
 texture = ExtResource("12_tree")
 scale = Vector2(2, 2)
+
+[node name="NaturalElements" type="Node2D" parent="Decoration"]
+z_index = -10
+
+[node name="Bush1" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(300, 1684)
+texture = ExtResource("28_bush")
+
+[node name="Bush2" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(1800, 1684)
+texture = ExtResource("28_bush")
+
+[node name="Bush3" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(3500, 1684)
+texture = ExtResource("28_bush")
+
+[node name="Bush4" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(5200, 1684)
+texture = ExtResource("28_bush")
+
+[node name="Bush5" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(6700, 1684)
+texture = ExtResource("28_bush")
+
+[node name="GrassTuft1" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(450, 1694)
+texture = ExtResource("29_grass")
+
+[node name="GrassTuft2" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(950, 1694)
+texture = ExtResource("29_grass")
+
+[node name="GrassTuft3" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(2450, 1694)
+texture = ExtResource("29_grass")
+
+[node name="GrassTuft4" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(4100, 1694)
+texture = ExtResource("29_grass")
+
+[node name="GrassTuft5" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(5650, 1694)
+texture = ExtResource("29_grass")
+
+[node name="GrassTuft6" type="Sprite2D" parent="Decoration/NaturalElements"]
+position = Vector2(7800, 1694)
+texture = ExtResource("29_grass")
+
+[node name="Obstacles" type="Node2D" parent="Decoration"]
+
+[node name="Rock1Small" type="StaticBody2D" parent="Decoration/Obstacles"]
+position = Vector2(850, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="Sprite2D" parent="Decoration/Obstacles/Rock1Small"]
+position = Vector2(0, -12)
+texture = ExtResource("25_rock_small")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decoration/Obstacles/Rock1Small"]
+shape = SubResource("RectangleShape2D_rock_small")
+
+[node name="Rock2Medium" type="StaticBody2D" parent="Decoration/Obstacles"]
+position = Vector2(2900, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="Sprite2D" parent="Decoration/Obstacles/Rock2Medium"]
+position = Vector2(0, -16)
+texture = ExtResource("26_rock_med")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decoration/Obstacles/Rock2Medium"]
+shape = SubResource("RectangleShape2D_rock_medium")
+
+[node name="Rock3Small" type="StaticBody2D" parent="Decoration/Obstacles"]
+position = Vector2(4200, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="Sprite2D" parent="Decoration/Obstacles/Rock3Small"]
+position = Vector2(0, -12)
+texture = ExtResource("25_rock_small")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decoration/Obstacles/Rock3Small"]
+shape = SubResource("RectangleShape2D_rock_small")
+
+[node name="Rock4Medium" type="StaticBody2D" parent="Decoration/Obstacles"]
+position = Vector2(6250, 1700)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite" type="Sprite2D" parent="Decoration/Obstacles/Rock4Medium"]
+position = Vector2(0, -16)
+texture = ExtResource("26_rock_med")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decoration/Obstacles/Rock4Medium"]
+shape = SubResource("RectangleShape2D_rock_medium")
+
+[node name="StoneMarker1" type="Sprite2D" parent="Decoration/Obstacles"]
+position = Vector2(1000, 1684)
+texture = ExtResource("30_marker")
+
+[node name="StoneMarker2" type="Sprite2D" parent="Decoration/Obstacles"]
+position = Vector2(3800, 1684)
+texture = ExtResource("30_marker")
+
+[node name="StoneMarker3" type="Sprite2D" parent="Decoration/Obstacles"]
+position = Vector2(7500, 1684)
+texture = ExtResource("30_marker")
 
 [node name="FinalLight" type="ColorRect" parent="Decoration"]
 offset_left = 8300.0
