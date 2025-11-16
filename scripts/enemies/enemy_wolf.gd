@@ -253,29 +253,37 @@ func _perform_attack() -> void:
 
 func _on_body_entered_contact(body: Node2D) -> void:
 	"""WOLF-SPECIFIC contact behavior - stays in CHASE after contact (different from base Enemy)"""
+	print(">>> [%s] body_entered_contact called | is_recoiling=%s | immunity=%.2f" % [name, is_recoiling, contact_immunity_timer])
+
 	# Duck typing: check if body can take damage and is in player group
 	if not body.has_method("take_damage") or not body.is_in_group("player"):
+		print(">>> [%s] SKIP: Not player" % name)
 		return
 
 	# Check if target is dead using duck typing
 	if (body.has_method("is_dead") and body.is_dead) or is_dead:
+		print(">>> [%s] SKIP: Dead" % name)
 		return
 
 	# Don't trigger contact damage while already recoiling (prevents multiple bounces)
 	if is_recoiling:
+		print(">>> [%s] SKIP: Already recoiling" % name)
 		return
 
 	# WOLF-SPECIFIC: Don't trigger contact if in immunity period after previous recoil
 	if contact_immunity_timer > 0:
+		print(">>> [%s] SKIP: Immunity active (%.2fs remaining)" % [name, contact_immunity_timer])
 		return
 
 	# Only deal contact damage in CHASE state (wolf-specific)
 	if current_state != State.CHASE:
+		print(">>> [%s] SKIP: Not in CHASE state (state=%d)" % [name, current_state])
 		return
 
 	# Check if enough time has passed since last contact damage
 	var current_time = Time.get_ticks_msec() / 1000.0
 	if current_time - last_contact_damage_time >= contact_damage_cooldown:
+		print(">>> [%s] *** CONTACT DAMAGE TRIGGERED ***" % name)
 		# Deal contact damage
 		var knockback_dir = sign(body.global_position.x - global_position.x)
 		var knockback = Vector2(knockback_dir * 250, -350)  # Softer than attacks
