@@ -253,12 +253,12 @@ func _on_body_entered_contact(body: Node2D) -> void:
 
 		# Enemy recoils with a short bounce
 		var enemy_recoil_dir = -knockback_dir  # Opposite direction
-		var enemy_recoil_velocity = enemy_recoil_dir * 200.0  # Short, snappy recoil
+		var enemy_recoil_velocity = enemy_recoil_dir * 300.0  # Stronger recoil to separate from player
 
 		# Apply recoil impulse and activate recoil state
 		velocity.x = enemy_recoil_velocity
 		is_recoiling = true
-		recoil_timer = recoil_duration  # Lock AI for 0.15 seconds
+		recoil_timer = 0.4  # Longer cooldown (0.4s instead of 0.15s)
 
 		# WOLF-SPECIFIC: Reset chase timer and STAY in CHASE (don't go to PATROL)
 		chase_timer = CHASE_DURATION

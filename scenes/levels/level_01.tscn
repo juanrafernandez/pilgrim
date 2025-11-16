@@ -1,9 +1,10 @@
-[gd_scene load_steps=42 format=3 uid="uid://b8xm3k9p2vwq1"]
+[gd_scene load_steps=43 format=3 uid="uid://b8xm3k9p2vwq1"]
 
 [ext_resource type="Script" path="res://scripts/levels/level_01.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://bpf5qr1j0mjf8" path="res://scenes/characters/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="3_camera"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/enemy_wolf.tscn" id="4_wolf"]
+[ext_resource type="PackedScene" uid="uid://cow123456" path="res://scenes/enemies/enemy_cow.tscn" id="4_cow"]
 [ext_resource type="Texture2D" path="res://assets/backgrounds/sky_gradient.png" id="5_sky"]
 [ext_resource type="Texture2D" path="res://assets/backgrounds/clouds.png" id="6_clouds"]
 [ext_resource type="Texture2D" path="res://assets/backgrounds/mountains_far.png" id="7_mountains_far"]
@@ -476,10 +477,10 @@ color = Color(1, 0.933333, 0.733333, 0.4)
 [node name="Wolf1" parent="Enemies" instance=ExtResource("4_wolf")]
 position = Vector2(650, 1600)
 
-[node name="Wolf2" parent="Enemies" instance=ExtResource("4_wolf")]
+[node name="Cow2" parent="Enemies" instance=ExtResource("4_cow")]
 position = Vector2(1600, 1480)
 
-[node name="Wolf3A" parent="Enemies" instance=ExtResource("4_wolf")]
+[node name="Cow3A" parent="Enemies" instance=ExtResource("4_cow")]
 position = Vector2(2450, 1430)
 
 [node name="Wolf3B" parent="Enemies" instance=ExtResource("4_wolf")]
@@ -491,13 +492,13 @@ position = Vector2(3300, 1600)
 [node name="Wolf4B" parent="Enemies" instance=ExtResource("4_wolf")]
 position = Vector2(3850, 1600)
 
-[node name="Wolf5A" parent="Enemies" instance=ExtResource("4_wolf")]
+[node name="Cow5A" parent="Enemies" instance=ExtResource("4_cow")]
 position = Vector2(5000, 1600)
 
 [node name="Wolf5B" parent="Enemies" instance=ExtResource("4_wolf")]
 position = Vector2(5600, 1530)
 
-[node name="Wolf6" parent="Enemies" instance=ExtResource("4_wolf")]
+[node name="Cow6" parent="Enemies" instance=ExtResource("4_cow")]
 position = Vector2(6500, 1600)
 
 [node name="Wolf7A" parent="Enemies" instance=ExtResource("4_wolf")]
