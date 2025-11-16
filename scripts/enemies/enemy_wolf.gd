@@ -57,12 +57,6 @@ func _ready() -> void:
 func change_state(new_state: State) -> void:
 	"""Override to initialize chase timer when entering CHASE (WOLF-SPECIFIC)"""
 	var old_state = current_state
-
-	# CRITICAL: Reset velocity when exiting ATTACK state to prevent backward drift
-	if old_state == State.ATTACK:
-		velocity.x = 0
-		print("%s: Exiting ATTACK, velocity reset to 0" % name)
-
 	super.change_state(new_state)
 
 	# Initialize chase timer when entering CHASE from non-CHASE state
@@ -176,10 +170,8 @@ func _ai_chase(delta: float) -> void:
 		change_state(State.PATROL)
 		return
 
-	# Check if in attack range
-	if _is_target_in_range(attack_range) and can_attack:
-		change_state(State.ATTACK)
-		return
+	# REMOVED: No longer enters ATTACK state - wolf only uses contact damage
+	# Wolf chases continuously and damages on contact via ContactArea
 
 	# INERTIA SYSTEM: When player jumps over wolf
 	var direction_to_target = sign(target.global_position.x - global_position.x)
@@ -243,18 +235,6 @@ func _ai_chase(delta: float) -> void:
 
 	velocity.x = direction * chase_speed * speed_multiplier
 	_update_sprite_direction()
-
-
-func _perform_attack() -> void:
-	"""Wolf lunges at target (UPDATED for decoupled base class)"""
-	# Lunge forward only if target exists
-	if target:
-		var direction = sign(target.global_position.x - global_position.x)
-		velocity.x = direction * 400.0  # Lunge speed
-
-	super._perform_attack()
-
-	# NOTE: ATTACK does NOT reset chase timer (only contact does)
 
 
 func _on_body_entered_contact(body: Node2D) -> void:
