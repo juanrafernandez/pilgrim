@@ -79,6 +79,24 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
+	# WOLF-SPECIFIC: Handle recoil completely (don't let parent handle it)
+	if is_recoiling:
+		recoil_timer -= delta
+		if recoil_timer <= 0:
+			# Recoil just finished - activate immunity period
+			is_recoiling = false
+			contact_immunity_timer = CONTACT_IMMUNITY_DURATION
+			print("%s: Recoil finished, immunity active for %.1fs" % [name, CONTACT_IMMUNITY_DURATION])
+		else:
+			# Still recoiling - slow down the velocity
+			velocity.x = move_toward(velocity.x, 0, move_speed * delta * 3)
+
+		# Apply gravity and movement during recoil
+		if not is_on_floor():
+			velocity.y += ProjectSettings.get_setting("physics/2d/default_gravity") * delta
+		move_and_slide()
+		return  # Don't call parent - we handled everything
+
 	# Update chase timer if in CHASE state
 	if current_state == State.CHASE:
 		chase_timer -= delta
@@ -91,18 +109,7 @@ func _physics_process(delta: float) -> void:
 			change_state(State.IDLE)
 			return
 
-	# WOLF-SPECIFIC: Handle recoil timer to activate immunity after recoil ends
-	if is_recoiling and recoil_timer > 0:
-		recoil_timer -= delta
-		if recoil_timer <= 0:
-			# Recoil just finished - activate immunity period
-			is_recoiling = false
-			contact_immunity_timer = CONTACT_IMMUNITY_DURATION
-			print("%s: Recoil finished, immunity active for %.1fs" % [name, CONTACT_IMMUNITY_DURATION])
-			# Don't return to patrol (wolf stays in chase)
-			return  # Skip parent processing since we handled recoil
-
-	# Call parent physics process
+	# Call parent physics process (only if not recoiling)
 	super._physics_process(delta)
 
 
