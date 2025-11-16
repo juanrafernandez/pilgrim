@@ -85,8 +85,9 @@ func _physics_process(delta: float) -> void:
 		if recoil_timer <= 0:
 			# Recoil just finished - activate immunity period
 			is_recoiling = false
+			velocity.x = 0  # CRITICAL: Reset velocity to stop backward movement
 			contact_immunity_timer = CONTACT_IMMUNITY_DURATION
-			print("%s: Recoil finished, immunity active for %.1fs" % [name, CONTACT_IMMUNITY_DURATION])
+			print("%s: Recoil finished, velocity reset, immunity active for %.1fs" % [name, CONTACT_IMMUNITY_DURATION])
 		else:
 			# Still recoiling - slow down the velocity
 			velocity.x = move_toward(velocity.x, 0, move_speed * delta * 3)
