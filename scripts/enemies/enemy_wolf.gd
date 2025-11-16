@@ -156,6 +156,15 @@ func _ai_relax(delta: float) -> void:
 
 func _ai_chase(delta: float) -> void:
 	"""Wolf chases aggressively with inertia when player jumps over (WOLF-SPECIFIC)"""
+	# WOLF-SPECIFIC: Reset any residual backward velocity when entering chase
+	# (prevents backward drift after ATTACK state)
+	if velocity.x < 0 and target and target.global_position.x > global_position.x:
+		# Moving left but target is to the right - reset
+		velocity.x = 0
+	elif velocity.x > 0 and target and target.global_position.x < global_position.x:
+		# Moving right but target is to the left - reset
+		velocity.x = 0
+
 	# Check if target is still valid
 	if not target or (target.has_method("is_dead") and target.is_dead):
 		chase_timer = 0
