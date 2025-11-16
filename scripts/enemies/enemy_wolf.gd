@@ -18,6 +18,10 @@ var inertia_distance_traveled: float = 0.0  # Distance traveled in inertia
 const INERTIA_DISTANCE: float = 70.0  # Wolf's length in pixels
 var inertia_last_position: Vector2 = Vector2.ZERO
 
+# Contact cooldown (prevent immediate re-contact after recoil)
+var contact_immunity_timer: float = 0.0  # Prevents contact immediately after recoil
+const CONTACT_IMMUNITY_DURATION: float = 0.6  # Can't contact for 0.6s after recoil ends
+
 
 func _ready() -> void:
 	# Wolf stats (fast, aggressive)
@@ -62,6 +66,10 @@ func change_state(new_state: State) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# Update contact immunity timer
+	if contact_immunity_timer > 0:
+		contact_immunity_timer -= delta
+
 	# Handle RELAX state (wolf-specific, not in base Enemy)
 	if en_relax:
 		_ai_relax(delta)
@@ -82,6 +90,17 @@ func _physics_process(delta: float) -> void:
 			target = null
 			change_state(State.IDLE)
 			return
+
+	# WOLF-SPECIFIC: Handle recoil timer to activate immunity after recoil ends
+	if is_recoiling and recoil_timer > 0:
+		recoil_timer -= delta
+		if recoil_timer <= 0:
+			# Recoil just finished - activate immunity period
+			is_recoiling = false
+			contact_immunity_timer = CONTACT_IMMUNITY_DURATION
+			print("%s: Recoil finished, immunity active for %.1fs" % [name, CONTACT_IMMUNITY_DURATION])
+			# Don't return to patrol (wolf stays in chase)
+			return  # Skip parent processing since we handled recoil
 
 	# Call parent physics process
 	super._physics_process(delta)
@@ -236,6 +255,10 @@ func _on_body_entered_contact(body: Node2D) -> void:
 
 	# Don't trigger contact damage while already recoiling (prevents multiple bounces)
 	if is_recoiling:
+		return
+
+	# WOLF-SPECIFIC: Don't trigger contact if in immunity period after previous recoil
+	if contact_immunity_timer > 0:
 		return
 
 	# Only deal contact damage in CHASE state (wolf-specific)
